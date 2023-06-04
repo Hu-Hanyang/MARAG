@@ -1,6 +1,8 @@
 # Multi-Agent Reach-Avoid Games (MARAG)
 This repository contains the implementation of the paper "Multi-Agent Reach-Avoid Games: Two Attackers Versus One Defender and Mixed Integer Programming (2023 CDC under review)". This implementation is based on the [OptimizedDP library](https://github.com/SFU-MARS/optimized_dp) developed by the MARS lab, Simon Fraser University.
 
+The codes are being refactoring. Use the "debug_speed" branch to get the same results now.
+
 # Details to Reimplement
 ## Step 1: Set Dynamics
 The dynamics of attackers and defenders (including the maximum speed) in different reach-avoid games are in files ``AttackerDefender1v0.py``, ``AttackerDefender1v1.py`` and ``AttackerDefender2v1.py``. 
