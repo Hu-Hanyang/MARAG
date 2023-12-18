@@ -131,6 +131,11 @@ print("The game is over. \n")
 print(f"The results of the selected is {capture_decisions}. \n")
 print(f"The final captured_status of all attackers is {attackers_status_logs[-1]}. \n")
 
+
+# Play the animation
+animation_2v1(attackers_trajectory, defenders_trajectory, attackers_status_logs, T)
+
+
 # plot the trajectories
 # plot_simulation(attackers_x, attackers_y, defenders_x, defenders_y)
 

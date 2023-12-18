@@ -138,10 +138,9 @@ print("The game is over. \n")
 print(f"The results of the selected is {capture_decisions}. \n")
 print(f"The final captured_status of all attackers is {attackers_status_logs[-1]}. \n")
 
-# plot the trajectories
-t_slice = [0, 44, 68, 111, 149, 206, 206]
-mips = [[[0, 1], [2, 4]], [[0, 1], [2]], [[1, 3], [2]], [[1, 2], []], [[2], []]]
-# total simulation time t = 
+
+# Play the animation
+animation_2v1(attackers_trajectory, defenders_trajectory, attackers_status_logs, T)
 
 # plot the trajectories seperately  T = [0.120s (24, A4 by D1), 0.280s (56 A0 by D0), 0.460s (92 A3 by D0), 0.525s (106 A5 by D0), 0.700s (140 A1 by D0), 0.955s (191 A2 by D0)]
 if T == 0.120: 

@@ -134,6 +134,9 @@ print(f"The final captured_status of all attackers is {attackers_status_logs[-1]
 # plot the trajectories
 # plot_simulation(attackers_x, attackers_y, defenders_x, defenders_y)
 
+# Play the animation
+animation_2v1(attackers_trajectory, defenders_trajectory, attackers_status_logs, T)
+
 # plot the trajectories seperately T = [0.53s (106 A0 by D0) ,0.785s(156 A1 arrives)]
 if T == 0.53:  # 100
     plot_simulation2v1_b1(attackers_x, attackers_y, defenders_x, defenders_y)  
