@@ -55,11 +55,11 @@ def check1v1(value1v1, joint_states1v1):
         value1v1 (ndarray): 1v1 HJ value function
         joint_states1v1 (tuple): state of (a1x, a1y, d1x, d1y)
     """
-    a1x_slice, a1y_slice, d1x_slice, d1y_slice = lo2slice1v1(joint_states1v1, slices=45)
+    a1x_slice, a1y_slice, d1x_slice, d1y_slice = lo2slice1v1(joint_states1v1, slices=30)
     flag = value1v1[a1x_slice, a1y_slice, d1x_slice, d1y_slice]
     if flag > 0:
-        return 1  # d1 could capture (a1, a2)
-    else:
+        return 1  # d1 could capture (a1)
+    else:  # d1 could not capture a1
         return 0
 
 # localizations to silces in 2v1 game
@@ -96,12 +96,27 @@ def check2v1(value2v1, joint_states2v1):
     flag = value2v1[a1x_slice, a1y_slice, a2x_slice, a2y_slice, d1x_slice, d1y_slice]
     # print("2v1 value is {}".format(flag))
     if flag > 0:
-        return 1, flag  # d1 could capture (a1, a2)
+        return 1, flag  # d1 could capture (a1, a2) simutaneously
     else:
         return 0, flag
 
+def check1v2(value1v2, joint_states1v2):
+    """ Returns a binary value, True means the attacker would be captured by two defenders
+
+        Args:
+            value1v2 (ndarray): 1v2 HJ value function
+            joint_states1v2 (tuple): state of (ax, ay, d1x, d1y, d2x, d2y)
+    """
+    ax_slice, ay_slice, d1x_slice, d1y_slice, d2x_slice, d2y_slice = lo2slice2v1(joint_states1v2)
+    flag = value1v2[ax_slice, ay_slice, d1x_slice, d1y_slice, d2x_slice, d2y_slice]
+
+    if flag > 0:  # d1 and d2 could capture a
+        return 1, flag
+    else:  # d1 and d2 could not capture a
+        return 0, flag
+
 # generate the capture pair list P and the capture pair complement list Pc
-def capture_pair(attackers, defenders, value2v1):
+def capture_2vs1(attackers, defenders, value2v1):
     """ Returns a list Pc that contains all pairs of attackers that the defender couldn't capture, [[(a1, a2), (a2, a3)], ...]
 
     Args:
@@ -159,6 +174,33 @@ def capture_pair2(attackers, defenders, value2v1, stops):
                             Pc[j].append((i, k))
     return Pc
 
+
+
+def capture_1vs2(attackers, defenders, value1v2):
+    #TODO: not finished, should not use dictionary or it will overwrite the former results
+    num_attacker, num_defender = len(attackers), len(defenders)
+    RA1v2 = [[] for _ in range(num_defender)]
+    RA1v2_ = []
+    # RA1v2C = []
+    # generate RA1v2
+    for j in range(num_defender):
+        djx, djy = defenders[j]
+        for k in range(j+1, num_defender):
+            dkx, dky = defenders[k]
+            for i in range(num_attacker):
+                aix, aiy = attackers[i]
+                joint_states = (aix, aiy, djx, djy, dkx, dky)
+                flag, val = check1v2(value1v2, joint_states)
+                if not flag:  # attacker i will win the 1 vs. 2 game
+                    RA1v2[j].append(i)
+                    RA1v2[k].append(i)
+                    RA1v2_.append((i, j, k))
+                # else:
+                #     RA1v2C.append({i: (j, k)})
+                    # RA1v2C.append((i, j, k))
+
+    return RA1v2, RA1v2_
+
 # generate the capture individual list I and the capture individual complement list Ic
 def capture_individual(attackers, defenders, value1v1):
     """ Returns a list Ic that contains all attackers that the defender couldn't capture, [[a1, a3], ...]
@@ -181,13 +223,13 @@ def capture_individual(attackers, defenders, value1v1):
                 Ic[j].append(i)
     return Ic
 
-def capture_individual2(attackers, defenders, value1v1, stops):
+def capture_1vs1(attackers, defenders, value1v1, stops):
     """ Returns a list Ic that contains all attackers that the defender couldn't capture, [[a1, a3], ...]
 
     Args:
         attackers (list): positions (set) of all attackers, [(a1x, a1y), ...]
         defenders (list): positions (set) of all defenders, [(d1x, d1y), ...]
-        value2v1 (ndarray): 1v1 HJ value function
+        value1v1 (ndarray): 1v1 HJ value function
         stops (list): the captured attackers index
     """
     num_attacker, num_defender = len(attackers), len(defenders)
@@ -202,7 +244,7 @@ def capture_individual2(attackers, defenders, value1v1, stops):
             else:
                 aix, aiy = attackers[i]
                 joint_states = (aix, aiy, djx, djy)
-                if not check1v1(value1v1, joint_states):
+                if not check1v1(value1v1, joint_states):  # defender j could not capture attacker i
                     Ic[j].append(i)
     return Ic
 
@@ -259,14 +301,156 @@ def mip_solver(num_attacker, num_defender, Pc, Ic):
         print(selected)
     return selected
 
-# def add_trajectory(trajectories, next_positions):
-#     """Return a updated trajectories (list) that contain trajectories of agents (attackers or defenders)
 
-#     Args: 
-#         trajectories (list): [[(a1x1, a1y1), ...], ...]
-#         next_positions (list): [(a1xi, a1yi), ...]
-#     """
-#     pass
+def extend_mip_solver(num_attacker, num_defender, RA1v1, RA1v2, RA2v1):
+    """ Returns a list selected that contains all allocated attackers that the defender could capture, [[a1, a3], ...]
+
+    Args:
+        num_attackers (int): the number of attackers
+        num_defenders (int): the number of defenders
+        RA1v1 (list): the single indexes of attackers that will win the 1 vs. 1 game for each defender
+        RA1v2 (list): the single indexes of attackers that will win the 1 vs. 2 game for each defender
+        RA2v1 (list): the pair indexes of attackers that will not be captured together in the 2 vs. 1 game for each defender
+    """
+    # initialize the solver
+    model = Model(solver_name=CBC) # use GRB for Gurobi, CBC default
+    e = [[model.add_var(var_type=BINARY) for j in range(num_defender)] for i in range(num_attacker)] # e[attacker index][defender index]
+    # initialize the weakly defend edges set W and their weights for each defender
+    Weakly = [[] for _ in range(num_defender)]
+    weights = np.ones((num_attacker, num_defender))
+    # add constraints
+    # add constraint 1: upper bound for attackers to be captured based on the 2 vs. 1 game
+    for j in range(num_defender):
+        model += xsum(e[i][j] for i in range(num_attacker)) <= 2
+
+    # add constraint 2: upper bound for defenders to be assgined based on the 1 vs. 2 game
+    for i in range(num_attacker):
+        model += xsum(e[i][j] for j in range(num_defender)) <= 2
+
+    # add constraint 3: the attacker i could not be captured by the defender j in both 1 vs. 1 and 1 vs. 2 games
+    for j in range(num_defender):
+        for attacker in RA1v1[j]:
+            if attacker in RA1v2[j]:  # the attacker could win the defender in both 1 vs. 1 and 1 vs. 2 games
+                model += e[attacker][j] == 0
+            else:  # the attacker could win the defender in 1 vs. 1 game but not in 1 vs. 2 game
+                Weakly[j].append(attacker)
+                weights[attacker][j] = 0.5
+
+    # add constraint 4: upper bound for attackers to be captured based on the 2 vs. 1 game result
+    for j in range(num_defender):
+        for pairs in (RA2v1[j]):
+            # print(pairs)
+            model += e[pairs[0]][j] + e[pairs[1]][j] <= 1
+
+    # add constraint 5: upper bound for weakly defended attackers
+    for j in range(num_defender):
+        for indiv in (Weakly[j]):
+            # print(indiv)
+            model += e[indiv][j] <= xsum(e[indiv][k] for k in range(num_defender))
+            
+    # set up objective functions
+    model.objective = maximize(xsum(weights[i][j] * e[i][j] for j in range(num_defender) for i in range(num_attacker)))
+    # problem solving
+    model.max_gap = 0.05
+    # log_status = []
+    status = model.optimize(max_seconds=300)
+    if status == OptimizationStatus.OPTIMAL:
+        print('optimal solution cost {} found'.format(model.objective_value))
+    elif status == OptimizationStatus.FEASIBLE:
+        print('sol.cost {} found, best possible: {} '.format(model.objective_value, model.objective_bound))
+    elif status == OptimizationStatus.NO_SOLUTION_FOUND:
+        print('no feasible solution found, lower bound is: {} '.format(model.objective_bound))
+    if status == OptimizationStatus.OPTIMAL or status == OptimizationStatus.FEASIBLE:
+        print('Solution:')
+        selected = []
+        assigned = [[] for _ in range(num_attacker)]
+        for j in range(num_defender):
+            selected.append([])
+            for i in range(num_attacker):
+                if e[i][j].x >= 0.9:
+                    selected[j].append(i)
+                    assigned[i].append(j)
+        # print(f"The selected results in the extend_mip_solver is {selected}.")
+
+    return selected, weights, assigned
+
+def extend_mip_solver1(num_attacker, num_defender, RA1v1, RA1v2, RA1v2_, RA2v1):
+    """ Returns a list selected that contains all allocated attackers that the defender could capture, [[a1, a3], ...]
+
+    Args:
+        num_attackers (int): the number of attackers
+        num_defenders (int): the number of defenders
+        RA1v1 (list): the single indexes of attackers that will win the 1 vs. 1 game for each defender
+        RA1v2 (list): the single indexes of attackers that will win the 1 vs. 2 game for each defender
+        RA2v1 (list): the pair indexes of attackers that will not be captured together in the 2 vs. 1 game for each defender
+    """
+    # initialize the solver
+    model = Model(solver_name=CBC) # use GRB for Gurobi, CBC default
+    e = [[model.add_var(var_type=BINARY) for j in range(num_defender)] for i in range(num_attacker)] # e[attacker index][defender index]
+    # initialize the weakly defend edges set W and their weights for each defender
+    Weakly = [[] for _ in range(num_defender)]
+    weights = np.ones((num_attacker, num_defender))
+    # add constraints
+    # add constraint 1: upper bound for attackers to be captured based on the 2 vs. 1 game
+    for j in range(num_defender):
+        model += xsum(e[i][j] for i in range(num_attacker)) <= 2
+
+    # add constraint 2: upper bound for defenders to be assgined based on the 1 vs. 2 game
+    for i in range(num_attacker):
+        model += xsum(e[i][j] for j in range(num_defender)) <= 2
+    for add in RA1v2_:
+        model += xsum(e[add[0]][j] for j in range(num_defender)) <= 1
+    #     model += e[add[0]][add[1]] + e[add[0]][add[2]] <= 1
+    # for i in range(num_attacker):
+    #     model += xsum(e[i][j] for j in range(num_defender)) <= 2
+
+    # add constraint 3: the attacker i could not be captured by the defender j in both 1 vs. 1 and 1 vs. 2 games
+    for j in range(num_defender):
+        for attacker in RA1v1[j]:
+            if attacker in RA1v2[j]:  # the attacker could win the defender in both 1 vs. 1 and 1 vs. 2 games
+                model += e[attacker][j] == 0
+            else:  # the attacker could win the defender in 1 vs. 1 game but not in 1 vs. 2 game
+                Weakly[j].append(attacker)
+                weights[attacker][j] = 0.5
+
+    # add constraint 4: upper bound for attackers to be captured based on the 2 vs. 1 game result
+    for j in range(num_defender):
+        for pairs in (RA2v1[j]):
+            # print(pairs)
+            model += e[pairs[0]][j] + e[pairs[1]][j] <= 1
+
+    # add constraint 5: upper bound for weakly defended attackers
+    for j in range(num_defender):
+        for indiv in (Weakly[j]):
+            # print(indiv)
+            model += e[indiv][j] <= xsum(e[indiv][k] for k in range(num_defender))
+            
+    # set up objective functions
+    model.objective = maximize(xsum(weights[i][j] * e[i][j] for j in range(num_defender) for i in range(num_attacker)))
+    # problem solving
+    model.max_gap = 0.05
+    # log_status = []
+    status = model.optimize(max_seconds=300)
+    if status == OptimizationStatus.OPTIMAL:
+        print('optimal solution cost {} found'.format(model.objective_value))
+    elif status == OptimizationStatus.FEASIBLE:
+        print('sol.cost {} found, best possible: {} '.format(model.objective_value, model.objective_bound))
+    elif status == OptimizationStatus.NO_SOLUTION_FOUND:
+        print('no feasible solution found, lower bound is: {} '.format(model.objective_bound))
+    if status == OptimizationStatus.OPTIMAL or status == OptimizationStatus.FEASIBLE:
+        print('Solution:')
+        selected = []
+        assigned = [[] for _ in range(num_attacker)]
+        for j in range(num_defender):
+            selected.append([])
+            for i in range(num_attacker):
+                if e[i][j].x >= 0.9:
+                    selected[j].append(i)
+                    assigned[i].append(j)
+        # print(f"The selected results in the extend_mip_solver is {selected}.")
+
+    return selected, weights, assigned
+
 
 def next_positions(current_positions, controls, tstep):
     """Return the next positions (list) of attackers or defenders
@@ -281,29 +465,17 @@ def next_positions(current_positions, controls, tstep):
         temp.append((current_positions[i][0]+controls[i][0]*tstep, current_positions[i][1]+controls[i][1]*tstep))
     return temp
 
-def next_positions_d(current_positions, controls, tstep, selected, captured):
+def next_positions_d(current_positions, controls, tstep):
     """Return the next positions (list) of attackers or defenders
 
     Arg:
     current_positions (list): [(), (),...]
-    controls (list): [(), (),...]
+    controls (list): [[(a, b)], [()],...]
     """
     temp = []
     num = len(controls)
-    for j in range(num):
-        num_attacker = len(selected[j])
-        if num_attacker == 1:
-            if captured[selected[j][0]] == 1:
-                temp.append((current_positions[j][0], current_positions[j][1]))
-            else:
-                temp.append((current_positions[j][0]+controls[j][0]*tstep, current_positions[j][1]+controls[j][1]*tstep))
-        elif num_attacker == 2:
-            if captured[selected[j][0]] == 1 and captured[selected[j][1]] == 1:
-                temp.append((current_positions[j][0], current_positions[j][1]))
-            else:
-                temp.append((current_positions[j][0]+controls[j][0]*tstep, current_positions[j][1]+controls[j][1]*tstep))
-        else:
-            temp.append((current_positions[j][0]+controls[j][0]*tstep, current_positions[j][1]+controls[j][1]*tstep))
+    for i in range(num):
+        temp.append((current_positions[i][0]+controls[i][0][0]*tstep, current_positions[i][1]+controls[i][0][1]*tstep))
     return temp
 
 def next_positions_a(current_positions, controls, tstep, captured):
@@ -716,7 +888,7 @@ def defender_control1v1_1slice(agents_1v1, grid1v1, value1v1, tau1v1, jointstate
     # calculate the derivatives
     # v = value1v1[...] # Minh: v = value1v0[..., neg2pos[0]]
     start_time = datetime.datetime.now()
-    print(f"The shape of the input value1v1 of defender is {value1v1.shape}. \n")
+    # print(f"The shape of the input value1v1 of defender is {value1v1.shape}. \n")
     spat_deriv_vector = spa_deriv(grid1v1.get_index(jointstate1v1), value1v1, grid1v1)
     opt_d1, opt_d2 = agents_1v1.optDstb_inPython(spat_deriv_vector)
     end_time = datetime.datetime.now()
@@ -730,7 +902,7 @@ def defender_control2v1_1slice(agents_2v1, grid2v1, value2v1, tau2v1, jointstate
     grid2v1 (class): the corresponding Grid instance
     value2v1 (ndarray): 1v1 HJ reachability value function with only final slice
     agents_2v1 (class): the corresponding AttackerDefender instance
-    joint_states2v1 (tuple): the corresponding positions of (A1, D1)
+    joint_states2v1 (tuple): the corresponding positions of (A1, A2, D)
     """
     # calculate the derivatives
     start_time = datetime.datetime.now()
@@ -740,6 +912,24 @@ def defender_control2v1_1slice(agents_2v1, grid2v1, value2v1, tau2v1, jointstate
     end_time = datetime.datetime.now()
     # print(f"The calculation of 6D spatial derivative vector is {end_time-start_time}. \n")
     return (opt_d1, opt_d2)
+
+def defender_control1vs2_slice(agents_1v2, grid1v2, value1v2, tau1v2, jointstate1v2):
+    """Return a list of 2-dimensional control inputs of one defender based on the value function
+    
+    Args:
+    grid1v2 (class): the corresponding Grid instance
+    value1v2 (ndarray): 1v2 HJ reachability value function with only final slice
+    agents_1v2 (class): the corresponding AttackerDefender instance
+    joint_states1v2 (tuple): the corresponding positions of (A, D1, D2)
+    """
+    # calculate the derivatives
+    start_time = datetime.datetime.now()
+    # print(f"The shape of the input value1v2 of defender is {value1v2.shape}. \n")
+    spat_deriv_vector = spa_deriv(grid1v2.get_index(jointstate1v2), value1v2, grid1v2)
+    opt_d1, opt_d2, opt_d3, opt_d4  = agents_1v2.optDstb_inPython(spat_deriv_vector)
+    end_time = datetime.datetime.now()
+    # print(f"The calculation of 6D spatial derivative vector is {end_time-start_time}. \n")
+    return (opt_d1, opt_d2, opt_d3, opt_d4)
 
 def capture_check(current_attackers, current_defenders, selected, last_captured):
     """
