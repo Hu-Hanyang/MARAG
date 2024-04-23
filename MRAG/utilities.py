@@ -26,6 +26,7 @@ def lo2slice1v0(joint_states1v0, slices=45):
             index.append(idx)
     return tuple(index)
 
+
 def lo2slice1v1(joint_states1v1, slices=45):
     """ Returns a tuple of the closest index of each state in the grid
 
@@ -47,15 +48,16 @@ def lo2slice1v1(joint_states1v1, slices=45):
             index.append(idx)
     return tuple(index)
 
+
 # check in the current state, the attacker is captured by the defender or not
-def check1v1(value1v1, joint_states1v1):
+def check1v1(value1v1, joint_states1v1, grid_size):
     """ Returns a binary value, 1 means the defender could capture the attacker
 
     Args:
         value1v1 (ndarray): 1v1 HJ value function
         joint_states1v1 (tuple): state of (a1x, a1y, d1x, d1y)
     """
-    a1x_slice, a1y_slice, d1x_slice, d1y_slice = lo2slice1v1(joint_states1v1, slices=30)
+    a1x_slice, a1y_slice, d1x_slice, d1y_slice = lo2slice1v1(joint_states1v1, slices=grid_size)
     flag = value1v1[a1x_slice, a1y_slice, d1x_slice, d1y_slice]
     if flag > 0:
         return 1  # d1 could capture (a1)
@@ -85,14 +87,14 @@ def lo2slice2v1(joint_states2v1, slices=30):
     return tuple(index)
 
 # check the capture relationship in 2v1 game
-def check2v1(value2v1, joint_states2v1):
+def check2v1(value2v1, joint_states2v1, grid_size):
     """ Returns a binary value, 1 means the defender could capture two attackers
 
     Args:
         value2v1 (ndarray): 2v1 HJ value function
         joint_states2v1 (tuple): state of (a1x, a1y, a2x, a2y, d1x, d1y)
     """
-    a1x_slice, a1y_slice, a2x_slice, a2y_slice, d1x_slice, d1y_slice = lo2slice2v1(joint_states2v1)
+    a1x_slice, a1y_slice, a2x_slice, a2y_slice, d1x_slice, d1y_slice = lo2slice2v1(joint_states2v1, slices=grid_size)
     flag = value2v1[a1x_slice, a1y_slice, a2x_slice, a2y_slice, d1x_slice, d1y_slice]
     # print("2v1 value is {}".format(flag))
     if flag > 0:
@@ -100,14 +102,15 @@ def check2v1(value2v1, joint_states2v1):
     else:
         return 0, flag
 
-def check1v2(value1v2, joint_states1v2):
+
+def check1v2(value1v2, joint_states1v2, grid_size):
     """ Returns a binary value, True means the attacker would be captured by two defenders
 
         Args:
             value1v2 (ndarray): 1v2 HJ value function
             joint_states1v2 (tuple): state of (ax, ay, d1x, d1y, d2x, d2y)
     """
-    ax_slice, ay_slice, d1x_slice, d1y_slice, d2x_slice, d2y_slice = lo2slice2v1(joint_states1v2)
+    ax_slice, ay_slice, d1x_slice, d1y_slice, d2x_slice, d2y_slice = lo2slice2v1(joint_states1v2, slices=grid_size)
     flag = value1v2[ax_slice, ay_slice, d1x_slice, d1y_slice, d2x_slice, d2y_slice]
 
     if flag > 0:  # d1 and d2 could capture a
@@ -125,6 +128,7 @@ def capture_2vs1(attackers, defenders, value2v1):
         value2v1 (ndarray): 2v1 HJ value function [, , , , ,]
     """
     num_attacker, num_defender = len(attackers), len(defenders)
+    grid_size = value2v1.shape[0]
     Pc = []
     values = []
     # generate Pc
@@ -137,9 +141,9 @@ def capture_2vs1(attackers, defenders, value2v1):
                 aix, aiy = attackers[i]
                 akx, aky = attackers[k]
                 joint_states = (aix, aiy, akx, aky, djx, djy)
-                flag, val = check2v1(value2v1, joint_states)
+                flag, val = check2v1(value2v1, joint_states, grid_size)
                 if not flag:
-                    Pc[j].append((i, k))
+                    Pc[j].append((i, k))  # the defender j could not capture (i, k) simultaneously
                 values[j].append(val)
     return Pc, values
 
@@ -179,6 +183,7 @@ def capture_pair2(attackers, defenders, value2v1, stops):
 def capture_1vs2(attackers, defenders, value1v2):
     #TODO: not finished, should not use dictionary or it will overwrite the former results
     num_attacker, num_defender = len(attackers), len(defenders)
+    grid_size = value1v2.shape[0]
     RA1v2 = [[] for _ in range(num_defender)]
     RA1v2_ = []
     # RA1v2C = []
@@ -190,7 +195,7 @@ def capture_1vs2(attackers, defenders, value1v2):
             for i in range(num_attacker):
                 aix, aiy = attackers[i]
                 joint_states = (aix, aiy, djx, djy, dkx, dky)
-                flag, val = check1v2(value1v2, joint_states)
+                flag, val = check1v2(value1v2, joint_states, grid_size)
                 if not flag:  # attacker i will win the 1 vs. 2 game
                     RA1v2[j].append(i)
                     RA1v2[k].append(i)
@@ -233,6 +238,7 @@ def capture_1vs1(attackers, defenders, value1v1, stops):
         stops (list): the captured attackers index
     """
     num_attacker, num_defender = len(attackers), len(defenders)
+    grid_size = value1v1.shape[0]
     Ic = []
     # generate I
     for j in range(num_defender):
@@ -244,7 +250,7 @@ def capture_1vs1(attackers, defenders, value1v1, stops):
             else:
                 aix, aiy = attackers[i]
                 joint_states = (aix, aiy, djx, djy)
-                if not check1v1(value1v1, joint_states):  # defender j could not capture attacker i
+                if not check1v1(value1v1, joint_states, grid_size):  # defender j could not capture attacker i
                     Ic[j].append(i)
     return Ic
 
@@ -375,6 +381,7 @@ def extend_mip_solver(num_attacker, num_defender, RA1v1, RA1v2, RA2v1):
     return selected, weights, assigned
 
 def extend_mip_solver1(num_attacker, num_defender, RA1v1, RA1v2, RA1v2_, RA2v1):
+    #TODO: need to check the implementation correctness of this function
     """ Returns a list selected that contains all allocated attackers that the defender could capture, [[a1, a3], ...]
 
     Args:
@@ -400,7 +407,7 @@ def extend_mip_solver1(num_attacker, num_defender, RA1v1, RA1v2, RA1v2_, RA2v1):
         model += xsum(e[i][j] for j in range(num_defender)) <= 2
     for add in RA1v2_:
         model += xsum(e[add[0]][j] for j in range(num_defender)) <= 1
-    #     model += e[add[0]][add[1]] + e[add[0]][add[2]] <= 1
+    #   
     # for i in range(num_attacker):
     #     model += xsum(e[i][j] for j in range(num_defender)) <= 2
 

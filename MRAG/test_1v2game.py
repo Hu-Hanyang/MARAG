@@ -14,12 +14,12 @@ from MRAG.AttackerDefender1v2 import AttackerDefender1v2
 # Simulation: 1 attacker with 2 defenders
 # preparations
 print("Preparing for the simulaiton... \n")
-T = 0.1 # attackers_stop_times = [0.475s (95 A1 is captured), 0.69s (138 A0 by D0)]
+T = 1.0 # attackers_stop_times = [0.475s (95 A1 is captured), 0.69s (138 A0 by D0)]
 deltat = 0.005 # calculation time interval
 times = int(T/deltat)
 
 grid_size1v1 = 45
-grid_size1v2 = 30
+grid_size1v2 = 35
 
 # load all value functions, grids and spatial derivative array
 value1v0 = np.load('MRAG/1v0AttackDefend.npy')  # value1v0.shape = [100, 100, len(tau)]
@@ -28,11 +28,9 @@ value1v0 = np.load('MRAG/1v0AttackDefend.npy')  # value1v0.shape = [100, 100, le
 # v1v1 = np.load('MRAG/1v1AttackDefend_speed15.npy')
 v1v1 = np.load('MRAG/1v1AttackDefend_g45_dspeed1.5.npy')
 
-# v1v2 = np.load('MRAG/1v2AttackDefend_g35_dspeed1.5.npy')
+v1v2 = np.load('MRAG/1v2AttackDefend_g35_dspeed1.5.npy')
 # v1v2 = np.load('MRAG/1v2AttackDefend_g35_dspeed1.0.npy')
-v1v2 = np.load('MRAG/1v2AttackDefend_g30_dspeed1.5.npy')
-
-
+# v1v2 = np.load('MRAG/1v2AttackDefend_g30_dspeed1.5.npy')
 print(f"The shape of the 1v2 value function is {v1v2.shape}. \n")
 value1v2 = v1v2[..., np.newaxis]  # value1v2.shape = [30, 30, 30, 30, 30, 30, 1]
 
@@ -51,13 +49,27 @@ tau1v2 = np.arange(start=0, stop=4.5 + 1e-5, step=0.025)
 # tau2v1 = np.arange(start=0, stop=4.5 + 1e-5, step=0.025)
 
 # initialize positions of attackers and defenders
-# # not work:
-# attackers_initials = [(-0.4, 0.0)] # 
-# defenders_initials = [(-0.5, 0.5), (-0.5, -0.6)] 
+
+# # Case 1: In theory: 1vs2 capture and both 1vs1 escape
+# # Actually, escape and defenders not hitting obstacles
+# attackers_initials = [(-0.15, 0.0)] 
+# # attackers_initials = [(-0.25, 0.0)] # barely captured
+# defenders_initials = [(-0.5, 0.8), (-0.5, -0.6)] 
+
+# # Case 2: In theory: 1vs2 capture and both 1vs1 capture
+# # Actually, the attacker is captured.
+# attackers_initials = [(-0.2, 0.0)] 
+# defenders_initials = [(0.0, 0.8), (-0.5, -0.3)] 
 
 # # # not work:
-attackers_initials =[(-0.1, 0.0)]  
-defenders_initials = [(-0.5, 0.5), (-0.5, -0.1)]  
+# attackers_initials =[(-0.05, 0.0)]  
+# defenders_initials = [(-0.5, 0.5), (-0.5, -0.1)]  
+
+# attackers_initials = [(-0.3, 0.0)] # [(-0.5, 0.0), (0.0, 0.8)]
+# defenders_initials = [(-0.8, -0.5), (-0.8, 0.5)]  #  [(-0.8, -0.3)]
+
+attackers_initials = [(0.0, 0.0)] # 
+defenders_initials = [(-0.5, 0.4), (-0.5, -0.3)]  
 
 ax = attackers_initials[0][0]
 ay = attackers_initials[0][1]
@@ -105,6 +117,8 @@ RA1v2s = []
 controls_defender0 = []
 controls_defender1 = []
 
+judges = []
+
 print("The simulation starts: \n")
 # simulation starts
 for _ in range(0, times):
@@ -128,10 +142,12 @@ for _ in range(0, times):
     controls_defender0.append((opt_d1, opt_d2))  
     controls_defender1.append((opt_d3, opt_d4))
     
-    # Plot BRT contour
+    # # Plot BRT contour
     ax_slice, ay_slice, d1x_slice, d1y_slice, d2x_slice, d2y_slice = lo2slice2v1(joint_state1v2, slices=grid_size1v2)
-    value_function_current_state = v1v2[:, :, d1x_slice, d1y_slice, d2x_slice, d2y_slice]
-    plot_game1v2(grid1v2, value_function_current_state, current_attackers, current_defenders, name="$\mathcal{RA}^{12}_{\infty}$")
+    # value_function_current_state = v1v2[:, :, d1x_slice, d1y_slice, d2x_slice, d2y_slice]
+    value_function_state = v1v2[ax_slice, ay_slice, d1x_slice, d1y_slice, d2x_slice, d2y_slice]
+    judges.append(1 if value_function_state<=0 else 0)
+    # plot_game1v2(grid1v2, value_function_current_state, current_attackers, current_defenders, name="$\mathcal{RA}^{12}_{\infty}$")
     
 
     # update the next postions of defenders
@@ -175,7 +191,7 @@ print(f"The final captured_status of all attackers is {attackers_status_logs[-1]
 
 print(f"The RA1v1s is {RA1v1s}. \n")
 print(f"The RA1v2s is {RA1v2s}. \n")
-
+print(f"During the game, the joint state is within the BRT: {judges}. \n")
 # Play the animation
 animation_2v1(attackers_trajectory, defenders_trajectory, attackers_status_logs, T)
 # print(f"The controls of defender0 is {controls_defender0}. \n")
