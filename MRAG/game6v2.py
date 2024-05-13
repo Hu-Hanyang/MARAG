@@ -17,9 +17,9 @@ times = int(T/deltat)
 
 # load all value functions, grids and spatial derivative array
 value1v0 = np.load('MRAG/1v0AttackDefend.npy')  # value1v0.shape = [100, 100, len(tau)]
-v1v1 = np.load('MRAG/1v1AttackDefend_speed15.npy')
+v1v1 = np.load('MRAG/1v1AttackDefend_g45_dspeed1.5.npy')
 value1v1 = v1v1[..., np.newaxis]  # value1v1.shape = [45, 45, 45, 45, 1]
-v2v1 = np.load('2v1AttackDefend_speed15.npy')
+v2v1 = np.load('MRAG/2v1AttackDefend_speed15.npy')
 value2v1 = v2v1[..., np.newaxis]  # value2v1.shape = [30, 30, 30, 30, 30, 30, 1]
 grid1v0 = Grid(np.array([-1.0, -1.0]), np.array([1.0, 1.0]), 2, np.array([100, 100])) # original 45
 grid1v1 = Grid(np.array([-1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0, 1.0]), 4, np.array([45, 45, 45, 45])) # original 45
@@ -135,32 +135,35 @@ for _ in range(0, times):
         break
 print("The game is over. \n")
 
-print(f"The results of the selected is {capture_decisions}. \n")
-print(f"The final captured_status of all attackers is {attackers_status_logs[-1]}. \n")
+# print(f"The results of the selected is {capture_decisions}. \n")
+# print(f"The final captured_status of all attackers is {attackers_status_logs[-1]}. \n")
 
-# plot the trajectories
-t_slice = [0, 44, 68, 111, 149, 206, 206]
-mips = [[[0, 1], [2, 4]], [[0, 1], [2]], [[1, 3], [2]], [[1, 2], []], [[2], []]]
+animation_2v1(attackers_trajectory, defenders_trajectory, attackers_status_logs, T)
+
+
+# # plot the trajectories
+# t_slice = [0, 44, 68, 111, 149, 206, 206]
+# mips = [[[0, 1], [2, 4]], [[0, 1], [2]], [[1, 3], [2]], [[1, 2], []], [[2], []]]
 # total simulation time t = 
 
-# plot the trajectories seperately  T = [0.120s (24, A4 by D1), 0.280s (56 A0 by D0), 0.460s (92 A3 by D0), 0.525s (106 A5 by D0), 0.700s (140 A1 by D0), 0.955s (191 A2 by D0)]
-if T == 0.120: 
-    plot_simulation6v2_1(attackers_x, attackers_y, defenders_x, defenders_y)
-elif T == 0.100:
-    plot_simulation6v2_1s(attackers_x, attackers_y, defenders_x, defenders_y)
-elif T == 0.280: # -24
-    plot_simulation6v2_2(attackers_x, attackers_y, defenders_x, defenders_y)
-elif T == 0.460: # -56
-    plot_simulation6v2_3(attackers_x, attackers_y, defenders_x, defenders_y)
-elif T == 0.300:
-    plot_simulation6v2_2s(attackers_x, attackers_y, defenders_x, defenders_y)
-elif T == 0.525:
-    plot_simulation6v2_4(attackers_x, attackers_y, defenders_x, defenders_y)
-elif T == 0.700:
-    plot_simulation6v2_5(attackers_x, attackers_y, defenders_x, defenders_y)
-elif T == 0.955:
-    plot_simulation6v2_6(attackers_x, attackers_y, defenders_x, defenders_y)
-elif T == 1.000:
-    plot_simulation6v2_4s(attackers_x, attackers_y, defenders_x, defenders_y)
-else:
-    plot_simulation(attackers_x, attackers_y, defenders_x, defenders_y)
+# # plot the trajectories seperately  T = [0.120s (24, A4 by D1), 0.280s (56 A0 by D0), 0.460s (92 A3 by D0), 0.525s (106 A5 by D0), 0.700s (140 A1 by D0), 0.955s (191 A2 by D0)]
+# if T == 0.120: 
+#     plot_simulation6v2_1(attackers_x, attackers_y, defenders_x, defenders_y)
+# elif T == 0.100:
+#     plot_simulation6v2_1s(attackers_x, attackers_y, defenders_x, defenders_y)
+# elif T == 0.280: # -24
+#     plot_simulation6v2_2(attackers_x, attackers_y, defenders_x, defenders_y)
+# elif T == 0.460: # -56
+#     plot_simulation6v2_3(attackers_x, attackers_y, defenders_x, defenders_y)
+# elif T == 0.300:
+#     plot_simulation6v2_2s(attackers_x, attackers_y, defenders_x, defenders_y)
+# elif T == 0.525:
+#     plot_simulation6v2_4(attackers_x, attackers_y, defenders_x, defenders_y)
+# elif T == 0.700:
+#     plot_simulation6v2_5(attackers_x, attackers_y, defenders_x, defenders_y)
+# elif T == 0.955:
+#     plot_simulation6v2_6(attackers_x, attackers_y, defenders_x, defenders_y)
+# elif T == 1.000:
+#     plot_simulation6v2_4s(attackers_x, attackers_y, defenders_x, defenders_y)
+# else:
+#     plot_simulation(attackers_x, attackers_y, defenders_x, defenders_y)

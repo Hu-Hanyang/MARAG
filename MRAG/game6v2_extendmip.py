@@ -1,38 +1,29 @@
-from odp.Plots.plotting_utilities import *
-from MRAG.utilities import *
+from utilities import *
 from odp.Grid import Grid
-from MRAG.compute_opt_traj import compute_opt_traj1v0
-from odp.solver import HJSolver, computeSpatDerivArray
 from copy import deepcopy
 from MRAG.AttackerDefender1v0 import AttackerDefender1v0
 from MRAG.AttackerDefender1v1 import AttackerDefender1v1 
-from MRAG.AttackerDefender2v1 import AttackerDefender2v1
 from MRAG.AttackerDefender1v2 import AttackerDefender1v2
+from MRAG.AttackerDefender2v1 import AttackerDefender2v1
+from odp.Plots.plotting_utilities import *
 
-
-
-# Simulation: 1 attacker with 2 defenders
+# This debug for not loading spatial derivatives array before the game
+# Simulation 3: 6 attackers with 2 defenders
 # preparations
 print("Preparing for the simulaiton... \n")
-T = 1.0 # attackers_stop_times = [0.475s (95 A1 is captured), 0.69s (138 A0 by D0)]
+T = 1.0 # total simulation time T = [0.120s (24, A4 by D1), 0.280s (56 A0 by D0), 0.460s (92 A3 by D0), 0.525s (106 A5 by D0), 0.700s (140 A1 by D0), 0.955s (191 A2 by D0)]
 deltat = 0.005 # calculation time interval
 times = int(T/deltat)
 
 # load all value functions, grids and spatial derivative array
 value1v0 = np.load('MRAG/1v0AttackDefend.npy')  # value1v0.shape = [100, 100, len(tau)]
-# print(value1v0.shape)
 v1v1 = np.load('MRAG/1v1AttackDefend_g45_dspeed1.5.npy')
-# v1v1 = np.load('MRAG/1v1AttackDefend.npy')
 value1v1 = v1v1[..., np.newaxis]  # value1v1.shape = [45, 45, 45, 45, 1]
-# v2v1 = np.load('MRAG/2v1AttackDefend.npy')
-# v2v1 = np.load('2v1AttackDefend_speed15.npy') # grid = 30
 v2v1 = np.load('MRAG/2v1AttackDefend_speed15.npy')
 print(f"The shape of the 2v1 value function is {v2v1.shape}. \n")
 value2v1 = v2v1[..., np.newaxis]  # value2v1.shape = [30, 30, 30, 30, 30, 30, 1]
-
 v1v2 = np.load('MRAG/1v2AttackDefend_g35_dspeed1.5.npy')
-value1v2 = v1v2[..., np.newaxis]  # value1v2.shape = [35, 35, 35, 35, 35, 35, 1]
-
+value1v2 = v1v2[..., np.newaxis]  # value1v2.shape = [30, 30, 30, 30, 30, 30, 1]
 grid1v0 = Grid(np.array([-1.0, -1.0]), np.array([1.0, 1.0]), 2, np.array([100, 100])) # original 45
 grid1v1 = Grid(np.array([-1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0, 1.0]), 4, np.array([45, 45, 45, 45])) # original 45
 grid1v2 = Grid(np.array([-1.0, -1.0, -1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]), 6, np.array([35, 35, 35, 35, 35, 35])) # original 45
@@ -45,19 +36,9 @@ tau1v0 = np.arange(start=0, stop=2.5 + 1e-5, step=0.025)
 tau1v1 = np.arange(start=0, stop=4.5 + 1e-5, step=0.025)
 tau1v2 = np.arange(start=0, stop=4.5 + 1e-5, step=0.025)
 tau2v1 = np.arange(start=0, stop=4.5 + 1e-5, step=0.025)
-
-# # In theory: 1vs2 capture and neither 1vs1 escape
-
-attackers_initials = [(0.0, 0.8)]
-defenders_initials = [(-0.5, 0.8), (-0.5, -0.6)] 
-
-# # In theory: 1vs2 capture and both 1vs1 capture
-# # Actually, use 1vs1 control and the attacker is captured
-# attackers_initials = [(-0.2, 0.0)] 
-# defenders_initials = [(0.0, 0.8), (-0.5, -0.3)] 
-# attackers_initials =[(-0.05, 0.0)]  
-# defenders_initials = [(-0.5, 0.5), (-0.5, -0.1)]  
-
+# initialize positions of attackers and defenders
+attackers_initials = [(0.0, 0.0), (0.0, 0.8), (-0.8, 0.0), (0.5, -0.5), (-0.5, -0.3), (0.8, -0.5)]
+defenders_initials = [(0.3, 0.5), (-0.3, -0.5)]  # , (0.3, -0.5)
 
 num_attacker = len(attackers_initials)
 num_defender = len(defenders_initials)
@@ -81,16 +62,11 @@ for i in range(num_attacker):
     attackers_trajectory[i].append(current_attackers[i])
     attackers_x[i].append(current_attackers[i][0])
     attackers_y[i].append(current_attackers[i][1])
+
 for j in range(num_defender):
     defenders_trajectory[j].append(current_defenders[j])
     defenders_x[j].append(current_defenders[j][0])
     defenders_y[j].append(current_defenders[j][1])
-
-# initialize the captured results
-attackers_status_logs = []
-attackers_status = [0 for _ in range(num_attacker)]
-stops_index = []  # the list stores the indexes of attackers that has been captured or arrived
-attackers_status_logs.append(deepcopy(attackers_status))
 
 # log the attackers be assigned defenders
 attackers_view = []
@@ -98,6 +74,12 @@ Escape1v1s = []
 Escape1v2s = []
 controls_defender0 = []
 controls_defender1 = []
+
+# initialize the captured results
+attackers_status_logs = []
+attackers_status = [0 for _ in range(num_attacker)]
+stops_index = []  # the list stores the indexes of attackers that has been captured
+attackers_status_logs.append(attackers_status)
 
 print("The simulation starts: \n")
 # simulation starts
@@ -195,21 +177,37 @@ for _ in range(0, times):
     if len(stops_index) == num_attacker:
         print(f"All attackers have arrived or been captured at the time t={(_+1)*deltat}. \n")
         break
-
 print("The game is over. \n")
 
-# print(f"The RA1v1s is {Escape1v1s}. \n")
-# print(f"The RA1v2s is {Escape1v2s}. \n")
-
-# print(f"The results of the selected is {capture_decisions}. \n")
+# print(f"The results of the selected is {defenders_task}. \n")
 print(f"The final captured_status of all attackers is {attackers_status_logs[-1]}. \n")
-
-# print(f"The log of attackers assigned is {attacker_assigneds}. \n")
-# print(f"The MIP assignment result is {defenders_task}. \n")
-# print(f"The log of RA1v2 is {RA1v2s}. \n")
-# print(f"The log of RA1v1 is {RA1v1s}. \n")
-# Play the animation
 print(f"In total {times} steps, the 1v2 game control is used {counters_1v2controls} times. \n")
+
 animation_2v1(attackers_trajectory, defenders_trajectory, attackers_status_logs, T)
-# print(f"The controls of defender0 is {controls_defender0}. \n")
-# print(f"The controls of defender1 is {controls_defender1}. \n")
+
+# # plot the trajectories
+# t_slice = [0, 44, 68, 111, 149, 206, 206]
+# mips = [[[0, 1], [2, 4]], [[0, 1], [2]], [[1, 3], [2]], [[1, 2], []], [[2], []]]
+# total simulation time t = 
+
+# plot the trajectories seperately  T = [0.120s (24, A4 by D1), 0.280s (56 A0 by D0), 0.460s (92 A3 by D0), 0.525s (106 A5 by D0), 0.700s (140 A1 by D0), 0.955s (191 A2 by D0)]
+# if T == 0.120: 
+#     plot_simulation6v2_1(attackers_x, attackers_y, defenders_x, defenders_y)
+# elif T == 0.100:
+#     plot_simulation6v2_1s(attackers_x, attackers_y, defenders_x, defenders_y)
+# elif T == 0.280: # -24
+#     plot_simulation6v2_2(attackers_x, attackers_y, defenders_x, defenders_y)
+# elif T == 0.460: # -56
+#     plot_simulation6v2_3(attackers_x, attackers_y, defenders_x, defenders_y)
+# elif T == 0.300:
+#     plot_simulation6v2_2s(attackers_x, attackers_y, defenders_x, defenders_y)
+# elif T == 0.525:
+#     plot_simulation6v2_4(attackers_x, attackers_y, defenders_x, defenders_y)
+# elif T == 0.700:
+#     plot_simulation6v2_5(attackers_x, attackers_y, defenders_x, defenders_y)
+# elif T == 0.955:
+#     plot_simulation6v2_6(attackers_x, attackers_y, defenders_x, defenders_y)
+# elif T == 1.000:
+#     plot_simulation6v2_4s(attackers_x, attackers_y, defenders_x, defenders_y)
+# else:
+#     plot_simulation(attackers_x, attackers_y, defenders_x, defenders_y)

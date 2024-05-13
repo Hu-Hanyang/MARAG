@@ -23,10 +23,11 @@ grid_size1v2 = 35
 
 # load all value functions, grids and spatial derivative array
 value1v0 = np.load('MRAG/1v0AttackDefend.npy')  # value1v0.shape = [100, 100, len(tau)]
-# # print(value1v0.shape)
+# print(value1v0.shape)
 
 # v1v1 = np.load('MRAG/1v1AttackDefend_speed15.npy')
-v1v1 = np.load('MRAG/1v1AttackDefend_g45_dspeed1.5.npy')
+v1v1 = np.load(f'MRAG/1v1AttackDefend_g45_dspeed1.5.npy')
+print(f"The shape of the 1v1 value function is {v1v1.shape}. \n")
 
 v1v2 = np.load('MRAG/1v2AttackDefend_g35_dspeed1.5.npy')
 # v1v2 = np.load('MRAG/1v2AttackDefend_g35_dspeed1.0.npy')
@@ -48,28 +49,21 @@ tau1v0 = np.arange(start=0, stop=2.5 + 1e-5, step=0.025)
 tau1v2 = np.arange(start=0, stop=4.5 + 1e-5, step=0.025)
 # tau2v1 = np.arange(start=0, stop=4.5 + 1e-5, step=0.025)
 
-# initialize positions of attackers and defenders
+# Test
+attackers_initials = [(-0.15, 0.0)] 
+defenders_initials = [(-0.5, 0.8), (-0.5, -0.6)] 
 
-# # Case 1: In theory: 1vs2 capture and both 1vs1 escape
-# # Actually, escape and defenders not hitting obstacles
-# attackers_initials = [(-0.15, 0.0)] 
-# # attackers_initials = [(-0.25, 0.0)] # barely captured
+# Theoretically capture actually capture
+# attackers_initials = [(-0.25, 0.0)] # barely captured
 # defenders_initials = [(-0.5, 0.8), (-0.5, -0.6)] 
-
-# # Case 2: In theory: 1vs2 capture and both 1vs1 capture
-# # Actually, the attacker is captured.
 # attackers_initials = [(-0.2, 0.0)] 
 # defenders_initials = [(0.0, 0.8), (-0.5, -0.3)] 
 
-# # # not work:
+# Theoretically capture actually escape
+# attackers_initials = [(0.0, 0.0)] # 
+# defenders_initials = [(-0.5, 0.4), (-0.5, -0.3)]  
 # attackers_initials =[(-0.05, 0.0)]  
 # defenders_initials = [(-0.5, 0.5), (-0.5, -0.1)]  
-
-# attackers_initials = [(-0.3, 0.0)] # [(-0.5, 0.0), (0.0, 0.8)]
-# defenders_initials = [(-0.8, -0.5), (-0.8, 0.5)]  #  [(-0.8, -0.3)]
-
-attackers_initials = [(0.0, 0.0)] # 
-defenders_initials = [(-0.5, 0.4), (-0.5, -0.3)]  
 
 ax = attackers_initials[0][0]
 ay = attackers_initials[0][1]
@@ -81,8 +75,8 @@ d2y = defenders_initials[1][1]
 # plot 1v2 reach-avoid tube
 jointstates2v1 = (ax, ay, d1x, d1y, d2x, d2y)
 ax_slice, ay_slice, d1x_slice, d1y_slice, d2x_slice, d2y_slice = lo2slice2v1(jointstates2v1, slices=grid_size1v2)
-value_function1v2_3 = value1v2[ax_slice, ay_slice, d1x_slice, d1y_slice, d2x_slice, d2y_slice]
-print(f"The initial value function of 1vs2 is {value_function1v2_3}. \n")
+value_function1v2_3 = v1v2[ax_slice, ay_slice, d1x_slice, d1y_slice, d2x_slice, d2y_slice]
+print(f"************ The initial value of 1 vs. 2 value function is {value_function1v2_3}. ************ \n")
 
 
 num_attacker = len(attackers_initials)
@@ -127,7 +121,6 @@ for _ in range(0, times):
     RA1v2, RA1v2_ = capture_1vs2(current_attackers, current_defenders, v1v2)  # attacker will win the 1 vs. 2 game
     RA1v1s.append(RA1v1)
     RA1v2s.append(RA1v2)
-
     
     control_defenders = [[] for num in range(num_defender)]  # current controls of defenders, [(d1xc, d1yc), (d2xc, d2yc)]
     a1x, a1y = current_attackers[0]
@@ -146,10 +139,9 @@ for _ in range(0, times):
     ax_slice, ay_slice, d1x_slice, d1y_slice, d2x_slice, d2y_slice = lo2slice2v1(joint_state1v2, slices=grid_size1v2)
     # value_function_current_state = v1v2[:, :, d1x_slice, d1y_slice, d2x_slice, d2y_slice]
     value_function_state = v1v2[ax_slice, ay_slice, d1x_slice, d1y_slice, d2x_slice, d2y_slice]
-    judges.append(1 if value_function_state<=0 else 0)
+    judges.append(value_function_state)
     # plot_game1v2(grid1v2, value_function_current_state, current_attackers, current_defenders, name="$\mathcal{RA}^{12}_{\infty}$")
     
-
     # update the next postions of defenders
     # newd_positions = next_positions(current_defenders, control_defenders, deltat)  # , selected, current_captured
     newd_positions = next_positions_d(current_defenders, control_defenders, deltat)
@@ -177,7 +169,7 @@ for _ in range(0, times):
     attackers_status_logs.append(deepcopy(attackers_status))
     attackers_arrived = arrived_check(current_attackers)
     stops_index = stoped_check(attackers_status, attackers_arrived)
-    print(f"The current status at iteration{_} of attackers is arrived:{attackers_arrived} + been captured:{attackers_status}. \n")
+    # print(f"The current status at iteration{_} of attackers is arrived:{attackers_arrived} + been captured:{attackers_status}. \n")
 
     if len(stops_index) == num_attacker:
         print(f"All attackers have arrived or been captured at the time t={(_+1)*deltat}. \n")
@@ -185,13 +177,13 @@ for _ in range(0, times):
 
 print("The game is over. \n")
 
-print(f"The results of the selected is {capture_decisions}. \n")
-print(f"The final captured_status of all attackers is {attackers_status_logs[-1]}. \n")
+# print(f"The results of the selected is {capture_decisions}. \n")
+# print(f"The final captured_status of all attackers is {attackers_status_logs[-1]}. \n")
 
 
-print(f"The RA1v1s is {RA1v1s}. \n")
-print(f"The RA1v2s is {RA1v2s}. \n")
-print(f"During the game, the joint state is within the BRT: {judges}. \n")
+# print(f"The RA1v1s is {RA1v1s}. \n")
+# print(f"The RA1v2s is {RA1v2s}. \n")
+# print(f"During the game, the joint state is within the BRT: {judges}. \n")
 # Play the animation
 animation_2v1(attackers_trajectory, defenders_trajectory, attackers_status_logs, T)
 # print(f"The controls of defender0 is {controls_defender0}. \n")
