@@ -31,14 +31,14 @@ start_time = time.time()
 grids = Grid(np.array([-1.0, -1.0]), np.array([1.0, 1.0]), 2, np.array([100, 100])) # original 45
 
 # 2. Initialize the dynamics
-agents_1v0 = AttackerDefender1v0(uMode="min", dMode="max")  # 1v1 (4 dims dynamics)
+agents_1v0 = AttackerDefender1v0(uMode="min", dMode="max")  
 
 # 3. Instruct the avoid set and reach set
 # 3.1 Avoid set, no constraint means inf
 obs1_attack = ShapeRectangle(grids, [-0.1, -1.0], [0.1, -0.3])  # attacker stuck in obs1
 obs2_attack = ShapeRectangle(grids, [-0.1, 0.30], [0.1, 0.60])  # attacker stuck in obs2
 # obs3_capture = agents_1v0.capture_set(grids, 0.1, "capture")  # attacker being captured by defender, try different radius
-avoid_set = np.minimum(obs1_attack, obs2_attack)
+avoid_set = np.minimum(obs1_attack, obs2_attack)  # union means np.minimum
 
 # 3.2 Reach set, run and see what it is!
 goal1_destination = ShapeRectangle(grids, [0.6, 0.1], [0.8, 0.3])  # attacker arrives target
@@ -49,13 +49,13 @@ reach_set = goal1_destination
 # plot_original(grids, reach_set)
 
 # 4. Set the look-back length and time step
-lookback_length = 2.5  # the same as 2014Mo 
+lookback_length = 20.0  # the same as 2014Mo 
 t_step = 0.025
 small_number = 1e-5
 tau = np.arange(start=0, stop=lookback_length + small_number, step=t_step)
 
 # while plotting make sure the len(slicesCut) + len(plotDims) = grid.dims
-po = PlotOptions(do_plot=False, plot_type="2d_plot", plotDims=[0, 1], slicesCut=[22, 22])
+po = PlotOptions(do_plot=True, plot_type="2d_plot", plotDims=[0, 1], slicesCut=[0, 0])
 
 # 5. Call HJSolver function
 compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithObstacle"} # original one

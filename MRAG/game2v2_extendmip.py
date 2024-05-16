@@ -41,8 +41,13 @@ tau2v1 = np.arange(start=0, stop=4.5 + 1e-5, step=0.025)
 # attackers_initials = [(-0.5, 0.5), (0.8, -0.5)]
 # defenders_initials = [(-0.3, 0.0), (0.3, 0.0)]  # , (0.3, -0.5)
 
-attackers_initials = [(-0.5, 0.5), (0.8, -0.5)]  # [(-0.5, 0.5), (0.8, -0.5)]
-defenders_initials = [(0.3, 0.5), (0.3, -0.5)]  
+# attackers_initials = [(-0.5, 0.5), (0.8, -0.5)]  # [(-0.5, 0.5), (0.8, -0.5)]
+# defenders_initials = [(0.3, 0.5), (0.3, -0.5)]  
+
+
+attackers_initials = [(-0.20858462485772092, 0.3159051917190883), (0.7637797872972226, -0.18710865446033892)]  # [(-0.5, 0.5), (0.8, -0.5)]
+defenders_initials = [(0.5693601683541638, 0.061632809442609834), (0.7164355518797395, -0.21683526850103896)]  
+
 
 # attackers_initials = [(-0.5, 0.5), (0.0, 0.8), (-0.5, -0.5), (0.8, -0.5)]
 # defenders_initials = [(-0.3, 0.0), (0.3, 0.0)]  # , (0.3, -0.5)
@@ -104,8 +109,8 @@ for _ in range(0, times):
     Escape1v1s.append(Escape1v1)
     Escape1v2s.append(Escape1v2)
 
-    selected, weights, assigned = extend_mip_solver1(num_attacker, num_defender, Escape1v1, Escape1v2, Escape_Triad, Escape_Pair)
-    # selected, weights, assigned = extend_mip_solver_test(num_attacker, num_defender, Escape1v1, Escape1v2, Escape_Triad, Escape_Pair)
+    # selected, weights, assigned = extend_mip_solver1(num_attacker, num_defender, Escape1v1, Escape1v2, Escape_Triad, Escape_Pair)
+    selected, weights, assigned = extend_mip_solver_test(num_attacker, num_defender, Escape1v1, Escape1v2, Escape_Triad, Escape_Pair)
     # print(f"In current step {_} the shape of weights is {weights.shape}.")
     # print(f"In current step {_} the assigned from attackers' views is {assigned}.")
     print(f"The MIP result at iteration{_} is {selected}. \n")
@@ -195,6 +200,12 @@ print("The game is over. \n")
 
 print(f"The results of the selected is {defenders_task}. \n")
 # print(f"The final captured_status of all attackers is {attackers_status_logs[-1]}. \n")
-print(f"In total {times} steps, the 1v2 game control is used {counters_1v2controls} times. \n")
+print(f"In total {_} steps, the 1v2 game control is used {counters_1v2controls} times. \n")
+
+# focus_step = 69
+# print(f"The position of attacker1 at step {focus_step}  is  {attackers_trajectory[0][focus_step]}. \n")
+# print(f"The trajectory of attacker2 at step {focus_step} is  {attackers_trajectory[1][focus_step]}. \n")
+# print(f"The trajectory of defender1 at step {focus_step} is {defenders_trajectory[0][focus_step]}. \n")
+# print(f"The trajectory of defender2 at step {focus_step} is {defenders_trajectory[1][focus_step]}. \n")
 
 animation_2v1(attackers_trajectory, defenders_trajectory, attackers_status_logs, T)
