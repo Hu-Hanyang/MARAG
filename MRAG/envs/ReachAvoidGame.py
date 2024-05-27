@@ -84,7 +84,7 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
 
         """
         new_status = np.zeros(self.NUM_ATTACKERS)
-        if self.step_counter == 0:
+        if self.step_counter == 0:  # Befire the first step
             return new_status
         else:       
             last_status = self.attackers_status[-1]
@@ -211,14 +211,40 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
 class RAG1vs1(ReachAvoidGameEnv):
     """1 vs. 1 reach-avoid game environment."""
 
-    def __init__(self, attackers_dynamics=Dynamics.SIG, 
+    def __init__(self, 
+                 num_attackers: int=1,
+                 num_defenders: int=1,
+                 attackers_dynamics=Dynamics.SIG, 
                  defender_dynamics=Dynamics.FSIG, 
                  initial_attacker=None, 
-                 initial_defender=None): 
+                 initial_defender=None, 
+                 ctrl_freq=200): 
 
-        super().__init__(attackers_dynamics=attackers_dynamics, 
+        super().__init__(num_attackers=num_attackers,
+                         num_defenders=num_defenders,
+                         attackers_dynamics=attackers_dynamics, 
                          defenders_dynamics=defender_dynamics, 
                          initial_attacker=initial_attacker, 
-                         initial_defender=initial_defender)
+                         initial_defender=initial_defender,
+                         ctrl_freq=ctrl_freq)
 
 
+class RAG2vs1(ReachAvoidGameEnv):
+    """1 vs. 1 reach-avoid game environment."""
+
+    def __init__(self, 
+                 num_attackers: int=2,
+                 num_defenders: int=1,
+                 attackers_dynamics=Dynamics.SIG, 
+                 defender_dynamics=Dynamics.FSIG, 
+                 initial_attacker=None, 
+                 initial_defender=None, 
+                 ctrl_freq=200): 
+
+        super().__init__(num_attackers=num_attackers,
+                         num_defenders=num_defenders,
+                         attackers_dynamics=attackers_dynamics, 
+                         defenders_dynamics=defender_dynamics, 
+                         initial_attacker=initial_attacker, 
+                         initial_defender=initial_defender,
+                         ctrl_freq=ctrl_freq)

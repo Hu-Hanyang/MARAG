@@ -1,7 +1,7 @@
 import numpy as np
 from enum import Enum
 from MRAG.dynamics.SingleIntegrator import SingleIntegrator
-from MRAG.envs.ReachAvoidGame import RAG1VS1
+from MRAG.envs.ReachAvoidGame import RAG1vs1
 
 class Physics:
     """Physics implementations enumeration class."""
@@ -129,6 +129,13 @@ class Physics:
 # print(f"The done is {done}. \n")
 
 ## RAG1VS1 test
-initial_attacker = np.array([[-1, 0.5]])
-initial_defender = np.array([[0.3, 0.2]])
-env = RAG1VS1(initial_attacker=initial_attacker, initial_defender=initial_defender)
+# initial_attacker = np.array([[-1, 0.5]])
+# initial_defender = np.array([[0.3, 0.2]])
+# env = RAG1VS1(initial_attacker=initial_attacker, initial_defender=initial_defender)
+
+# Attacker status test
+attackers_status = np.array([0, 1, -1, 0])
+num_attacker = 4
+for num in range(num_attacker):
+    if not attackers_status[num]:
+        print(f"The attacker {num} is free.")

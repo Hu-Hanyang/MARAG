@@ -2,11 +2,11 @@
 
 '''
 
+import math
+import time
 import numpy as np
 from MRAG.dynamics.SingleIntegrator import SingleIntegrator
 from MRAG.dynamics.DubinCar3D import DubinsCar
-
-value1vs1 = np.load('MRAG/values/1v1AttackDefend_g45_dspeed1.5.npy')
 
 
 def make_agents(physics_info, numbers, initials, freqency):
@@ -28,22 +28,190 @@ def make_agents(physics_info, numbers, initials, freqency):
         raise ValueError("Invalid physics info while generating agents.")
 
 
-def hj_preparations():
+def hj_preparations_sig():
+    """ Loads all calculated HJ value functions for the single integrator agents.
+    This function needs to be called before any game starts.
+    
+    Returns:
+        value1vs1 (np.ndarray): the value function for 1 vs 1 game
+        value2vs1 (np.ndarray): the value function for 2 vs 1 game
+        value1vs2 (np.ndarray): the value function for 1 vs 2 game
+    """
+    start = time.time()
+    value1vs1 = np.load('MRAG/values/1v1AttackDefend_g45_dspeed1.5.npy')
+    value2vs1 = np.load('MRAG/values/2v1AttackDefend_speed1.5.npy')
+    value1vs2 = np.load('MRAG/values/1v2AttackDefend_g35_dspeed1.5.npy')
+    end = time.time()
+    print(f"============= HJ value functions loaded Successfully! (Time: {end-start :.4f} seconds) =============")
+
+    return value1vs1, value2vs1, value1vs2
+
+
+def po2slice1vs1(attacker, defender, grid_size):
+    """ Convert the position of the attacker and defender to the slice of the value function for 1 vs 1 game.
+
+    Args:
+        attacker (np.ndarray): the attacker's state
+        defender (np.ndarray): the defender's state
+        grid_size (int): the size of the grid
+    
+    Returns:
+        joint_slice (tuple): the joint slice of the joint state using the grid size
+
+    """
+    joint_state = (attacker[0], attacker[1], defender[0], defender[1])  # (xA1, yA1, xD1, yD1)
+    joint_slice = []
+    grid_points = np.linspace(-1, +1, num=grid_size)
+    for i, s in enumerate(joint_state):
+        idx = np.searchsorted(grid_points, s)
+        if idx > 0 and (
+            idx == len(grid_points)
+            or math.fabs(s - grid_points[idx - 1])
+            < math.fabs(s - grid_points[idx])
+        ):
+            joint_slice.append(idx - 1)
+        else:
+            joint_slice.append(idx)
+
+    return tuple(joint_slice)
+
+
+def po2slice2vs1(attacker_i, attacker_k, defender, grid_size):
+    """ Convert the position of the attackers and defender to the slice of the value function for 2 vs 1 game.
+
+    Args:
+        attackers (np.ndarray): the attackers' states
+        defender (np.ndarray): the defender's state
+        grid_size (int): the size of the grid
+    
+    Returns:
+        joint_slice (tuple): the joint slice of the joint state using the grid size
+
+    """
+    joint_state = (attacker_i[0], attacker_i[1], attacker_k[0], attacker_k[1], defender[0], defender[1])  # (xA1, yA1, xA2, yA2, xD1, yD1)
+    joint_slice = []
+    grid_points = np.linspace(-1, +1, num=grid_size)
+    for i, s in enumerate(joint_state):
+        idx = np.searchsorted(grid_points, s)
+        if idx > 0 and (
+            idx == len(grid_points)
+            or math.fabs(s - grid_points[idx - 1])
+            < math.fabs(s - grid_points[idx])
+        ):
+            joint_slice.append(idx - 1)
+        else:
+            joint_slice.append(idx)
+
+    return tuple(joint_slice)
+
+
+def check_1vs1(attacker, defender, value1vs1):
+    """ Check if the attacker could escape from the defender in a 1 vs 1 game.
+
+    Args:
+        attacker (np.ndarray): the attacker's state
+        defender (np.ndarray): the defender's state
+        value1vs1 (np.ndarray): the value function for 1 vs 1 game
+    
+    Returns:
+        bool: False, if the attacker could escape (the attacker will win)
+    """
+    joint_slice = po2slice1vs1(attacker, defender, value1vs1.shape[0])
+    # print(f"The value1vs1[joint_slice] is {value1vs1[joint_slice]}. \n")
+
+    return value1vs1[joint_slice] > 0
+
+
+def check_2vs1(attacker_i, attacker_k, defender, value2vs1):
+    """ Check if the attackers could escape from the defender in a 2 vs 1 game.
+    Here escape means that at least one of the attackers could escape from the defender.
+
+    Args:
+        attacker_i (np.ndarray): the attacker_i's states
+        attacker_j (np.ndarray): the attacker_j's states
+        defender (np.ndarray): the defender's state
+        value2vs1 (np.ndarray): the value function for 2 vs 1 game
+    
+    Returns:
+        bool: False, if the attackers could escape (the attackers will win)
+    """
+    joint_slice = po2slice2vs1(attacker_i, attacker_k, defender, value2vs1.shape[0])
+
+    return value2vs1[joint_slice] > 0
+
+
+def judge_1vs1(attackers, defenders, current_attackers_status, value1vs1):
+    """ Check the result of the 1 vs 1 game for those free attackers.
+
+    Args:  
+        attackers (np.ndarray): the attackers' states
+        defenders (np.ndarray): the defenders' states
+        attackers_status (np.ndarray): the current moment attackers' status, 0 stands for free, -1 stands for captured, 1 stands for arrived
+        value1vs1 (np.ndarray): the value function for 1 vs 1 game
+    
+    Returns:
+        EscapedAttacker1vs1 (a list of lists): the attacker that could escape from the defender in a 1 vs 1 game
+    """
+    num_attackers, num_defenders = len(attackers), len(defenders)
+    EscapedAttacker1vs1 = [[] for _ in range(num_defenders)]
+
+    for j in range(num_defenders):
+        for i in range(num_attackers):
+            if not current_attackers_status[i]:  # the attcker[i] is free now
+                if not check_1vs1(attackers[i], defenders[j], value1vs1):  # the attacker could escape
+                    EscapedAttacker1vs1[j].append(i)
+
+    return EscapedAttacker1vs1
+    
+
+def judge_2vs1(attackers, defenders, current_attackers_status, value2vs1):
+    """ Check the result of the 2 vs 1 game for those free attackers.
+    
+    Args:
+        attackers (np.ndarray): the attackers' states
+        defenders (np.ndarray): the defenders' states
+        attackers_status (np.ndarray): the current moment attackers' status, 0 stands for free, -1 stands for captured, 1 stands for arrived
+        value2vs1 (np.ndarray): the value function for 2 vs 1 game
+    
+    Returns:
+        EscapedPairs2vs1 (a list of lists): the pair of attackers that could escape from the defender in a 2 vs 1 game
+    """
+    num_attackers, num_defenders = len(attackers), len(defenders)
+    EscapedPairs2vs1 = [[] for _ in range(num_defenders)]
+    for j in range(num_defenders):
+        for i in range(num_attackers):
+            if not current_attackers_status[i]:  # the attcker[i] is free now
+                for k in range(i+1, num_attackers):
+                    if not current_attackers_status[k]:
+                        if not check_2vs1(attackers[i], attackers[k], defenders[j], value2vs1):
+                            EscapedPairs2vs1[j].append([i, k])
+    
+    return EscapedPairs2vs1
+
+
+
+def judge_1vs2(attackers, defenders, current_attackers_status, value1vs2):
+    """ Check the result of the 1 vs 2 game for those free attackers.
+
+    Args:
+        attackers (np.ndarray): the attackers' states
+        defenders (np.ndarray): the defenders' states
+        attackers_status (np.ndarray): the current moment attackers' status, 0 stands for free, -1 stands for captured, 1 stands for arrived
+        value1vs2 (np.ndarray): the value function for 1 vs 2 game
+
+    Returns:
+        EscapedAttackers1vs2 (a list of lists): the attacker that could escape from the defenders in a 1 vs 2 game
+    """
     pass
 
-def judge_1vs1(attackers, defenders, attackers_status, value1vs1):
-    pass
-
-def judge_2vs1(attackers, defenders, attackers_status, value2vs1):
-    pass
-
-def judge_1vs2(attackers, defenders, attackers_status, value1vs2):
-    pass
-
-def judges(attackers, defenders, attackers_status, value1vs1, value2vs1, value1vs2):
+def judges(attackers, defenders, current_attackers_status, value1vs1, value2vs1, value1vs2):
     pass
 
 
 
 
+def animate_game():
+    pass
 
+def initial_check(attackers, defenders, value1vs1, value2vs1, value1vs2):
+    pass

@@ -145,8 +145,7 @@ class BaseGameEnv(gym.Env):
         Parameters
         ----------
         action : ndarray | (num_players, dim_action)
-            The input action for all players, translated into RPMs by
-            the specific implementation of `_preprocessAction()` in each subclass.
+            The input action for all players (in the sequence of attackers + defenders).
 
         Returns
         -------
