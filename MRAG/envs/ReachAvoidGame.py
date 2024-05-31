@@ -10,7 +10,7 @@ from MRAG.envs.BaseGame import Dynamics
 
 
 class ReachAvoidGameEnv(BaseRLGameEnv):
-    """Single agent RL problem: hover at position."""
+    """Multi-agent reach-avoid games."""
 
     ################################################################################
     
@@ -22,6 +22,8 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
                  initial_attacker: np.ndarray=None,  # shape (num_atackers, state_dim)
                  initial_defender: np.ndarray=None,  # shape (num_defenders, state_dim)
                  ctrl_freq: int = 200,
+                 uMode="min", 
+                 dMode="max",
                  output_folder='results',
                  game_length_sec=20,
                  map={'map': [-1., 1., -1., 1.]},  # Hanyang: rectangele [xmin, xmax, ymin, ymax]
@@ -46,6 +48,10 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
             A dictionary contains the dynamics of the defenders.
         ctrl_freq : int, optional
             The control frequency of the environment.
+        uMode : str, optional
+            The mode of the attacker, default is "min".
+        dMode : str, optional
+            The mode of the defender, default is "max".
         output_folder : str, optional
             The folder where to save logs.
         game_length_sec=20 : int, optional
@@ -74,6 +80,8 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
         self.des = des
         self.obstacles = obstacles
         self.GAME_LENGTH_SEC = game_length_sec
+        self.uMode = uMode
+        self.dMode = dMode
     ################################################################################
     
     def _getAttackersStatus(self):
@@ -206,7 +214,106 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
         info['current_attackers_status'] = self.attackers_status[-1]
         
         return info 
+    
+    ################################################################################
+    
+    def optDistb_2vs1(self, spat_deriv):
+        """Computes the optimal control (disturbance) for the defender in a 2 vs. 1 game.
+        
+        Parameters:
+            spat_deriv (tuple): spatial derivative in all dimensions
+        
+        Returns:
+            tuple: a tuple of optimal control of the defender (disturbances)
+        """
+        opt_d1 = self.defenders.uMax
+        opt_d2 = self.defenders.uMax
+        deriv5 = spat_deriv[4]
+        deriv6 = spat_deriv[5]
+        distb_len = np.sqrt(deriv5*deriv5 + deriv6*deriv6)
+        if self.dMode == "max":
+            if distb_len == 0:
+                opt_d1 = 0.0
+                opt_d2 = 0.0
+            else:
+                opt_d1 = self.defenders.speed * deriv5 / distb_len
+                opt_d2 = self.defenders.speed * deriv6 / distb_len
+        else:
+            if distb_len == 0:
+                opt_d1 = 0.0
+                opt_d2 = 0.0
+            else:
+                opt_d1 = -self.defenders.speed * deriv5 / distb_len
+                opt_d2 = -self.defenders.speed * deriv6 / distb_len
+        return (opt_d1, opt_d2)
+    
+    ################################################################################
+    
+    def optDistb_1vs1(self, spat_deriv):
+        """Computes the optimal control (disturbance) for the defender in a 1 vs. 1 game.
+        
+        Parameters:
+            spat_deriv (tuple): spatial derivative in all dimensions
+        
+        Returns:
+            tuple: a tuple of optimal control of the defender (disturbances)
+        """
+        opt_d1 = self.defenders.uMax
+        opt_d2 = self.defenders.uMax
+        deriv3 = spat_deriv[2]
+        deriv4 = spat_deriv[3]
+        distb_len = np.sqrt(deriv3*deriv3 + deriv4*deriv4)
+        if self.dMode == "max":
+            if distb_len == 0:
+                opt_d1 = 0.0
+                opt_d2 = 0.0
+            else:
+                opt_d1 = self.defenders.speed * deriv3 / distb_len
+                opt_d2 = self.defenders.speed * deriv4 / distb_len
+        else:
+            if distb_len == 0:
+                opt_d1 = 0.0
+                opt_d2 = 0.0
+            else:
+                opt_d1 = -self.defenders.speed * deriv3 / distb_len
+                opt_d2 = -self.defenders.speed * deriv4 / distb_len
+        return (opt_d1, opt_d2)
 
+    ################################################################################
+
+    def optCtrl_1vs0(self, spat_deriv):
+        """Computes the optimal control (disturbance) for the attacker in a 1 vs. 0 game.
+        
+        Parameters:
+            spat_deriv (tuple): spatial derivative in all dimensions
+        
+        Returns:
+            tuple: a tuple of optimal control of the defender (disturbances)
+        """
+        opt_a1 = self.attackers.uMax
+        opt_a2 = self.attackers.uMax
+        deriv1 = spat_deriv[0]
+        deriv2 = spat_deriv[1]
+        ctrl_len = np.sqrt(deriv1*deriv1 + deriv2*deriv2)
+        if self.uMode == "min":
+            if ctrl_len == 0:
+                opt_a1 = 0.0
+                opt_a2 = 0.0
+            else:
+                opt_a1 = - self.attackers.speed * deriv1 / ctrl_len
+                opt_a2 = - self.attackers.speed * deriv2 / ctrl_len
+        else:
+            if ctrl_len == 0:
+                opt_a1 = 0.0
+                opt_a2 = 0.0
+            else:
+                opt_a1 = self.attackers.speed * deriv1 / ctrl_len
+                opt_a2 = self.attackers.speed * deriv2 / ctrl_len
+        return (opt_a1, opt_a2)
+        
+    ################################################################################
+
+        
 
 class RAG1vs1(ReachAvoidGameEnv):
     """1 vs. 1 reach-avoid game environment."""

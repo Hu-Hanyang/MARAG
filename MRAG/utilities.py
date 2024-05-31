@@ -5,6 +5,8 @@
 import math
 import time
 import numpy as np
+
+from odp.Grid import Grid
 from MRAG.dynamics.SingleIntegrator import SingleIntegrator
 from MRAG.dynamics.DubinCar3D import DubinsCar
 
@@ -33,18 +35,29 @@ def hj_preparations_sig():
     This function needs to be called before any game starts.
     
     Returns:
+        value1vs0 (np.ndarray): the value function for 1 vs 0 game with all time slices
         value1vs1 (np.ndarray): the value function for 1 vs 1 game
         value2vs1 (np.ndarray): the value function for 2 vs 1 game
         value1vs2 (np.ndarray): the value function for 1 vs 2 game
+        grid1vs0 (Grid): the grid for 1 vs 0 game
+        grid1vs1 (Grid): the grid for 1 vs 1 game
+        grid2vs1 (Grid): the grid for 2 vs 1 game
+        grid1vs2 (Grid): the grid for 1 vs 2 game
     """
     start = time.time()
+    value1vs0 = np.load('MRAG/values/1v0AttackDefend_g100_speed1.0.npy')
     value1vs1 = np.load('MRAG/values/1v1AttackDefend_g45_dspeed1.5.npy')
-    value2vs1 = np.load('MRAG/values/2v1AttackDefend_speed1.5.npy')
+    value2vs1 = np.load('MRAG/values/2v1AttackDefend_g30_speed1.5.npy')
     value1vs2 = np.load('MRAG/values/1v2AttackDefend_g35_dspeed1.5.npy')
     end = time.time()
     print(f"============= HJ value functions loaded Successfully! (Time: {end-start :.4f} seconds) =============")
+    grid1vs0 = Grid(np.array([-1.0, -1.0]), np.array([1.0, 1.0]), 2, np.array([100, 100])) 
+    grid1vs1 = Grid(np.array([-1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0, 1.0]), 4, np.array([45, 45, 45, 45]))
+    grid2vs1 = Grid(np.array([-1.0, -1.0, -1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]), 6, np.array([30, 30, 30, 30, 30, 30]))
+    grid1vs2 = Grid(np.array([-1.0, -1.0, -1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]), 6, np.array([35, 35, 35, 35, 35, 35]))
+    print(f"============= Grids created Successfully! =============")
 
-    return value1vs1, value2vs1, value1vs2
+    return value1vs0, value1vs1, value2vs1, value1vs2, grid1vs0, grid1vs1, grid2vs1, grid1vs2
 
 
 def po2slice1vs1(attacker, defender, grid_size):
@@ -117,7 +130,6 @@ def check_1vs1(attacker, defender, value1vs1):
         bool: False, if the attacker could escape (the attacker will win)
     """
     joint_slice = po2slice1vs1(attacker, defender, value1vs1.shape[0])
-    # print(f"The value1vs1[joint_slice] is {value1vs1[joint_slice]}. \n")
 
     return value1vs1[joint_slice] > 0
 
@@ -170,7 +182,7 @@ def judge_2vs1(attackers, defenders, current_attackers_status, value2vs1):
     Args:
         attackers (np.ndarray): the attackers' states
         defenders (np.ndarray): the defenders' states
-        attackers_status (np.ndarray): the current moment attackers' status, 0 stands for free, -1 stands for captured, 1 stands for arrived
+        current_attackers_status (np.ndarray): the current moment attackers' status, 0 stands for free, -1 stands for captured, 1 stands for arrived
         value2vs1 (np.ndarray): the value function for 2 vs 1 game
     
     Returns:
@@ -189,25 +201,57 @@ def judge_2vs1(attackers, defenders, current_attackers_status, value2vs1):
     return EscapedPairs2vs1
 
 
-
 def judge_1vs2(attackers, defenders, current_attackers_status, value1vs2):
     """ Check the result of the 1 vs 2 game for those free attackers.
 
     Args:
         attackers (np.ndarray): the attackers' states
         defenders (np.ndarray): the defenders' states
-        attackers_status (np.ndarray): the current moment attackers' status, 0 stands for free, -1 stands for captured, 1 stands for arrived
+        current_attackers_status (np.ndarray): the current moment attackers' status, 0 stands for free, -1 stands for captured, 1 stands for arrived
         value1vs2 (np.ndarray): the value function for 1 vs 2 game
 
     Returns:
         EscapedAttackers1vs2 (a list of lists): the attacker that could escape from the defenders in a 1 vs 2 game
+        EscapedTri1vs2 (a list of lists): the triad of the attacker and defenders that could escape from the defenders in a 1 vs 2 game
     """
-    pass
+    num_attackers, num_defenders = len(attackers), len(defenders)
+    EscapedAttackers1vs2 = [[] for _ in range(num_defenders)]
+    EscapedTri1vs2 = [[] for _ in range(num_defenders)]  #
+    for j in range(num_defenders):
+        for k in range(j+1, num_defenders):
+            for i in range(num_attackers):
+                if not current_attackers_status[i]:
+                    if not check_2vs1(attackers[i], defenders[j], defenders[k], value1vs2):
+                        EscapedAttackers1vs2[j].append(i)
+                        EscapedAttackers1vs2[k].append(i)
+                        EscapedTri1vs2[j].append([i, j, k])
+                        EscapedTri1vs2[k].append([i, j, k])
+                        
+    return EscapedAttackers1vs2, EscapedTri1vs2
+
 
 def judges(attackers, defenders, current_attackers_status, value1vs1, value2vs1, value1vs2):
-    pass
+    """ Check the result of 1 vs. 1, 2 vs. 1 and 1 vs. 2 games for those free attackers.
 
+    Args:
+        attackers (np.ndarray): the attackers' states
+        defenders (np.ndarray): the defenders' states
+        current_attackers_status (np.ndarray): the current moment attackers' status, 0 stands for free, -1 stands for captured, 1 stands for arrived
+        value1vs1 (np.ndarray): the value function for 1 vs 1 game
+        value2vs1 (np.ndarray): the value function for 2 vs 1 game
+        value1vs2 (np.ndarray): the value function for 1 vs 2 game
 
+    Returns:
+        EscapedAttacker1vs1 (a list of lists): the attacker that could escape from the defender in a 1 vs 1 game
+        EscapedPairs2vs1 (a list of lists): the pair of attackers that could escape from the defender in a 2 vs 1 game
+        EscapedAttackers1vs2 (a list of lists): the attacker that could escape from the defenders in a 1 vs 2 game
+        EscapedTri1vs2 (a list of lists): the triad of the attacker and defenders that could escape from the defenders in a 1 vs 2 game
+    """
+    EscapedAttacker1vs1 = judge_1vs1(attackers, defenders, current_attackers_status, value1vs1)
+    EscapedPairs2vs1 = judge_2vs1(attackers, defenders, current_attackers_status, value2vs1)
+    EscapedAttackers1vs2, EscapedTri1vs2 = judge_1vs2(attackers, defenders, current_attackers_status, value1vs2)
+    
+    return EscapedAttacker1vs1, EscapedPairs2vs1, EscapedAttackers1vs2, EscapedTri1vs2
 
 
 def animate_game():

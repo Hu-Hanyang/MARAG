@@ -130,12 +130,20 @@ class Physics:
 
 ## RAG1VS1 test
 # initial_attacker = np.array([[-1, 0.5]])
-# initial_defender = np.array([[0.3, 0.2]])
+initial_defender = np.array([[0.3, 0.2]])
+print(initial_defender[0].shape)
+print(list(initial_defender[0]))
 # env = RAG1VS1(initial_attacker=initial_attacker, initial_defender=initial_defender)
 
 # Attacker status test
-attackers_status = np.array([0, 1, -1, 0])
-num_attacker = 4
-for num in range(num_attacker):
-    if not attackers_status[num]:
-        print(f"The attacker {num} is free.")
+# attackers_status = np.array([0, 1, -1, 0])
+# # num_attacker = 4
+# number_of_zeros = np.count_nonzero(attackers_status == 0)
+# zero_positions = np.where(attackers_status == 0)[0]
+# print(f"The shape of the attackers_status is {attackers_status.shape}. \n")
+# print(f"The number of zeros is {number_of_zeros}. \n")
+# print(f"The zero_positions is {zero_positions}. \n")
+# print(zero_positions[0])
+# for num in range(num_attacker):
+#     if not attackers_status[num]:
+#         print(f"The attacker {num} is free.")

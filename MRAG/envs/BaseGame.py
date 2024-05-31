@@ -170,7 +170,7 @@ class BaseGameEnv(gym.Env):
         """
         
         #### Step the simulation using the desired physics update ##
-        assert action.shape[0] == self.NUM_PLAYERS+ self.NUM_DEFENDERS, \
+        assert action.shape[0] == self.NUM_PLAYERS, \
             "The action dimension does not match the attackers and defenders."
             
         attackers_action = action[:self.NUM_ATTACKERS]  # ndarray, shape (num_attackers, dim_action)
