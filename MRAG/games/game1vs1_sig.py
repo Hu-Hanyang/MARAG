@@ -4,7 +4,7 @@ from MRAG.envs.ReachAvoidGame import RAG1vs1
 from MRAG.solvers import mip_solver, extend_mip_solver
 from MRAG.utilities import *
 from MRAG.controllers import hj_contoller_attackers, hj_controller_defenders
-from MRAG.plots import plot_1vs1
+from MRAG.plots import animation
 
 
 #### Game Settings ####
@@ -23,8 +23,9 @@ total_steps = int(T * ctrl_freq)
 game = RAG1vs1(initial_attacker=initial_attacker, initial_defender=initial_defender, ctrl_freq=ctrl_freq)
 
 #### Game Loop ####
+print(f"================ The game is started. ================")
 for step in range(total_steps):
-    EscapedAttacker1vs1, EscapedPairs2vs1, EscapedAttackers1vs2, EscapedTri1vs2 =  judges(game.attackers.state, game.defenders.state, game.attackers_status[-1], value1vs1, value2vs1, value1vs2)
+    EscapedAttacker1vs1, EscapedPairs2vs1, EscapedAttackers1vs2, EscapedTri1vs2 = judges(game.attackers.state, game.defenders.state, game.attackers_status[-1], value1vs1, value2vs1, value1vs2)
     assignments = mip_solver(num_defenders, game.attackers_status[-1],  EscapedAttacker1vs1, EscapedPairs2vs1)
     control_defenders = hj_controller_defenders(game, assignments, value1vs1, value2vs1, grid1vs1, grid2vs1)
     control_attackers = hj_contoller_attackers(game, value1vs0, grid1vs0)
@@ -33,7 +34,7 @@ for step in range(total_steps):
     if terminated or truncated:
         break
     
-print(f"The game is over at the {step} step ({step*ctrl_freq} seconds).")
+print(f"================ The game is over at the {step} step ({step*ctrl_freq} seconds). ================")
 
 
 #### Animation ####
