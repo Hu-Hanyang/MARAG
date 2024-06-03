@@ -1,6 +1,6 @@
 import numpy as np
 
-from MRAG.envs.ReachAvoidGame import RAG1vs1, RAG2vs1, ReachAvoidGameEnv
+from MRAG.envs.ReachAvoidGame import ReachAvoidGameEnv
 from MRAG.solvers import mip_solver, extend_mip_solver
 from MRAG.utilities import *
 from MRAG.controllers import hj_contoller_attackers, hj_controller_defenders
@@ -20,7 +20,7 @@ ctrl_freq = 200  # control frequency
 total_steps = int(T * ctrl_freq)
 
 #### Game Initialization ####
-game = ReachAvoidGameEnv(num_attackers=6, num_defenders=2, 
+game = ReachAvoidGameEnv(num_attackers=num_attackers, num_defenders=num_defenders, 
                          initial_attacker=initial_attacker, initial_defender=initial_defender, 
                          ctrl_freq=ctrl_freq)
 
@@ -29,9 +29,6 @@ print(f"================ The game is started. ================")
 for step in range(total_steps):
     print(f"================ The {step} step is started. ================")
     EscapedAttacker1vs1, EscapedPairs2vs1, EscapedAttackers1vs2, EscapedTri1vs2 = judges(game.attackers.state, game.defenders.state, game.attackers_status[-1], value1vs1, value2vs1, value1vs2)
-    # print((f"The current status of the attackers is {game.attackers_status[-1]}"))
-    # print(f"EscapedAttacker1vs1: {EscapedAttacker1vs1}")
-    # print(f"EscapedPairs2vs1: {EscapedPairs2vs1}")
     assignments = mip_solver(num_defenders, game.attackers_status[-1],  EscapedAttacker1vs1, EscapedPairs2vs1)
     control_defenders = hj_controller_defenders(game, assignments, value1vs1, value2vs1, grid1vs1, grid2vs1)
     control_attackers = hj_contoller_attackers(game, value1vs0, grid1vs0)
@@ -41,3 +38,6 @@ for step in range(total_steps):
         break
     
 print(f"================ The game is over at the {step} step ({step / ctrl_freq} seconds). ================")
+
+#### Animation ####
+animation(game.attackers_traj, game.defenders_traj, game.attackers_status)

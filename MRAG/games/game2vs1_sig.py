@@ -20,7 +20,7 @@ ctrl_freq = 200  # control frequency
 total_steps = int(T * ctrl_freq)
 
 #### Game Initialization ####
-game = ReachAvoidGameEnv(num_attackers=2, num_defenders=1, 
+game = ReachAvoidGameEnv(num_attackers=num_attackers, num_defenders=num_defenders, 
                          initial_attacker=initial_attacker, initial_defender=initial_defender, 
                          ctrl_freq=ctrl_freq)
 
@@ -37,3 +37,6 @@ for step in range(total_steps):
         break
     
 print(f"================ The game is over at the {step} step ({step / ctrl_freq} seconds). ================")
+
+#### Animation ####
+animation(game.attackers_traj, game.defenders_traj, game.attackers_status)

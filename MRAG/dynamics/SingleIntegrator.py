@@ -69,6 +69,8 @@ class SingleIntegrator(BaseDynamics):
             action (np.ndarray, shape num_attacker x action_dim): the actions of all agents
         """
         for i in range(self.numbers):
+            # temp = self.forward(self.state[i], action[i])
+            # self.state[i] = temp
             self.state[i] = self.forward(self.state[i], action[i])
     
     def _get_state(self):

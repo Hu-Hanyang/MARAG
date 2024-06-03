@@ -20,7 +20,7 @@ ctrl_freq = 200  # control frequency
 total_steps = int(T * ctrl_freq)
 
 #### Game Initialization ####
-game = ReachAvoidGameEnv(num_attackers=1, num_defenders=1, 
+game = ReachAvoidGameEnv(num_attackers=num_attackers, num_defenders=num_defenders, 
                          initial_attacker=initial_attacker, initial_defender=initial_defender, 
                          ctrl_freq=ctrl_freq)
 
@@ -40,7 +40,12 @@ print(f"================ The game is over at the {step} step ({step / ctrl_freq}
 
 
 #### Animation ####
-
+# print((f"The length of the attackers trajectory is {len(game.attackers_traj)} and the length of the defenders trajectory is {len(game.defenders_traj)}"))
+# print(f"The attackers trajectory is {game.attackers_traj}. \n")
+# print(f"The defenders trajectory is {game.defenders_traj}. \n")
+# print(f"The attackers status is {game.attackers_status}")
+# print(f"The defenders trajectory is {game.defenders_traj}")
+animation(game.attackers_traj, game.defenders_traj, game.attackers_status)
 
 
 

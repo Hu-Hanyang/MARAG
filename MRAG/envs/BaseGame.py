@@ -102,9 +102,9 @@ class BaseGameEnv(gym.Env):
         # Update the state
         self.state = np.vstack([self.attackers._get_state(), self.defenders._get_state()])
         # Log the state and trajectory information
-        self.attackers_traj.append(self.attackers._get_state())
-        self.defenders_traj.append(self.defenders._get_state())
-        self.attackers_status.append(self._getAttackersStatus())
+        self.attackers_traj.append(self.attackers._get_state().copy())
+        self.defenders_traj.append(self.defenders._get_state().copy())
+        self.attackers_status.append(self._getAttackersStatus().copy())
     
     ################################################################################
 
