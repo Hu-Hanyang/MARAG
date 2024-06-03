@@ -1,6 +1,6 @@
 import numpy as np
 
-from MRAG.envs.ReachAvoidGame import RAG1vs1, RAG2vs1
+from MRAG.envs.ReachAvoidGame import ReachAvoidGameEnv
 from MRAG.solvers import mip_solver, extend_mip_solver
 from MRAG.utilities import *
 from MRAG.controllers import hj_contoller_attackers, hj_controller_defenders
@@ -20,7 +20,9 @@ ctrl_freq = 200  # control frequency
 total_steps = int(T * ctrl_freq)
 
 #### Game Initialization ####
-game = RAG2vs1(initial_attacker=initial_attacker, initial_defender=initial_defender, ctrl_freq=ctrl_freq)
+game = ReachAvoidGameEnv(num_attackers=2, num_defenders=1, 
+                         initial_attacker=initial_attacker, initial_defender=initial_defender, 
+                         ctrl_freq=ctrl_freq)
 
 #### Game Loop ####
 print(f"================ The game is started. ================")

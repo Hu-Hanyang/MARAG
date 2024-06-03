@@ -136,8 +136,13 @@ print(list(initial_defender[0]))
 # env = RAG1VS1(initial_attacker=initial_attacker, initial_defender=initial_defender)
 
 # Attacker status test
-# attackers_status = np.array([0, 1, -1, 0])
-# # num_attacker = 4
+current_attackers_status = np.array([ 0,  0,  0,  0, -1,  0.])
+num_attacker = 6
+num_free_attackers = np.count_nonzero(current_attackers_status == 0)
+free_attackers_positions = np.where(current_attackers_status == 0)[0]
+print(f"The free_attackers_positions is {free_attackers_positions}. \n")
+print(f"The position of the attacker 5 in free_attackers_positions is {np.where(free_attackers_positions == 5)[0][0]}. \n")
+
 # number_of_zeros = np.count_nonzero(attackers_status == 0)
 # zero_positions = np.where(attackers_status == 0)[0]
 # print(f"The shape of the attackers_status is {attackers_status.shape}. \n")
@@ -147,3 +152,4 @@ print(list(initial_defender[0]))
 # for num in range(num_attacker):
 #     if not attackers_status[num]:
 #         print(f"The attacker {num} is free.")
+

@@ -34,11 +34,12 @@ def mip_solver(num_defenders, current_attackers_status,  EscapedAttacker1vs1, Es
     # add constraint 3: the attacker i could not be captured by the defender j in the 1 vs. 1 game
     for j in range(num_defenders):
         for indiv in (EscapedAttacker1vs1[j]):
-            model += e[indiv][j] == 0
+            model += e[np.where(free_attackers_positions == indiv)[0][0]][j] == 0
     # add constraint 4: upper bound for attackers to be captured based on the 2 vs. 1 game result
     for j in range(num_defenders):
         for pairs in (EscapedPairs2vs1[j]):
-            model += e[pairs[0]][j] + e[pairs[1]][j] <= 1
+            print(f"j is {j}, pairs is {pairs}")
+            model += e[np.where(free_attackers_positions == pairs[0])[0][0]][j] + e[np.where(free_attackers_positions == pairs[1])[0][0]][j] <= 1
             
     # set up objective functions
     model.objective = maximize(xsum(e[i][j] for j in range(num_defenders) for i in range(num_free_attackers)))
