@@ -34,7 +34,7 @@ for step in range(total_steps):
     if terminated or truncated:
         break
     
-print(f"================ The game is over at the {step} step ({step*ctrl_freq} seconds). ================")
+print(f"================ The game is over at the {step} step ({step / ctrl_freq} seconds). ================")
 
 
 #### Animation ####

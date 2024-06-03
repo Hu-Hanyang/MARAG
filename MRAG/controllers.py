@@ -197,11 +197,11 @@ def hj_contoller_attackers(game, value1vs0, grid1vs0):
         if not current_attackers_status[i]:  # the attacker is free
             neg2pos, pos2neg = find_sign_change1v0(grid1vs0, value1vs0, attackers[i])
             if len(neg2pos):
-                control_attackers = attacker_control_1vs0(game, grid1vs0, value1vs0, attackers[i], neg2pos)
+                control_attackers[i] = attacker_control_1vs0(game, grid1vs0, value1vs0, attackers[i], neg2pos)
             else:
-                control_attackers = (0.0, 0.0)
+                control_attackers[i] = (0.0, 0.0)
         else:  # the attacker is captured or arrived
-            control_attackers = (0.0, 0.0)
+            control_attackers[i] = (0.0, 0.0)
             
     return control_attackers
 

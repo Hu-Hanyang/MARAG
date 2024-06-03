@@ -3,26 +3,35 @@ import numpy as np
 from MRAG.envs.ReachAvoidGame import RAG1vs1, RAG2vs1
 from MRAG.solvers import mip_solver, extend_mip_solver
 from MRAG.utilities import *
+from MRAG.controllers import hj_contoller_attackers, hj_controller_defenders
+from MRAG.plots import animation
 
 
 #### Game Settings ####
-value1vs1, value2vs1, value1vs2 = hj_preparations_sig()
+value1vs0, value1vs1, value2vs1, value1vs2, grid1vs0, grid1vs1, grid2vs1, grid1vs2  = hj_preparations_sig()
+num_attackers = 2
+num_defenders = 1
 initial_attacker = np.array([[-0.8, -0.5], [-0.8, 0.5]])
 initial_defender = np.array([[0.8, 0.0]])
+assert num_attackers == initial_attacker.shape[0], "The number of attackers should be equal to the number of initial attacker states."
+assert num_defenders == initial_defender.shape[0], "The number of defenders should be equal to the number of initial defender states."
 T = 10.0  # time for the game
 ctrl_freq = 200  # control frequency
 total_steps = int(T * ctrl_freq)
-#### Controller ####
 
+#### Game Initialization ####
+game = RAG2vs1(initial_attacker=initial_attacker, initial_defender=initial_defender, ctrl_freq=ctrl_freq)
 
-env = RAG2vs1(initial_attacker=initial_attacker, initial_defender=initial_defender, ctrl_freq=ctrl_freq)
-
-print(f"Initial Attacker State: {env.attackers.state}")
-print(f"Initial Defender State: {env.defenders.state}")
-print(f"Initial Attacker Status: {env.attackers_status}")
-
-EscapedAttacker2vs1 = judge_2vs1(env.attackers.state, env.defenders.state, env.attackers_status[-1], value2vs1)
-print(f"EscapedAttacker2vs1: {EscapedAttacker2vs1}")
-
-
-
+#### Game Loop ####
+print(f"================ The game is started. ================")
+for step in range(total_steps):
+    EscapedAttacker1vs1, EscapedPairs2vs1, EscapedAttackers1vs2, EscapedTri1vs2 = judges(game.attackers.state, game.defenders.state, game.attackers_status[-1], value1vs1, value2vs1, value1vs2)
+    assignments = mip_solver(num_defenders, game.attackers_status[-1],  EscapedAttacker1vs1, EscapedPairs2vs1)
+    control_defenders = hj_controller_defenders(game, assignments, value1vs1, value2vs1, grid1vs1, grid2vs1)
+    control_attackers = hj_contoller_attackers(game, value1vs0, grid1vs0)
+    obs, reward, terminated, truncated, info = game.step(np.vstack((control_attackers, control_defenders)))
+    
+    if terminated or truncated:
+        break
+    
+print(f"================ The game is over at the {step} step ({step / ctrl_freq} seconds). ================")
