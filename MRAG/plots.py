@@ -169,7 +169,7 @@ def animation(attackers_traj, defenders_traj, attackers_status):
 
         # Generate a frame based on the characteristic of each agent
         frames.append(go.Frame(data=go.Scatter(x=x_list, y=y_list, mode="markers", name="Agents trajectory",
-                                               marker=dict(symbol=symbol_list, size=4, color=color_list), showlegend=False)))
+                                               marker=dict(symbol=symbol_list, size=6, color=color_list), showlegend=False)))
 
     
     # Static object - obstacles, goal region, grid

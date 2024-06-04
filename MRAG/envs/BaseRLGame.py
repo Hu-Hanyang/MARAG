@@ -6,7 +6,6 @@ This module also contains enumerations for cost functions, tasks, disturbances, 
 
 import os
 import numpy as np
-import pybullet as p
 from gymnasium import spaces
 from collections import deque
 

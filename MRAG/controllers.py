@@ -138,6 +138,7 @@ def find_sign_change1v0(grid1vs0, value1vs0, attacker):
 def hj_controller_defenders(game, assigments, 
                             value1vs1, value2vs1, 
                             grid1vs1, grid2vs1):
+    #TODO: Hanyang: big exits 
     """This fuction computes the control for the defenders based on the assignments. 
        Assume dynamics are single integrator.
 
