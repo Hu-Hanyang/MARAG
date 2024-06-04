@@ -311,3 +311,51 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
         return (opt_a1, opt_a2)
         
     ################################################################################
+    def optDstb_1vs2(self, spat_deriv):
+        """Computes the optimal control (disturbance) for the attacker in a 1 vs. 2 game.
+        
+        Parameters:
+            spat_deriv (tuple): spatial derivative in all dimensions
+        
+        Returns:
+            tuple: a tuple of optimal control of the defender (disturbances)
+        """
+        opt_d1 = self.defenders.uMax
+        opt_d2 = self.defenders.uMax
+        opt_d3 = self.defenders.uMax
+        opt_d4 = self.defenders.uMax
+        deriv3 = spat_deriv[2]
+        deriv4 = spat_deriv[3]
+        deriv5 = spat_deriv[4]
+        deriv6 = spat_deriv[5]
+        distb_len1 = np.sqrt(deriv3*deriv3 + deriv4*deriv4)
+        distb_len2 = np.sqrt(deriv5*deriv5 + deriv6*deriv6)
+        # The initialized control only change sign in the following cases
+        if self.dMode == "max":
+            if distb_len1 == 0:
+                opt_d1 = 0.0
+                opt_d2 = 0.0
+            else:
+                opt_d1 = self.defenders.speed*deriv3 / distb_len1
+                opt_d2 = self.defenders.speed*deriv4 / distb_len1
+            if distb_len2 == 0:
+                opt_d3 = 0.0
+                opt_d4 = 0.0
+            else:
+                opt_d3 = self.defenders.speed*deriv5 / distb_len2
+                opt_d4 = self.defenders.speed*deriv6 / distb_len2
+        else:
+            if distb_len1 == 0:
+                opt_d1 = 0.0
+                opt_d2 = 0.0
+            else:
+                opt_d1 = -self.defenders.speed*deriv3 / distb_len1
+                opt_d2 = -self.defenders.speed*deriv4 / distb_len1
+            if distb_len2 == 0:
+                opt_d3 = 0.0
+                opt_d4 = 0.0
+            else:
+                opt_d3 = -self.defenders.speed*deriv5 / distb_len2
+                opt_d4 = -self.defenders.speed*deriv6 / distb_len2
+
+        return (opt_d1, opt_d2, opt_d3, opt_d4)

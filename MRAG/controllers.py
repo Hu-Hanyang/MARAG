@@ -65,14 +65,17 @@ def spa_deriv(slice_index, value_function, grid, periodic_dims=[]):
 
 
 def defender_control_2vs1(game, grid2vs1, value2vs1, jointstate_2vs1):
-    """Return a list of 2-dimensional control inputs of one defender based on the value function
+    """Return a tuple of 2-dimensional control inputs of one defender based on the value function
     
     Args:
-    game (class): the corresponding ReachAvoidGameEnv instance
-    grid2vs1 (class): the corresponding Grid instance
-    value2vs1 (ndarray, (grid_size*dim, 1)): 1v1 HJ reachability value function with only final slice
-    game (class instance): the corresponding ReachAvoidGameEnv instance
-    jointstate_2vs1 (tuple): the corresponding positions of (A1, A2, D)
+        game (class): the corresponding ReachAvoidGameEnv instance
+        grid2vs1 (class): the corresponding Grid instance
+        value2vs1 (ndarray, (grid_size*dim, 1)): 1v1 HJ reachability value function with only final slice
+        game (class instance): the corresponding ReachAvoidGameEnv instance
+        jointstate_2vs1 (tuple): the corresponding positions of (A1, A2, D1)
+
+    Returns:
+        opt_d1, opt_d2 (tuple): the optimal control of the defender
     """
     value2vs1s = value2vs1[..., np.newaxis] 
     spat_deriv_vector = spa_deriv(grid2vs1.get_index(jointstate_2vs1), value2vs1s, grid2vs1)
@@ -82,20 +85,43 @@ def defender_control_2vs1(game, grid2vs1, value2vs1, jointstate_2vs1):
 
 
 def defender_control_1vs1(game, grid1vs1, value1vs1, jointstate_1vs1):
-    """Return a list of 2-dimensional control inputs of one defender based on the value function
+    """Return a tuple of 2-dimensional control inputs of one defender based on the value function
     
     Args:
-    game (class): the corresponding ReachAvoidGameEnv instance
-    grid1v1 (class): the corresponding Grid instance
-    value1v1 (ndarray): 1v1 HJ reachability value function with only final slice
-    agents_1v1 (class): the corresponding AttackerDefender instance
-    joint_states1v1 (tuple): the corresponding positions of (A1, D1)
+        game (class): the corresponding ReachAvoidGameEnv instance
+        grid1v1 (class): the corresponding Grid instance
+        value1v1 (ndarray): 1vs1 HJ reachability value function with only final slice
+        agents_1v1 (class): the corresponding AttackerDefender instance
+        joint_states1v1 (tuple): the corresponding positions of (A1, D1)
+    
+    Returns:
+        opt_d1, opt_d2 (tuple): the optimal control of the defender
     """
     value1vs1s = value1vs1[..., np.newaxis] 
     spat_deriv_vector = spa_deriv(grid1vs1.get_index(jointstate_1vs1), value1vs1s, grid1vs1)
     opt_d1, opt_d2 = game.optDistb_1vs1(spat_deriv_vector)
 
     return (opt_d1, opt_d2)
+
+
+def defender_control_1vs2(game, grid1vs2, value1vs2, jointstate_1vs2):
+    """Return a tuple of 4-dimensional control inputs of one defender based on the value function
+    
+    Args:
+        game (class): the corresponding ReachAvoidGameEnv instance
+        grid1vs2 (class): the corresponding Grid instance
+        value1vs2 (ndarray, (grid_size*dim, 1)): 1vs2 HJ reachability value function with only final slice
+        game (class instance): the corresponding ReachAvoidGameEnv instance
+        jointstate_1vs2 (tuple): the corresponding positions of (A1, D1, D2)
+
+    Returns:
+        opt_d1, opt_d2 (tuple): the optimal control of the defender
+    """
+    value2vs1s = value1vs2[..., np.newaxis] 
+    spat_deriv_vector = spa_deriv(grid1vs2.get_index(jointstate_1vs2), value2vs1s, grid1vs2)
+    opt_d1, opt_d2, opt_d3, opt_d4 = game.optDistb_1vs2(spat_deriv_vector)
+
+    return (opt_d1, opt_d2, opt_d3, opt_d4)
 
 
 def attacker_control_1vs0(game, grid1vs0, value1vs0, attacker, neg2pos):
@@ -135,10 +161,9 @@ def find_sign_change1v0(grid1vs0, value1vs0, attacker):
     return np.where(checklist==1)[0], np.where(checklist==-1)[0]
 
 
-def hj_controller_defenders(game, assigments, 
+def hj_controller_defenders(game, assignments, 
                             value1vs1, value2vs1, 
-                            grid1vs1, grid2vs1):
-    #TODO: Hanyang: big exits 
+                            grid1vs1, grid2vs1): 
     """This fuction computes the control for the defenders based on the assignments. 
        Assume dynamics are single integrator.
 
@@ -159,23 +184,88 @@ def hj_controller_defenders(game, assigments,
     defenders = game.defenders.state.copy()
     num_defenders = game.NUM_DEFENDERS 
     control_defenders = np.zeros((num_defenders, 2))
+
     for j in range(num_defenders):
         d1x, d1y = defenders[j]
-        if len(assigments[j]) == 2: # defender j capture the attacker selected[j][0] and selected[j][1]
-            a1x, a1y = attackers[assigments[j][0]]
-            a2x, a2y = attackers[assigments[j][1]]
+        if len(assignments[j]) == 2: # defender j capture the attacker selected[j][0] and selected[j][1]
+            a1x, a1y = attackers[assignments[j][0]]
+            a2x, a2y = attackers[assignments[j][1]]
             jointstate_2vs1 = (a1x, a1y, a2x, a2y, d1x, d1y)
             control_defenders[j] = defender_control_2vs1(game, grid2vs1, value2vs1, jointstate_2vs1)
-        elif len(assigments[j]) == 1:
-            a1x, a1y = attackers[assigments[j][0]]
+        elif len(assignments[j]) == 1:
+            a1x, a1y = attackers[assignments[j][0]]
             jointstate_1vs1 = (a1x, a1y, d1x, d1y)
             control_defenders[j] = defender_control_1vs1(game, grid1vs1, value1vs1, jointstate_1vs1)
-        elif len(assigments[j]) == 0: # defender j could not capture any of attackers
+        elif len(assignments[j]) == 0: # defender j could not capture any of attackers
             control_defenders[j] = (0.0, 0.0)
         else:
             raise ValueError("The number of attackers assigned to one defender should be less than 3.")
         
     return control_defenders
+
+
+def extend_hj_controller_defenders(game, 
+                                   assignments, weights, attacker_views,
+                                   value1vs1, value2vs1, value1vs2, 
+                                   grid1vs1, grid2vs1, grid1vs2):
+    """This fuction computes the control for the defenders based on the assignments.
+       Assume dynamics are single integrator.
+
+    Args:
+        game (class): the corresponding ReachAvoidGameEnv instance
+        assignments (a list of lists): the list of attackers that the defender assigned to capture
+        weights (np.ndarray, (num_free_attackers, num_defenders)): the weights for each assignment
+        attacker_views (a list of lists): the list of defenders that could capture the attacker
+        value1vs1 (np.ndarray): the value function for 1 vs 1 game
+        value2vs1 (np.ndarray): the value function for 2 vs 1 game
+        value1vs2 (np.ndarray): the value function for 1 vs 2 game
+        grid1vs1 (Grid): the grid for 1 vs 1 game
+        grid2vs1 (Grid): the grid for 2 vs 1 game
+        grid1vs2 (Grid): the grid for 1 vs 2 game
+
+    Returns:
+        control_defenders ((ndarray): the control of defenders
+    """
+    attackers = game.attackers.state.copy()
+    defenders = game.defenders.state.copy()
+    num_defenders = game.NUM_DEFENDERS 
+    control_defenders = np.zeros((num_defenders, 2))
+    calculated_defenders = []  # store the calculated defenders which should not calculate the control again
+    flag_1vs2 = False
+
+    for j in range(num_defenders):
+
+        if j in calculated_defenders:
+            continue
+        d1x, d1y = defenders[j]
+
+        if len(assignments[j]) == 2: # defender j capture the attacker selected[j][0] and selected[j][1]
+            a1x, a1y = attackers[assignments[j][0]]
+            a2x, a2y = attackers[assignments[j][1]]
+            jointstate_2vs1 = (a1x, a1y, a2x, a2y, d1x, d1y)
+            control_defenders[j] = defender_control_2vs1(game, grid2vs1, value2vs1, jointstate_2vs1)
+        elif len(assignments[j]) == 1:
+            a1x, a1y = attackers[assignments[j][0]]
+
+            if weights[assignments[j][0], j] == 0.5:  # use 1 vs. 2 game based control
+                collaborate_defender = attacker_views[assignments[j][0]][-1]
+                d2x, d2y = defenders[collaborate_defender]
+                jointstate_1vs2 = (a1x, a1y, d1x, d1y, d2x, d2y)
+                opt_d1, opt_d2, opt_d3, opt_d4 = defender_control_1vs2(game, grid1vs2, value1vs2, jointstate_1vs2)
+                control_defenders[j] = (opt_d1, opt_d2)
+                control_defenders[collaborate_defender] = (opt_d3, opt_d4)
+                calculated_defenders.append(collaborate_defender)
+                flag_1vs2 = True
+            else:  # use 1 vs. 1 game based control
+                jointstate_1vs1 = (a1x, a1y, d1x, d1y)
+                control_defenders[j] = defender_control_1vs1(game, grid1vs1, value1vs1, jointstate_1vs1)
+
+        elif len(assignments[j]) == 0: # defender j could not capture any of attackers
+            control_defenders[j] = (0.0, 0.0)
+        else:
+            raise ValueError("The number of attackers assigned to one defender should be less than 3.")
+
+    return control_defenders, flag_1vs2
 
 
 def hj_contoller_attackers(game, value1vs0, grid1vs0):
