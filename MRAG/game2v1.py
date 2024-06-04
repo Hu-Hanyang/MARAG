@@ -18,14 +18,14 @@ deltat = 0.005 # calculation time interval
 times = int(T/deltat)
 
 # load all value functions, grids and spatial derivative array
-value1v0 = np.load('MRAG/1v0AttackDefend.npy')  # value1v0.shape = [100, 100, len(tau)]
+value1v0 = np.load('MRAG/values/1v0AttackDefend_g100_speed1.0.npy')  # value1v0.shape = [100, 100, len(tau)]
 print(value1v0.shape)
-v1v1 = np.load('MRAG/1v1AttackDefend_speed15.npy')
+v1v1 = np.load('MRAG/values/1v1AttackDefend_g45_dspeed1.5.npy')
 # v1v1 = np.load('MRAG/1v1AttackDefend.npy')
 value1v1 = v1v1[..., np.newaxis]  # value1v1.shape = [45, 45, 45, 45, 1]
 # v2v1 = np.load('MRAG/2v1AttackDefend.npy')
 # v2v1 = np.load('2v1AttackDefend_speed15.npy') # grid = 30
-v2v1 = np.load('MRAG/2v1AttackDefend_speed15.npy')
+v2v1 = np.load('MRAG/values/2v1AttackDefend_g30_speed1.5.npy')
 print(f"The shape of the 2v1 value function is {v2v1.shape}. \n")
 value2v1 = v2v1[..., np.newaxis]  # value2v1.shape = [30, 30, 30, 30, 30, 30, 1]
 grid1v0 = Grid(np.array([-1.0, -1.0]), np.array([1.0, 1.0]), 2, np.array([100, 100])) # original 45
