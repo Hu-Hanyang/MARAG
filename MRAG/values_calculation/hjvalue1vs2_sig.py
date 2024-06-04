@@ -12,6 +12,8 @@ from odp.Plots.plotting_utilities import plot_isosurface, plot_valuefunction
 from odp.solver import HJSolver
 
 """ USER INTERFACES
+- 0. This file needs to be run with the MRAG/values_calculation/MRAG_6D.py file, 
+replace the original odp/computeGraphs/graph_6D.py with the MRAG_6D.py, also change some corresponding variables
 - 1. Define grid
 - 2. Instantiate the dynamics of the agent
 - 3. Generate initial values for grid using shape functions

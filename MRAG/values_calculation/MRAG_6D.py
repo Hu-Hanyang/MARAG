@@ -30,9 +30,10 @@ def graph_6D(my_object, g, compMethod, accuracy, generate_SpatDeriv=False, deriv
         # deriv_diff6 = hcl.compute(V_init.shape, lambda *x: 0, "deriv_diff6")
 
         # These variables are used to dissipation calculation
+        #Hanyang: modify here when changing between 1vs2 and 2vs1 calculations
         max_alpha1 = hcl.scalar(my_object.attackers.speed, "max_alpha1")
         max_alpha2 = hcl.scalar(my_object.attackers.speed, "max_alpha2")
-        max_alpha3 = hcl.scalar(my_object.defenders.speed, "max_alpha3")  #Hanyang: modify this to be consistent with dynamics 
+        max_alpha3 = hcl.scalar(my_object.defenders.speed, "max_alpha3")  
         max_alpha4 = hcl.scalar(my_object.defenders.speed, "max_alpha4")
         # max_alpha3 = hcl.scalar(my_object.attackers.speed, "max_alpha3")  
         # max_alpha4 = hcl.scalar(my_object.attackers.speed, "max_alpha4")
