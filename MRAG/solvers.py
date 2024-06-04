@@ -7,6 +7,7 @@ from mip import Model, xsum, maximize, BINARY, CBC, OptimizationStatus
 
 
 def mip_solver(num_defenders, current_attackers_status,  EscapedAttacker1vs1, EscapedPairs2vs1):
+    #TODO: Bug exits in logic maybe
     """ Returns a list selected that contains all allocated attackers that the defender could capture, [[a1, a3], ...]
 
     Args:

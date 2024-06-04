@@ -1,7 +1,7 @@
 import numpy as np
 from enum import Enum
 from MRAG.dynamics.SingleIntegrator import SingleIntegrator
-from MRAG.envs.ReachAvoidGame import RAG1vs1
+from MRAG.envs.ReachAvoidGame import ReachAvoidGameEnv
 
 class Physics:
     """Physics implementations enumeration class."""
@@ -130,19 +130,29 @@ class Physics:
 
 ## RAG1VS1 test
 # initial_attacker = np.array([[-1, 0.5]])
-initial_defender = np.array([[0.3, 0.2]])
-print(initial_defender[0].shape)
-print(list(initial_defender[0]))
+# initial_defender = np.array([[0.3, 0.2]])
+# print(initial_defender[0].shape)
+# print(list(initial_defender[0]))
 # env = RAG1VS1(initial_attacker=initial_attacker, initial_defender=initial_defender)
 
 # Attacker status test
-current_attackers_status = np.array([ 0,  0,  0,  0, -1,  0.])
-num_attacker = 6
+current_attackers_status = np.array([0, +1, 0, -1, 0, 0])
+num_attackers = 6
+num_defenders = 2
 num_free_attackers = np.count_nonzero(current_attackers_status == 0)
 free_attackers_positions = np.where(current_attackers_status == 0)[0]
 print(f"The free_attackers_positions is {free_attackers_positions}. \n")
 print(f"The position of the attacker 5 in free_attackers_positions is {np.where(free_attackers_positions == 5)[0][0]}. \n")
-
+for num in range(num_attackers):
+    if not current_attackers_status[num]:
+        print(f"The attacker {num} is free.")
+        
+for j in range(num_defenders):
+        for i in range(num_attackers):
+            if not current_attackers_status[i]:  # the attcker[i] is free now
+                for k in range(i+1, num_attackers):
+                    if not current_attackers_status[k]:
+                        print(f"The possible check pair is {(i, k)}")
 # number_of_zeros = np.count_nonzero(attackers_status == 0)
 # zero_positions = np.where(attackers_status == 0)[0]
 # print(f"The shape of the attackers_status is {attackers_status.shape}. \n")
