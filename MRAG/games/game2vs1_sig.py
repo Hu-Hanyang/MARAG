@@ -37,6 +37,7 @@ for step in range(total_steps):
         break
     
 print(f"================ The game is over at the {step} step ({step / ctrl_freq} seconds). ================")
+print(f"================ The final attackers status is {game.attackers_status[-1]}. ================")
 
 #### Animation ####
 animation(game.attackers_traj, game.defenders_traj, game.attackers_status)

@@ -100,7 +100,7 @@ class BaseGameEnv(gym.Env):
 
         """
         # Update the state
-        self.state = np.vstack([self.attackers._get_state(), self.defenders._get_state()])
+        self.state = np.vstack([self.attackers._get_state().copy(), self.defenders._get_state().copy()])
         # Log the state and trajectory information
         self.attackers_traj.append(self.attackers._get_state().copy())
         self.defenders_traj.append(self.defenders._get_state().copy())
@@ -172,7 +172,8 @@ class BaseGameEnv(gym.Env):
         #### Step the simulation using the desired physics update ##
         assert action.shape[0] == self.NUM_PLAYERS, \
             "The action dimension does not match the attackers and defenders."
-            
+        
+        action = action.copy()
         attackers_action = action[:self.NUM_ATTACKERS]  # ndarray, shape (num_attackers, dim_action)
         defenders_action = action[-self.NUM_ATTACKERS:]  # ndarray, shape (num_defenders, dim_action)
         self.attackers.step(attackers_action)

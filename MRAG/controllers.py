@@ -155,8 +155,8 @@ def hj_controller_defenders(game, assigments,
     Returns:
         control_defenders ((ndarray): the control of defenders
     """
-    attackers = game.attackers.state
-    defenders = game.defenders.state
+    attackers = game.attackers.state.copy()
+    defenders = game.defenders.state.copy()
     num_defenders = game.NUM_DEFENDERS 
     control_defenders = np.zeros((num_defenders, 2))
     for j in range(num_defenders):
