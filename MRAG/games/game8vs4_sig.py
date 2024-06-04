@@ -9,10 +9,12 @@ from MRAG.plots import animation
 
 #### Game Settings ####
 value1vs0, value1vs1, value2vs1, value1vs2, grid1vs0, grid1vs1, grid2vs1, grid1vs2  = hj_preparations_sig()
-num_attackers = 2
-num_defenders = 1
-initial_attacker = np.array([[-0.5, 0.0], [0.0, 0.8]])   # np.array([[-0.8, -0.5], [-0.8, 0.5]])
-initial_defender = np.array([[0.3, -0.3]]) #np.array([[0.8, 0.0]])
+num_attackers = 8
+num_defenders = 4
+initial_attacker = np.array([(0.5, 0.5), (-0.8, 0.8), (-0.8, 0.3), (0.0, 0.8), 
+                             (-0.8, -0.2), (-0.8, -0.8), (0.8, -0.8), (0.6, -0.5)])
+initial_defender = np.array([(0.3, 0.3), (0.3, -0.3), 
+                             (-0.3, 0.3), (-0.3, -0.3)])
 assert num_attackers == initial_attacker.shape[0], "The number of attackers should be equal to the number of initial attacker states."
 assert num_defenders == initial_defender.shape[0], "The number of defenders should be equal to the number of initial defender states."
 T = 10.0  # time for the game

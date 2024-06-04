@@ -254,8 +254,37 @@ def judges(attackers, defenders, current_attackers_status, value1vs1, value2vs1,
     return EscapedAttacker1vs1, EscapedPairs2vs1, EscapedAttackers1vs2, EscapedTri1vs2
 
 
-def animate_game():
-    pass
+def current_status_check(current_attackers_status, step=None):
+    """ Check the current status of the attackers.
 
-def initial_check(attackers, defenders, value1vs1, value2vs1, value1vs2):
-    pass
+    Args:
+        current_attackers_status (np.ndarray): the current moment attackers' status, 0 stands for free, -1 stands for captured, 1 stands for arrived
+        step (int): the current step of the game
+    
+    Returns:
+        status (dic): the current status of the attackers
+    """
+    num_attackers = len(current_attackers_status)
+    num_free, num_arrived, num_captured = 0, 0, 0
+    status = {'free': [], 'arrived': [], 'captured': []}
+    
+    for i in range(num_attackers):
+        if current_attackers_status[i] == 0:
+            num_free += 1
+            status['free'].append(i)
+        elif current_attackers_status[i] == 1:
+            num_arrived += 1
+            status['arrived'].append(i)
+        elif current_attackers_status[i] == -1:
+            num_captured += 1
+            status['captured'].append(i)
+        else:
+            raise ValueError("Invalid status for the attackers.")
+    
+    print(f"================= Step {step}: {num_captured}/{num_attackers} are captured \t"
+      f"{num_arrived}/{num_attackers} have arrived \t"
+      f"{num_free}/{num_attackers} are free =================")
+
+    print(f"================= The current status of the attackers: {status} =================")
+
+    return status

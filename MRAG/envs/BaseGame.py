@@ -175,7 +175,7 @@ class BaseGameEnv(gym.Env):
         
         action = action.copy()
         attackers_action = action[:self.NUM_ATTACKERS]  # ndarray, shape (num_attackers, dim_action)
-        defenders_action = action[-self.NUM_ATTACKERS:]  # ndarray, shape (num_defenders, dim_action)
+        defenders_action = action[-self.NUM_DEFENDERS:]  # ndarray, shape (num_defenders, dim_action)
         self.attackers.step(attackers_action)
         self.defenders.step(defenders_action)
         #### Update and all players' information #####

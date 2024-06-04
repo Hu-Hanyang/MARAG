@@ -25,7 +25,7 @@ game = ReachAvoidGameEnv(num_attackers=num_attackers, num_defenders=num_defender
                          ctrl_freq=ctrl_freq)
 
 #### Game Loop ####
-print(f"================ The game is started. ================")
+print(f"================ The game starts now. ================")
 for step in range(total_steps):
     EscapedAttacker1vs1, EscapedPairs2vs1, EscapedAttackers1vs2, EscapedTri1vs2 = judges(game.attackers.state, game.defenders.state, game.attackers_status[-1], value1vs1, value2vs1, value1vs2)
     assignments = mip_solver(num_defenders, game.attackers_status[-1],  EscapedAttacker1vs1, EscapedPairs2vs1)
@@ -36,15 +36,10 @@ for step in range(total_steps):
     if terminated or truncated:
         break
     
-print(f"================ The game is over at the {step} step ({step / ctrl_freq} seconds). ================")
-
+print(f"================ The game is over at the {step} step ({step / ctrl_freq} seconds). ================ \n")
+current_status_check(game.attackers_status[-1], step)
 
 #### Animation ####
-# print((f"The length of the attackers trajectory is {len(game.attackers_traj)} and the length of the defenders trajectory is {len(game.defenders_traj)}"))
-# print(f"The attackers trajectory is {game.attackers_traj}. \n")
-# print(f"The defenders trajectory is {game.defenders_traj}. \n")
-# print(f"The attackers status is {game.attackers_status}")
-# print(f"The defenders trajectory is {game.defenders_traj}")
 animation(game.attackers_traj, game.defenders_traj, game.attackers_status)
 
 
