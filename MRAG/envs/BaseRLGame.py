@@ -92,11 +92,22 @@ class BaseRLGameEnv(BaseGameEnv):
         
         attackers_lower_bound = np.array([attacker_lower_bound for i in range(self.NUM_ATTACKERS)])
         attackers_upper_bound = np.array([attacker_upper_bound for i in range(self.NUM_ATTACKERS)])
-        defenders_lower_bound = np.array([defender_lower_bound for i in range(self.NUM_DEFENDERS)])
-        defenders_upper_bound = np.array([defender_upper_bound for i in range(self.NUM_DEFENDERS)])
+
+        if self.NUM_DEFENDERS > 0:
+            defenders_lower_bound = np.array([defender_lower_bound for i in range(self.NUM_DEFENDERS)])
+            defenders_upper_bound = np.array([defender_upper_bound for i in range(self.NUM_DEFENDERS)])
+            
+            act_lower_bound = np.concatenate((attackers_lower_bound, defenders_lower_bound), axis=0)
+            act_upper_bound = np.concatenate((attackers_upper_bound, defenders_upper_bound), axis=0)
+        else:
+            act_lower_bound = attackers_lower_bound
+            act_upper_bound = attackers_upper_bound
+
+        # defenders_lower_bound = np.array([defender_lower_bound for i in range(self.NUM_DEFENDERS)])
+        # defenders_upper_bound = np.array([defender_upper_bound for i in range(self.NUM_DEFENDERS)])
         
-        act_lower_bound = np.concatenate((attackers_lower_bound, defenders_lower_bound), axis=0)
-        act_upper_bound = np.concatenate((attackers_upper_bound, defenders_upper_bound), axis=0)
+        # act_lower_bound = np.concatenate((attackers_lower_bound, defenders_lower_bound), axis=0)
+        # act_upper_bound = np.concatenate((attackers_upper_bound, defenders_upper_bound), axis=0)
 
         return spaces.Box(low=act_lower_bound, high=act_upper_bound, dtype=np.float32)
  
@@ -135,11 +146,22 @@ class BaseRLGameEnv(BaseGameEnv):
         
         attackers_lower_bound = np.array([attacker_lower_bound for i in range(self.NUM_ATTACKERS)])
         attackers_upper_bound = np.array([attacker_upper_bound for i in range(self.NUM_ATTACKERS)])
-        defenders_lower_bound = np.array([defender_lower_bound for i in range(self.NUM_DEFENDERS)])
-        defenders_upper_bound = np.array([defender_upper_bound for i in range(self.NUM_DEFENDERS)])
+
+        if self.NUM_DEFENDERS > 0:
+            defenders_lower_bound = np.array([defender_lower_bound for i in range(self.NUM_DEFENDERS)])
+            defenders_upper_bound = np.array([defender_upper_bound for i in range(self.NUM_DEFENDERS)])
+            
+            obs_lower_bound = np.concatenate((attackers_lower_bound, defenders_lower_bound), axis=0)
+            obs_upper_bound = np.concatenate((attackers_upper_bound, defenders_upper_bound), axis=0)
+        else:
+            obs_lower_bound = attackers_lower_bound
+            obs_upper_bound = attackers_upper_bound
+
+        # defenders_lower_bound = np.array([defender_lower_bound for i in range(self.NUM_DEFENDERS)])
+        # defenders_upper_bound = np.array([defender_upper_bound for i in range(self.NUM_DEFENDERS)])
         
-        obs_lower_bound = np.concatenate((attackers_lower_bound, defenders_lower_bound), axis=0)
-        obs_upper_bound = np.concatenate((attackers_upper_bound, defenders_upper_bound), axis=0)
+        # obs_lower_bound = np.concatenate((attackers_lower_bound, defenders_lower_bound), axis=0)
+        # obs_upper_bound = np.concatenate((attackers_upper_bound, defenders_upper_bound), axis=0)
         
         return spaces.Box(low=obs_lower_bound, high=obs_upper_bound, dtype=np.float32)
     

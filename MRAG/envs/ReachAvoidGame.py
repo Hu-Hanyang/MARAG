@@ -1,6 +1,5 @@
 '''Base environment class module for the reach-avoid game.
 
-This module also contains enumerations for cost functions, tasks, disturbances, and quadrotor types.
 '''
 
 import numpy as np

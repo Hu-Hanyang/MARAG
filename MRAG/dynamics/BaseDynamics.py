@@ -21,7 +21,10 @@ class BaseDynamics:
         self.initials = initials
         self.state = self.initials
         self.freqency = freqency
-        self.dim = self.initials.shape[0] * self.initials.shape[1]
+        if initials is not None:
+            self.dim = self.initials.shape[0] * self.initials.shape[1]
+        else:
+            self.dim = 0
     
     def forward(self, state, action):
         """Update and return the next state of one agent after executing the action.
