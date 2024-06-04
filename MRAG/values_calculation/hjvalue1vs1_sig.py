@@ -73,7 +73,7 @@ print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
 print(f'The shape of the value function is {result.shape} \n')
 
 # 6. Save the value function
-np.save(f'MRAG/values/1v1AttackDefend_g{grid_size}_dspeed1.5.npy', result) 
+np.save(f'MRAG/values/1vs1AttackDefend_g{grid_size}_dspeed1.5.npy', result) 
 print("The value function has been saved successfully.")
 
 # Record the time of whole process

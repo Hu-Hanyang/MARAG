@@ -144,7 +144,7 @@ print(f"The size of the value function is {result.nbytes / (1024 ** 3): .2f} GB 
 print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
 print(f'The shape of the value function is {result.shape} \n')
 # save the value function
-# np.save(f'1v2AttackDefend_g{grid_size}_dspeed{speed_d}.npy', result)
+# np.save(f'MRAG/values/1vs2AttackDefend_g{grid_size}_dspeed{speed_d}.npy', result)
 print("The value function has been saved successfully.")
 
 # Record the time of whole process

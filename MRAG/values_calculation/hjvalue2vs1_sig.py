@@ -41,13 +41,7 @@ agents_2v1 = AttackerDefender2vs1(uMode="min", dMode="max")  # 2v1 (6 dim dynami
 
 # 3. Instruct the avoid set and reach set
 # 3.0 First load the 6D reach-avoid set
-# RA_1V1 = np.load("1v1AttackDefend_g25_speed15.npy")  # grid = 25
-# RA_1V1 = np.load("1v1AttackDefend_g27_speed15.npy")  # grid = 27
-# RA_1V1 = np.load("1v1AttackDefend_g29_speed15.npy")  # grid = 29
-# RA_1V1 = np.load("1v1AttackDefend_g31_speed15.npy")  # grid = 31
-# RA_1V1 = np.load("1v1AttackDefend_g33_speed15.npy")  # grid = 33
-# RA_1V1 = np.load("1v1AttackDefend_g35_speed15.npy")  # grid = 35
-RA_1V1 = np.load(f'MRAG/values/1v1AttackDefend_g{grid_size}_dspeed1.5.npy')  # grid = grid_size
+RA_1V1 = np.load(f'MRAG/values/1vs1AttackDefend_g{grid_size}_dspeed1.5.npy')  # grid = grid_size
 
 # 3.1 Avoid set, no constraint means inf
 obs1_a1 = ShapeRectangle(grids, [-0.1, -1.0, -1000, -1000, -1000, -1000], [0.1, -0.3, 1000, 1000, 1000, 1000])  # a1 get stuck in the obs1
@@ -200,7 +194,7 @@ print(f'The shape of the value function is {result.shape} \n')
 print("The calculation is done! \n")
 
 # 6. Save the value function
-# np.save(f'MRAG/2v1AttackDefend_g{grid_size}_speed1.5.npy', result)
+# np.save(f'MRAG/values/2vs1AttackDefend_g{grid_size}_speed1.5.npy', result)
 # print(f"The value function has been saved successfully.")
 
 # Record the time of whole process
