@@ -4,7 +4,7 @@ from MRAG.envs.ReachAvoidGame import ReachAvoidGameEnv
 from MRAG.solvers import mip_solver, extend_mip_solver
 from MRAG.utilities import *
 from MRAG.controllers import hj_contoller_attackers, hj_controller_defenders
-from MRAG.plots import animation, plot_scene
+from MRAG.plots import animation, plot_scene, plot_value_1vs1, plot_value_3agents
 
 
 #### Game Settings ####
@@ -24,23 +24,29 @@ game = ReachAvoidGameEnv(num_attackers=num_attackers, num_defenders=num_defender
                          initial_attacker=initial_attacker, initial_defender=initial_defender, 
                          ctrl_freq=ctrl_freq)
 
-#### Game Loop ####
-print(f"================ The game starts now. ================")
-for step in range(total_steps):
-    EscapedAttacker1vs1, EscapedPairs2vs1, EscapedAttackers1vs2, EscapedTri1vs2 = judges(game.attackers.state, game.defenders.state, game.attackers_status[-1], value1vs1, value2vs1, value1vs2)
-    assignments = mip_solver(num_defenders, game.attackers_status[-1],  EscapedAttacker1vs1, EscapedPairs2vs1)
-    control_defenders = hj_controller_defenders(game, assignments, value1vs1, value2vs1, grid1vs1, grid2vs1)
-    control_attackers = hj_contoller_attackers(game, value1vs0, grid1vs0)
-    obs, reward, terminated, truncated, info = game.step(np.vstack((control_attackers, control_defenders)))
-    
-    if terminated or truncated:
-        break
-    
-print(f"================ The game is over at the {step} step ({step / ctrl_freq} seconds). ================ \n")
-current_status_check(game.attackers_status[-1], step)
 
-#### Animation ####
-animation(game.attackers_traj, game.defenders_traj, game.attackers_status)
-# plot_scene(game.attackers_traj, game.defenders_traj, game.attackers_status, step=40, save=True)
-plot_scene(game.attackers_traj, game.defenders_traj, game.attackers_status, step=40)
+
+plot_value_1vs1(game.attackers.state, game.defenders.state, 
+                plot_attacker=0, plot_defender=0, 
+                fix_agent=1, value1vs1=value1vs1, grid1vs1=grid1vs1)
+
+plot_value_3agents(game.attackers.state, game.defenders.state, plot_agents=[0, 1, 2], free_dim=0, value_function=value2vs1, grids=grid2vs1)
+
+#### Game Loop ####
+# print(f"================ The game starts now. ================")
+# for step in range(total_steps):
+#     EscapedAttacker1vs1, EscapedPairs2vs1, EscapedAttackers1vs2, EscapedTri1vs2 = judges(game.attackers.state, game.defenders.state, game.attackers_status[-1], value1vs1, value2vs1, value1vs2)
+#     assignments = mip_solver(num_defenders, game.attackers_status[-1],  EscapedAttacker1vs1, EscapedPairs2vs1)
+#     control_defenders = hj_controller_defenders(game, assignments, value1vs1, value2vs1, grid1vs1, grid2vs1)
+#     control_attackers = hj_contoller_attackers(game, value1vs0, grid1vs0)
+#     obs, reward, terminated, truncated, info = game.step(np.vstack((control_attackers, control_defenders)))
+    
+#     if terminated or truncated:
+#         break
+    
+# print(f"================ The game is over at the {step} step ({step / ctrl_freq} seconds). ================ \n")
+# current_status_check(game.attackers_status[-1], step)
+
+# #### Animation ####
+# animation(game.attackers_traj, game.defenders_traj, game.attackers_status)
 

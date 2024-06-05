@@ -47,12 +47,12 @@ tau1v0 = np.arange(start=0, stop=2.5 + 1e-5, step=0.025)
 tau1v2 = np.arange(start=0, stop=4.5 + 1e-5, step=0.025)
 # tau2v1 = np.arange(start=0, stop=4.5 + 1e-5, step=0.025)
 
-# # Test
-# attackers_initials = [(-0.15, 0.0)] 
-# defenders_initials = [(-0.5, 0.8), (-0.5, -0.6)] 
+# Test
+attackers_initials = [(-0.15, 0.0)] 
+defenders_initials = [(-0.5, 0.8), (-0.5, -0.6)] 
 
-attackers_initials = [(-0.5, 0.5)]
-defenders_initials = [(0.5, 0.3), (0.5, -0.3)]
+# attackers_initials = [(-0.5, 0.5)]
+# defenders_initials = [(0.5, 0.3), (0.5, -0.3)]
 
 # Theoretically capture actually capture
 # attackers_initials = [(-0.25, 0.0)] # barely captured
@@ -167,5 +167,5 @@ print("The game is over. \n")
 # print(f"During the game, the joint state is within the BRT: {judges}. \n")
 # Play the animation
 animation_2v1(attackers_trajectory, defenders_trajectory, attackers_status_logs, T)
-print(f"The controls of defenders are {defenders_controls}. \n")
-print(f"The controls of attackers are {attackers_controls}. \n")
+# print(f"The controls of defenders are {defenders_controls}. \n")
+# print(f"The controls of attackers are {attackers_controls}. \n")

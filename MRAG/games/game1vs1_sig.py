@@ -4,15 +4,15 @@ from MRAG.envs.ReachAvoidGame import ReachAvoidGameEnv
 from MRAG.solvers import mip_solver, extend_mip_solver
 from MRAG.utilities import *
 from MRAG.controllers import hj_contoller_attackers, hj_controller_defenders
-from MRAG.plots import animation
+from MRAG.plots import animation, plot_value_1vs1
 
 
 #### Game Settings ####
 value1vs0, value1vs1, value2vs1, value1vs2, grid1vs0, grid1vs1, grid2vs1, grid1vs2  = hj_preparations_sig()
 num_attackers = 1
 num_defenders = 1
-initial_attacker = np.array([[-0.4, 0.0]])
-initial_defender = np.array([[0.5, 0.0]])
+initial_attacker = np.array([[-0.4, -0.8]])
+initial_defender = np.array([[0.3, -0.8]])
 assert num_attackers == initial_attacker.shape[0], "The number of attackers should be equal to the number of initial attacker states."
 assert num_defenders == initial_defender.shape[0], "The number of defenders should be equal to the number of initial defender states."
 T = 10.0  # time for the game
@@ -23,6 +23,12 @@ total_steps = int(T * ctrl_freq)
 game = ReachAvoidGameEnv(num_attackers=num_attackers, num_defenders=num_defenders, 
                          initial_attacker=initial_attacker, initial_defender=initial_defender, 
                          ctrl_freq=ctrl_freq)
+
+
+
+# plot_value_1vs1(game.attackers.state, game.defenders.state, 
+#                 plot_attacker=0, plot_defender=0, 
+#                 fix_agent=1, value1vs1=value1vs1, grid1vs1=grid1vs1)
 
 #### Game Loop ####
 print(f"================ The game starts now. ================")

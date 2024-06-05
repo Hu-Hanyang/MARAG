@@ -152,6 +152,24 @@ def check_2vs1(attacker_i, attacker_k, defender, value2vs1):
     return value2vs1[joint_slice] > 0
 
 
+def check_1vs2(attacker, defender_j, defender_k, value1vs2, epsilon=0.035):
+    """ Check if the attacker could escape from the defenders in a 1 vs 2 game.
+
+    Args:
+        attacker (np.ndarray): the attacker's state
+        defender_j (np.ndarray): the defender_i's state
+        defender_k (np.ndarray): the defender_k's state
+        value1vs2 (np.ndarray): the value function for 1 vs 2 game
+        epsilon (float): the threshold for the attacker to escape
+    
+    Returns:
+        bool: False, if the attacker could escape (the attacker will win)
+    """
+    joint_slice = po2slice2vs1(attacker, defender_j, defender_k, value1vs2.shape[0])
+
+    return value1vs2[joint_slice] > epsilon
+
+
 def judge_1vs1(attackers, defenders, current_attackers_status, value1vs1):
     """ Check the result of the 1 vs 1 game for those free attackers.
 
@@ -221,7 +239,7 @@ def judge_1vs2(attackers, defenders, current_attackers_status, value1vs2):
         for k in range(j+1, num_defenders):
             for i in range(num_attackers):
                 if not current_attackers_status[i]:
-                    if not check_2vs1(attackers[i], defenders[j], defenders[k], value1vs2):
+                    if not check_1vs2(attackers[i], defenders[j], defenders[k], value1vs2):
                         EscapedAttackers1vs2[j].append(i)
                         EscapedAttackers1vs2[k].append(i)
                         EscapedTri1vs2[j].append([i, j, k])
