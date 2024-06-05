@@ -268,6 +268,26 @@ def extend_hj_controller_defenders(game,
     return control_defenders, flag_1vs2
 
 
+def single_1vs2_controller_defender(game, value1vs2, grid1vs2):
+    attackers = game.attackers.state.copy()
+    defenders = game.defenders.state.copy()
+    assert game.NUM_ATTACKERS == 1, "The number of attacker should be 1."
+    assert game.NUM_DEFENDERS == 2, "The number of defender should be 2."
+    num_defenders = game.NUM_DEFENDERS 
+    control_defenders = np.zeros((num_defenders, 2))
+    
+    a1x, a1y = attackers[0]
+    d1x, d1y = defenders[0]
+    d2x, d2y = defenders[1]
+    jointstate_1vs2 = (a1x, a1y, d1x, d1y, d2x, d2y)
+    opt_d1, opt_d2, opt_d3, opt_d4 = defender_control_1vs2(game, grid1vs2, value1vs2, jointstate_1vs2)
+    
+    control_defenders[0] = (opt_d1, opt_d2)
+    control_defenders[1] = (opt_d3, opt_d4)
+
+    return control_defenders
+
+
 def hj_contoller_attackers(game, value1vs0, grid1vs0):
     """This function computes the control for the attackers based on the control_attackers. 
        Assume dynamics are single integrator.

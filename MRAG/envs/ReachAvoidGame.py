@@ -311,7 +311,7 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
         return (opt_a1, opt_a2)
         
     ################################################################################
-    def optDstb_1vs2(self, spat_deriv):
+    def optDistb_1vs2(self, spat_deriv):
         """Computes the optimal control (disturbance) for the attacker in a 1 vs. 2 game.
         
         Parameters:
@@ -330,7 +330,6 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
         deriv6 = spat_deriv[5]
         distb_len1 = np.sqrt(deriv3*deriv3 + deriv4*deriv4)
         distb_len2 = np.sqrt(deriv5*deriv5 + deriv6*deriv6)
-        # The initialized control only change sign in the following cases
         if self.dMode == "max":
             if distb_len1 == 0:
                 opt_d1 = 0.0

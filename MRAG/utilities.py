@@ -281,9 +281,9 @@ def current_status_check(current_attackers_status, step=None):
         else:
             raise ValueError("Invalid status for the attackers.")
     
-    print(f"================= Step {step}: {num_captured}/{num_attackers} are captured \t"
-      f"{num_arrived}/{num_attackers} have arrived \t"
-      f"{num_free}/{num_attackers} are free =================")
+    print(f"================= Step {step}: {num_captured}/{num_attackers} attackers are captured \t"
+      f"{num_arrived}/{num_attackers} attackers have arrived \t"
+      f"{num_free}/{num_attackers} attackers are free =================")
 
     print(f"================= The current status of the attackers: {status} =================")
 
