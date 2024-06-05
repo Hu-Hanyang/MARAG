@@ -90,13 +90,15 @@ def plot_value_3agents(attackers, defenders, plot_agents, free_dim, value_functi
     assert len(plot_agents) == 3, "The number of agents to plot should be 3."
     assert free_dim in plot_agents, "The fixed agent should be two of plot agents"
     num_attackers = attackers.shape[0]
-    num_defenders = defenders.shape[0]
     info = {}
+    attacker_counter, defender_counter = 0, 0
     for player in plot_agents:
         if player < num_attackers:
             info[player] = "Attacker"
+            attacker_counter += 1
         else:
             info[player] = "Defender"
+            defender_counter += 1
     
     players = np.vstack((attackers, defenders))
     p1x_slice, p1y_slice, p2x_slice, p2y_slice, p3x_silce, p3y_slice = po2slice2vs1(players[plot_agents[0]], players[plot_agents[1]], players[plot_agents[2]], value_function.shape[0])
@@ -117,10 +119,6 @@ def plot_value_3agents(attackers, defenders, plot_agents, free_dim, value_functi
     x_players = players[:, 0]
     y_players = players[:, 1]
 
-    x_attackers = attackers[:, 0]
-    y_attackers = attackers[:, 1]
-    x_defenders = defenders[:, 0]
-    y_defenders = defenders[:, 1]
     print("Plotting beautiful 2D plots. Please wait\n")
     fig = go.Figure(data=go.Contour(
         x=mg_X.flatten(),
@@ -157,14 +155,8 @@ def plot_value_3agents(attackers, defenders, plot_agents, free_dim, value_functi
                 fig.add_trace(go.Scatter(x=[x_players[player]], y=[y_players[player]], mode="markers", name='Free Defender', marker=dict(symbol="square", size=10, color='red')))   
             else:
                 fig.add_trace(go.Scatter(x=[x_players[player]], y=[y_players[player]], mode="markers", name='Fixed Defender', marker=dict(symbol="square", size=10, color='green')))
-    # fig.add_trace(go.Scatter(x=x_attackers, y=y_attackers, mode="markers", name='Attacker', marker=dict(symbol="triangle-up", size=10, color='red')))
-    # for i in range(len(x_attackers)):
-    #     fig.add_trace(go.Scatter(x=[x_attackers[i]], y=[y_attackers[i]], mode="markers", name=f'Attacker{i+1}', marker=dict(symbol="triangle-up", size=10, color='red')))
-    # plot defenders
-    # fig.add_trace(go.Scatter(x=x_defenders, y=y_defenders, mode="markers", name='Fixed Defender', marker=dict(symbol="square", size=10, color='green')))
-   
     # figure settings
-    # fig.update_layout(title={'text': f"<b>{name}<b>", 'y':0.82, 'x':0.4, 'xanchor': 'center','yanchor': 'top', 'font_size': 30})
+    fig.update_layout(title={'text': f"<b>{int(attacker_counter)} vs. {int(defender_counter)} game value function <b>", 'y':0.85, 'x':0.4, 'xanchor': 'center','yanchor': 'top', 'font_size': 20})
     fig.update_layout(autosize=False, width=580, height=500, margin=dict(l=50, r=50, b=100, t=100, pad=0), paper_bgcolor="White", xaxis_range=[-1, 1], yaxis_range=[-1, 1], font=dict(size=20)) # $\mathcal{R} \mathcal{A}_{\infty}^{21}$
     fig.update_xaxes(showline = True, linecolor = 'black', linewidth = 2.0, griddash = 'dot', zeroline=False, gridcolor = 'Lightgrey', mirror=True, ticks='outside') # showgrid=False
     fig.update_yaxes(showline = True, linecolor = 'black', linewidth = 2.0, griddash = 'dot', zeroline=False, gridcolor = 'Lightgrey', mirror=True, ticks='outside') # showgrid=False,
@@ -319,7 +311,3 @@ def plot_scene(attackers_traj, defenders_traj, attackers_status, step, save=Fals
     else:
         plt.savefig(f"{save_path}/scene_{step}.png", bbox_inches='tight')
         print(f"Plot saved at {save_path}.")
-
-
-
-

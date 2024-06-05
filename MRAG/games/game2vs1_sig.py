@@ -30,7 +30,7 @@ plot_value_1vs1(game.attackers.state, game.defenders.state,
                 plot_attacker=0, plot_defender=0, 
                 fix_agent=1, value1vs1=value1vs1, grid1vs1=grid1vs1)
 
-plot_value_3agents(game.attackers.state, game.defenders.state, plot_agents=[0, 1, 2], free_dim=0, value_function=value2vs1, grids=grid2vs1)
+plot_value_3agents(game.attackers.state, game.defenders.state, plot_agents=[0, 1, 2], free_dim=2, value_function=value2vs1, grids=grid2vs1)
 
 #### Game Loop ####
 # print(f"================ The game starts now. ================")
