@@ -22,14 +22,14 @@ grid_size1v1 = 45
 grid_size1v2 = 35
 
 # load all value functions, grids and spatial derivative array
-value1v0 = np.load('MRAG/1v0AttackDefend.npy')  # value1v0.shape = [100, 100, len(tau)]
+value1v0 = np.load('MRAG/values/1vs0AttackDefend_g100_speed1.0.npy')  # value1v0.shape = [100, 100, len(tau)]
 # print(value1v0.shape)
 
 # v1v1 = np.load('MRAG/1v1AttackDefend_speed15.npy')
-v1v1 = np.load(f'MRAG/1v1AttackDefend_g45_dspeed1.5.npy')
+v1v1 = np.load(f'MRAG/values/1vs1AttackDefend_g45_dspeed1.5.npy')
 print(f"The shape of the 1v1 value function is {v1v1.shape}. \n")
 
-v1v2 = np.load('MRAG/1v2AttackDefend_g35_dspeed1.5.npy')
+v1v2 = np.load('MRAG/values/1vs2AttackDefend_g35_dspeed1.5.npy')
 # v1v2 = np.load('MRAG/1v2AttackDefend_g35_dspeed1.0.npy')
 # v1v2 = np.load('MRAG/1v2AttackDefend_g30_dspeed1.5.npy')
 print(f"The shape of the 1v2 value function is {v1v2.shape}. \n")
@@ -52,6 +52,9 @@ tau1v2 = np.arange(start=0, stop=4.5 + 1e-5, step=0.025)
 # Test
 attackers_initials = [(-0.15, 0.0)] 
 defenders_initials = [(-0.5, 0.8), (-0.5, -0.6)] 
+
+attackers_initials = [(-0.5, 0.5)]
+defenders_initials = [(0.5, 0.3), (0.5, -0.3)]
 
 # Theoretically capture actually capture
 # attackers_initials = [(-0.25, 0.0)] # barely captured
@@ -117,10 +120,10 @@ print("The simulation starts: \n")
 # simulation starts
 for _ in range(0, times):
 
-    RA1v1 = capture_1vs1(current_attackers, current_defenders, v1v1, stops_index)  # attacker will win the 1 vs. 1 game
-    RA1v2, RA1v2_ = capture_1vs2(current_attackers, current_defenders, v1v2)  # attacker will win the 1 vs. 2 game
-    RA1v1s.append(RA1v1)
-    RA1v2s.append(RA1v2)
+    # RA1v1 = capture_1vs1(current_attackers, current_defenders, v1v1, stops_index)  # attacker will win the 1 vs. 1 game
+    # RA1v2, RA1v2_ = capture_1vs2(current_attackers, current_defenders, v1v2)  # attacker will win the 1 vs. 2 game
+    # RA1v1s.append(RA1v1)
+    # RA1v2s.append(RA1v2)
     
     control_defenders = [[] for num in range(num_defender)]  # current controls of defenders, [(d1xc, d1yc), (d2xc, d2yc)]
     a1x, a1y = current_attackers[0]
@@ -132,14 +135,14 @@ for _ in range(0, times):
     control_defenders[0].append((opt_d1, opt_d2))
     control_defenders[1].append((opt_d3, opt_d4))   
 
-    controls_defender0.append((opt_d1, opt_d2))  
-    controls_defender1.append((opt_d3, opt_d4))
+    # controls_defender0.append((opt_d1, opt_d2))  
+    # controls_defender1.append((opt_d3, opt_d4))
     
-    # # Plot BRT contour
-    ax_slice, ay_slice, d1x_slice, d1y_slice, d2x_slice, d2y_slice = lo2slice2v1(joint_state1v2, slices=grid_size1v2)
-    # value_function_current_state = v1v2[:, :, d1x_slice, d1y_slice, d2x_slice, d2y_slice]
-    value_function_state = v1v2[ax_slice, ay_slice, d1x_slice, d1y_slice, d2x_slice, d2y_slice]
-    judges.append(value_function_state)
+    # # # Plot BRT contour
+    # ax_slice, ay_slice, d1x_slice, d1y_slice, d2x_slice, d2y_slice = lo2slice2v1(joint_state1v2, slices=grid_size1v2)
+    # # value_function_current_state = v1v2[:, :, d1x_slice, d1y_slice, d2x_slice, d2y_slice]
+    # value_function_state = v1v2[ax_slice, ay_slice, d1x_slice, d1y_slice, d2x_slice, d2y_slice]
+    # judges.append(value_function_state)
     # plot_game1v2(grid1v2, value_function_current_state, current_attackers, current_defenders, name="$\mathcal{RA}^{12}_{\infty}$")
     
     # update the next postions of defenders
