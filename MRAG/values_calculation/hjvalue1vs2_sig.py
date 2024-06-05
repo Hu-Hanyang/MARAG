@@ -35,11 +35,11 @@ grids = Grid(np.array([-1.0, -1.0, -1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0,
 process = psutil.Process(os.getpid())
 print("1. Gigabytes consumed {}".format(process.memory_info().rss/1e9))  # in bytes
 
-RA_1v1 = np.load(f"MRAG/values/1v1AttackDefend_g{grid_size}_dspeed{speed_d}.npy") 
+RA_1v1 = np.load(f"MRAG/values/1vs1AttackDefend_g{grid_size}_dspeed{speed_d}.npy") 
 print("The 1vs1 value function has been loaded successfully.")
 
 # 2. Instantiate the dynamics of the agent
-agents_1v2 = AttackerDefender1vs2(uMode="min", dMode="max", speed_a=1.0, speed_d=speed_d)  
+agents_1v2 = AttackerDefender1vs2(uMode="min", dMode="max")  
 
 # 3. Avoid set, no constraint means inf
 obs1_attack = ShapeRectangle(grids, [-0.1, -1.0, -1000, -1000, -1000, -1000], [0.1, -0.3, 1000, 1000, 1000, 1000])  # attacker gets stuck in obs1

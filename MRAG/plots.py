@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 from plotly.graph_objects import Layout
 
@@ -117,8 +118,8 @@ def animation(attackers_traj, defenders_traj, attackers_status):
     fig.show()
 
 
-def plot_scene(attackers_traj, defenders_traj, attackers_status, step, save=False, save_path=None):
-    #TODO: Hanyang: not finished yet
+
+def plot_scene(attackers_traj, defenders_traj, attackers_status, step, save=False, save_path='MRAG'):
     """Plot the scene of the game at a specific step.
 
     Args:
@@ -132,5 +133,62 @@ def plot_scene(attackers_traj, defenders_traj, attackers_status, step, save=Fals
     Returns:
         None
     """
-    pass
+    assert step <= len(attackers_traj), "The step should be less than the length of the attackers' trajectories."
+    attackers = attackers_traj[step]
+    defenders = defenders_traj[step]
+    status = attackers_status[step]
+    
+    # Create the plot
+    fig, ax = plt.subplots(figsize=(10, 8))
+    
+    # Set map boundaries
+    ax.set_xlim([-1, 1])
+    ax.set_ylim([-1, 1])
+    ax.set_aspect('equal', adjustable='box')
+
+    # Add caption
+    # plt.text(0, 1.05, "Our Method", ha='center', va='center', fontsize=16)
+
+    # Draw outer map boundary
+    outer_map = plt.Rectangle((-1, -1), 2, 2, edgecolor='black', facecolor='none', linewidth=2.0)
+    ax.add_patch(outer_map)
+
+    # Draw obstacles
+    obstacle1 = plt.Rectangle((-0.1, -1.0), 0.2, 0.7, edgecolor='black', facecolor='none', label='Obstacle', linewidth=2.0)
+    obstacle2 = plt.Rectangle((-0.1, 0.3), 0.2, 0.3, edgecolor='black', facecolor='none', linewidth=2.0)
+    ax.add_patch(obstacle1)
+    ax.add_patch(obstacle2)
+
+    # Draw target
+    target = plt.Rectangle((0.6, 0.1), 0.2, 0.2, edgecolor='purple', facecolor='none', label='Target', linewidth=2.0)
+    ax.add_patch(target)
+    
+    # Plot attackers
+    for i in range(len(attackers)):
+        if status[i] == 0:
+            ax.plot(attackers[i, 0], attackers[i, 1], 'r^', label='Free Attacker' if i == 0 else "")
+        elif status[i] == -1:
+            ax.plot(attackers[i, 0], attackers[i, 1], marker=(4, 2, 0), color='red', markersize=10, label='Captured Attacker' if i == 0 else "")
+        elif status[i] == 1:
+            ax.plot(attackers[i, 0], attackers[i, 1], 'ro', label='Arrived Attacker' if i == 0 else "")
+    
+    # Plot defenders
+    for i in range(len(defenders)):
+        ax.plot(defenders[i, 0], defenders[i, 1], 'bs', label='Defender' if i == 0 else "")
+    
+    # Add legend
+    handles, labels = ax.get_legend_handles_labels()
+    by_label = dict(zip(labels, handles))
+    ax.legend(by_label.values(), by_label.keys(), loc='upper left', bbox_to_anchor=(1.05, 1))
+
+    # Adjust the plot to ensure the legend is fully visible
+    plt.tight_layout()
+
+    if not save:
+        plt.show()
+    else:
+        plt.savefig(f"{save_path}/scene_{step}.png", bbox_inches='tight')
+        print(f"Plot saved at {save_path}.")
+
+
 

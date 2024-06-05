@@ -4,7 +4,7 @@ from MRAG.envs.ReachAvoidGame import ReachAvoidGameEnv
 from MRAG.solvers import mip_solver, extend_mip_solver
 from MRAG.utilities import *
 from MRAG.controllers import hj_contoller_attackers, hj_controller_defenders
-from MRAG.plots import animation
+from MRAG.plots import animation, plot_scene
 
 
 #### Game Settings ####
@@ -41,3 +41,6 @@ current_status_check(game.attackers_status[-1], step)
 
 #### Animation ####
 animation(game.attackers_traj, game.defenders_traj, game.attackers_status)
+# plot_scene(game.attackers_traj, game.defenders_traj, game.attackers_status, step=40, save=True)
+plot_scene(game.attackers_traj, game.defenders_traj, game.attackers_status, step=40)
+
