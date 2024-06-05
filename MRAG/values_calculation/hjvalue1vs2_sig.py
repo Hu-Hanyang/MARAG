@@ -27,7 +27,7 @@ replace the original odp/computeGraphs/graph_6D.py with the MRAG_6D.py, also cha
 start_time = time.time()
 
 # 1. Define grid
-grid_size = 3
+grid_size = 35
 speed_d = 1.5
 
 grids = Grid(np.array([-1.0, -1.0, -1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]), 
@@ -126,7 +126,7 @@ small_number = 1e-5
 tau = np.arange(start=0, stop=lookback_length + small_number, step=t_step)
 
 # while plotting make sure the len(slicesCut) + len(plotDims) = grid.dims
-po = PlotOptions(do_plot=False, plot_type="2d_plot", plotDims=[0, 1], slicesCut=[22, 22])
+po = PlotOptions(do_plot=True, plot_type="set", plotDims=[0, 1], slicesCut=[2, 2, 2, 2])
 
 # In this example, we compute a Reach-Avoid Tube
 compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithObstacle"} # original one
@@ -144,7 +144,7 @@ print(f"The size of the value function is {result.nbytes / (1024 ** 3): .2f} GB 
 print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
 print(f'The shape of the value function is {result.shape} \n')
 # save the value function
-# np.save(f'MRAG/values/1vs2AttackDefend_g{grid_size}_dspeed{speed_d}.npy', result)
+np.save(f'MRAG/values/1vs2AttackDefend_g{grid_size}_dspeed{speed_d}.npy', result)
 print("The value function has been saved successfully.")
 
 # Record the time of whole process

@@ -24,7 +24,7 @@ from odp.solver import HJSolver
 start_time = time.time()
 
 # 1. Initialize the grids
-grid_size = 3
+grid_size = 35
 speed_d = 1.5
 grids = Grid(np.array([-1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0, 1.0]), 4, np.array([grid_size, grid_size, grid_size, grid_size]))
 
