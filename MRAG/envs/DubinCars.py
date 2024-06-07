@@ -1,23 +1,24 @@
-'''Base environment class module for the reach-avoid game.
+'''Base environment class module for the reach-avoid game with DubinCar dynamics.
 
 '''
 
 import numpy as np
+import heterocl as hcl
 
 from MRAG.envs.BaseRLGame import BaseRLGameEnv
 from MRAG.envs.BaseGame import Dynamics
 
-
-class ReachAvoidGameEnv(BaseRLGameEnv):
-    """Multi-agent reach-avoid games class for SingleIntegrator dynamics."""
+#TODO: Hanyang: not finished yet, 20240606
+class DubinCarGameEnv(BaseRLGameEnv):
+    """Multi-agent reach-avoid games class for DubinCar dynamics."""
 
     ################################################################################
     
     def __init__(self,
                  num_attackers: int=1,
                  num_defenders: int=1,
-                 attackers_dynamics=Dynamics.SIG,  
-                 defenders_dynamics=Dynamics.FSIG,
+                 attackers_dynamics=Dynamics.DUB3D,  
+                 defenders_dynamics=Dynamics.DUB3D,
                  initial_attacker: np.ndarray=None,  # shape (num_atackers, state_dim)
                  initial_defender: np.ndarray=None,  # shape (num_defenders, state_dim)
                  ctrl_freq: int = 200,
@@ -112,7 +113,7 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
                     else:
                         # check if the attacker is captured
                         for j in range(self.NUM_DEFENDERS):
-                            if np.linalg.norm(current_attacker_state[num] - current_defender_state[j]) <= 0.1:
+                            if np.linalg.norm(current_attacker_state[num][:3] - current_defender_state[j][:3]) <= 0.1:
                                 new_status[num] = -1
                                 break
 
@@ -129,7 +130,7 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
         Returns:
             bool: True if the state is inside the area, False otherwise.
         """
-        x, y = state  # Unpack the state assuming it's a 2D coordinate
+        x, y, theta = state  # Unpack the state assuming it's a 2D coordinate
 
         for bounds in area.values():
             x_lower, x_upper, y_lower, y_upper = bounds
@@ -216,39 +217,8 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
     
     ################################################################################
     
-    def optDistb_2vs1(self, spat_deriv):
-        """Computes the optimal control (disturbance) for the defender in a 2 vs. 1 game.
-        
-        Parameters:
-            spat_deriv (tuple): spatial derivative in all dimensions
-        
-        Returns:
-            tuple: a tuple of optimal control of the defender (disturbances)
-        """
-        opt_d1 = self.defenders.uMax
-        opt_d2 = self.defenders.uMax
-        deriv5 = spat_deriv[4]
-        deriv6 = spat_deriv[5]
-        distb_len = np.sqrt(deriv5*deriv5 + deriv6*deriv6)
-        if self.dMode == "max":
-            if distb_len == 0:
-                opt_d1 = 0.0
-                opt_d2 = 0.0
-            else:
-                opt_d1 = self.defenders.speed * deriv5 / distb_len
-                opt_d2 = self.defenders.speed * deriv6 / distb_len
-        else:
-            if distb_len == 0:
-                opt_d1 = 0.0
-                opt_d2 = 0.0
-            else:
-                opt_d1 = -self.defenders.speed * deriv5 / distb_len
-                opt_d2 = -self.defenders.speed * deriv6 / distb_len
-        return (opt_d1, opt_d2)
-    
-    ################################################################################
-    
     def optDistb_1vs1(self, spat_deriv):
+        #TODO: Not finished yet, 20240606
         """Computes the optimal control (disturbance) for the defender in a 1 vs. 1 game.
         
         Parameters:
@@ -281,6 +251,7 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
     ################################################################################
 
     def optCtrl_1vs0(self, spat_deriv):
+        #TODO: Not finished yet, 20240606
         """Computes the optimal control (disturbance) for the attacker in a 1 vs. 0 game.
         
         Parameters:
@@ -311,51 +282,112 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
         return (opt_a1, opt_a2)
         
     ################################################################################
-    
-    def optDistb_1vs2(self, spat_deriv):
-        """Computes the optimal control (disturbance) for the attacker in a 1 vs. 2 game.
-        
-        Parameters:
-            spat_deriv (tuple): spatial derivative in all dimensions
-        
-        Returns:
-            tuple: a tuple of optimal control of the defender (disturbances)
-        """
-        opt_d1 = self.defenders.uMax
-        opt_d2 = self.defenders.uMax
-        opt_d3 = self.defenders.uMax
-        opt_d4 = self.defenders.uMax
-        deriv3 = spat_deriv[2]
-        deriv4 = spat_deriv[3]
-        deriv5 = spat_deriv[4]
-        deriv6 = spat_deriv[5]
-        distb_len1 = np.sqrt(deriv3*deriv3 + deriv4*deriv4)
-        distb_len2 = np.sqrt(deriv5*deriv5 + deriv6*deriv6)
-        if self.dMode == "max":
-            if distb_len1 == 0:
-                opt_d1 = 0.0
-                opt_d2 = 0.0
-            else:
-                opt_d1 = self.defenders.speed*deriv3 / distb_len1
-                opt_d2 = self.defenders.speed*deriv4 / distb_len1
-            if distb_len2 == 0:
-                opt_d3 = 0.0
-                opt_d4 = 0.0
-            else:
-                opt_d3 = self.defenders.speed*deriv5 / distb_len2
-                opt_d4 = self.defenders.speed*deriv6 / distb_len2
-        else:
-            if distb_len1 == 0:
-                opt_d1 = 0.0
-                opt_d2 = 0.0
-            else:
-                opt_d1 = -self.defenders.speed*deriv3 / distb_len1
-                opt_d2 = -self.defenders.speed*deriv4 / distb_len1
-            if distb_len2 == 0:
-                opt_d3 = 0.0
-                opt_d4 = 0.0
-            else:
-                opt_d3 = -self.defenders.speed*deriv5 / distb_len2
-                opt_d4 = -self.defenders.speed*deriv6 / distb_len2
 
-        return (opt_d1, opt_d2, opt_d3, opt_d4)
+
+class DubinCar1vs0(DubinCarGameEnv):
+    """1 vs. 0 reach-avoid game class with 1 DubinCar3D dynamics."""
+    def __init__(self, 
+                 num_attackers: int=1,
+                 num_defenders: int=0,
+                 attackers_dynamics=Dynamics.DUB3D, 
+                 defender_dynamics=Dynamics.DUB3D, 
+                 initial_attacker=None, 
+                 initial_defender=None, 
+                 uMax=1.0,  #TODO: Check the hardware ability
+                 dMax=1.0,
+                 uMode="min", 
+                 dMode="max",
+                 ctrl_freq=200): 
+        
+        if initial_attacker is None:
+            initial_attacker = np.zeros((num_attackers, 3))
+        if initial_defender is None:
+            initial_defender = np.zeros((num_defenders, 3))
+
+        super().__init__(num_attackers=num_attackers,
+                         num_defenders=num_defenders,
+                         attackers_dynamics=attackers_dynamics, 
+                         defenders_dynamics=defender_dynamics, 
+                         initial_attacker=initial_attacker, 
+                         initial_defender=initial_defender,
+                         uMode=uMode, dMode=dMode,
+                         ctrl_freq=ctrl_freq)
+        
+        self.x = np.vstack((initial_attacker, initial_defender))
+
+        self.uMax = uMax
+        self.dMax = dMax
+        assert self.uMax == self.attackers.uMax, "The maximum control input for the attacker is not correct."
+        assert self.dMax == self.defenders.uMax, "The maximum disturbance input for the attacker is not correct."
+
+
+    def dynamics(self, t, state, uOpt, dOpt):
+        xA_dot = hcl.scalar(0, "xA_dot")
+        yA_dot = hcl.scalar(0, "yA_dot")
+        thetaA_dot = hcl.scalar(0, "thetaA_dot")
+        xD_dot = hcl.scalar(0, "xD_dot")
+        yD_dot = hcl.scalar(0, "yD_dot")
+        thetaD_dot = hcl.scalar(0, "thetaD_dot")
+
+        xA_dot[0] = self.speed_a*hcl.cos(state[2])
+        yA_dot[0] = self.speed_a*hcl.sin(state[2])
+        thetaA_dot[0] = uOpt[0]
+        xD_dot[0] = self.speed_d*hcl.cos(state[5])
+        yD_dot[0] = self.speed_d*hcl.sin(state[5])
+        thetaD_dot[0] = dOpt[0]
+
+        return (xA_dot[0], yA_dot[0], thetaA_dot[0], xD_dot[0], yD_dot[0], thetaD_dot[0])  
+
+class DubinCar1vs1(DubinCarGameEnv):
+    """1 vs. 1 reach-avoid game class with 2 DubinCar3D dynamics."""
+    def __init__(self, 
+                 num_attackers: int=1,
+                 num_defenders: int=1,
+                 attackers_dynamics=Dynamics.DUB3D, 
+                 defender_dynamics=Dynamics.DUB3D, 
+                 initial_attacker=None, 
+                 initial_defender=None, 
+                 uMax=1.0,  #TODO: Check the hardware ability
+                 dMax=1.0,
+                 uMode="min", 
+                 dMode="max",
+                 ctrl_freq=200): 
+        
+        if initial_attacker is None:
+            initial_attacker = np.zeros((num_attackers, 3))
+        if initial_defender is None:
+            initial_defender = np.zeros((num_defenders, 3))
+
+        super().__init__(num_attackers=num_attackers,
+                         num_defenders=num_defenders,
+                         attackers_dynamics=attackers_dynamics, 
+                         defenders_dynamics=defender_dynamics, 
+                         initial_attacker=initial_attacker, 
+                         initial_defender=initial_defender,
+                         uMode=uMode, dMode=dMode,
+                         ctrl_freq=ctrl_freq)
+        
+        self.x = np.vstack((initial_attacker, initial_defender))
+
+        self.uMax = uMax
+        self.dMax = dMax
+        assert self.uMax == self.attackers.uMax, "The maximum control input for the attacker is not correct."
+        assert self.dMax == self.defenders.uMax, "The maximum disturbance input for the attacker is not correct."
+
+
+    def dynamics(self, t, state, uOpt, dOpt):
+        xA_dot = hcl.scalar(0, "xA_dot")
+        yA_dot = hcl.scalar(0, "yA_dot")
+        thetaA_dot = hcl.scalar(0, "thetaA_dot")
+        xD_dot = hcl.scalar(0, "xD_dot")
+        yD_dot = hcl.scalar(0, "yD_dot")
+        thetaD_dot = hcl.scalar(0, "thetaD_dot")
+
+        xA_dot[0] = self.speed_a*hcl.cos(state[2])
+        yA_dot[0] = self.speed_a*hcl.sin(state[2])
+        thetaA_dot[0] = uOpt[0]
+        xD_dot[0] = self.speed_d*hcl.cos(state[5])
+        yD_dot[0] = self.speed_d*hcl.sin(state[5])
+        thetaD_dot[0] = dOpt[0]
+
+        return (xA_dot[0], yA_dot[0], thetaA_dot[0], xD_dot[0], yD_dot[0], thetaD_dot[0])  

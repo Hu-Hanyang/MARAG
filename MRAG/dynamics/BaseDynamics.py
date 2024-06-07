@@ -9,7 +9,7 @@ import numpy as np
 class BaseDynamics:
     """Base class for "drone aviary" Gym environments."""
     
-    def __init__(self, number, initials, freqency):
+    def __init__(self, number, initials, frequency):
         ''' Initialize the dynamics of the agents.
         Now assume all agents have the same dynamics. 
         If heterogeneous dynamics are needed, please change the states type from ndarray to list.
@@ -20,11 +20,12 @@ class BaseDynamics:
         self.numbers = number
         self.initials = initials
         self.state = self.initials
-        self.freqency = freqency
+        self.frequency = frequency
         if initials is not None:
             self.dim = self.initials.shape[0] * self.initials.shape[1]
         else:
             self.dim = 0
+    
     
     def forward(self, state, action):
         """Update and return the next state of one agent after executing the action.
@@ -34,6 +35,7 @@ class BaseDynamics:
         """
         raise NotImplementedError
 
+
     def step(self, action):
         """Update and return the next state of all agents after executing the action.
 
@@ -42,14 +44,17 @@ class BaseDynamics:
         """
         raise NotImplementedError
     
+
     def _get_state(self):
         """Return the current states of all agents in the form of xxx.
-
-        Must be implemented in a subclass.
+        
+        Returns:
+            np.ndarray (shape (num_agents, state_dim)): the current states of all agents
 
         """
-        raise NotImplementedError
+        return self.state
     
+
     def _dynamics(self):
         """Return the dynamics of the agents.
 

@@ -21,11 +21,13 @@ def make_agents(physics_info, numbers, initials, freqency):
         freqency (int): the frequency of the simulation
     '''
     if physics_info['id'] == 'sig':
-        return SingleIntegrator(number=numbers, initials=initials, frequncy=freqency, speed=physics_info['speed'])
+        return SingleIntegrator(number=numbers, initials=initials, frequency=freqency, speed=physics_info['speed'])
     elif physics_info['id'] == 'fsig':
-        return SingleIntegrator(number=numbers, initials=initials, frequncy=freqency, speed=physics_info['speed'])
+        return SingleIntegrator(number=numbers, initials=initials, frequency=freqency, speed=physics_info['speed'])
     elif physics_info['id'] == 'dub3d':
-        return DubinsCar(number=numbers, initials=initials)
+        return DubinsCar(number=numbers, initials=initials, frequency=freqency, speed=physics_info['speed'])
+    elif physics_info['id'] == 'fdub3d':
+        return DubinsCar(number=numbers, initials=initials, frequency=freqency, speed=physics_info['speed'])
     else:
         raise ValueError("Invalid physics info while generating agents.")
 

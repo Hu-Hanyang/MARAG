@@ -3,12 +3,6 @@ import heterocl as hcl
 
 from MRAG.dynamics.BaseDynamics import BaseDynamics
 
-#TODO: Not finished yet, Hanyang, 20240520
-""" DubinCar(3D) Dynamics Implementation 
- x_dot = v * cos(theta)
- y_dot = v * sin(theta)
- theta_dot = u
- """
 
 class DubinsCar(BaseDynamics):
     '''3D * num DubinsCar agents dynamics.
@@ -16,34 +10,63 @@ class DubinsCar(BaseDynamics):
     y_dot = v * sin(theta)
     theta_dot = u
     '''
-    def __init__(self, physics, number, initials, x=[0, 0, 0, 0, 0, 0], uMin=-1, uMax=1, dMin=-1, 
-                 dMax=1, uMode="min", dMode="max", speed_a=1.0, speed_d=1.5):
-        self.x = x
+    def __init__(self, number, initials, frequency, uMin=-1, uMax=1, speed=1.0):
+        ''' Initialize the dynamics of the agents.
+        
+        Args:
+            number (int): the number of agents
+            initials (np.ndarray): the initial states of all agents
+        '''
+        super().__init__(number=number, initials=initials, frequency=frequency)
         self.uMax = uMax
         self.uMin = uMin
-        self.dMax = dMax
-        self.dMin = dMin
-        assert (uMode in ["min", "max"])
-        self.uMode = uMode
-        self.dMode = dMode
-        self.speed_a = speed_a
-        self.speed_d = speed_d     
+        self.speed = speed
+        assert self.dim == number*3, "The dimension of the initial states are not correct for the DubinsCar."
+    
+    
+    def _dynamics(self, state, action):
+        """Return the partial derivative equations of one agent.
+
+        Args:
+            state (np.ndarray, shape(3, )): the state of one agent
+            action (np.ndarray, shape (1, )): the action of one agent
+        """
+        dx = self.speed * np.cos(state[2])
+        dy = self.speed * np.sin(state[2])
+        dtheta = action[0]
+        return (dx, dy, dtheta)
 
 
-    def forward(self, state, action, ):
-        x_dot = hcl.scalar(0, "x_dot")
-        y_dot = hcl.scalar(0, "y_dot")
-        theta_dot = hcl.scalar(0, "theta_dot")
-        xD_dot = hcl.scalar(0, "xD_dot")
-        yD_dot = hcl.scalar(0, "yD_dot")
-        thetaD_dot = hcl.scalar(0, "thetaD_dot")
+    def forward(self, state, action):
+        """Update and return the next state of one agent with the action based on the Runge Kutta method.
+                
+        Args:
+            state (np.ndarray,  shape(3, )): the state of one agent
+            action (np.ndarray, shape (1, )): the action of one agent
 
-        x_dot[0] = self.speed_a*hcl.cos(state[2])
-        y_dot[0] = self.speed_a*hcl.sin(state[2])
-        theta_dot[0] = uOpt[0]
-        xD_dot[0] = self.speed_d*hcl.cos(state[5])
-        yD_dot[0] = self.speed_d*hcl.sin(state[5])
-        thetaD_dot[0] = dOpt[0]
+        """
+        x, y, theta = state
+        u = action[0]
+        dx, dy, dtheta = self._dynamics(state, action)
+        # Compute the k1 terms
+        k1 = self._dynamics(state, action)
 
-        return (x_dot[0], y_dot[0], theta_dot[0], xD_dot[0], yD_dot[0], thetaD_dot[0])  
+        # Calculate the k values
+        k2 = self._dynamics(state + 0.5 * self.frequency * k1, action)
+        k3 = self._dynamics(state + 0.5 * self.frequency * k2, action)
+        k4 = self._dynamics(state + self.frequency * k3, action)
 
+        next_state = state + (self.frequency / 6.0) * (k1 + 2 * k2 + 2 * k3 + k4)
+        
+        return next_state
+
+
+    def step(self, action):
+        """Update and return the next state of all agents after executing the action.
+        
+        Args:
+            action (np.ndarray, shape (num, 1)): the actions of all agents
+
+        """
+        for i in range(self.numbers):
+            self.state[i] = self.forward(self.state[i], action[i])
