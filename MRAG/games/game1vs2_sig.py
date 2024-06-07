@@ -29,24 +29,24 @@ game = ReachAvoidGameEnv(num_attackers=num_attackers, num_defenders=num_defender
 
 plot_value_3agents(game.attackers.state, game.defenders.state, plot_agents=[0, 1, 2], free_dim=0, value_function=value1vs2, grids=grid1vs2)
 
-# defenders_controls = []
-# attackers_controls = []
-# #### Game Loop ####
-# print(f"================ The game starts now. ================")
-# for step in range(total_steps):
-#     control_defenders = single_1vs2_controller_defender(game, value1vs2, grid1vs2)
-#     defenders_controls.append(control_defenders.copy())
-#     # control_defenders = hj_controller_defenders(game, assignments, value1vs1, value2vs1, grid1vs1, grid2vs1)
-#     control_attackers = hj_contoller_attackers(game, value1vs0, grid1vs0)
-#     attackers_controls.append(control_attackers.copy())
-#     obs, reward, terminated, truncated, info = game.step(np.vstack((control_attackers, control_defenders)))
+defenders_controls = []
+attackers_controls = []
+#### Game Loop ####
+print(f"================ The game starts now. ================")
+for step in range(total_steps):
+    control_defenders = single_1vs2_controller_defender(game, value1vs2, grid1vs2)
+    defenders_controls.append(control_defenders.copy())
+    # control_defenders = hj_controller_defenders(game, assignments, value1vs1, value2vs1, grid1vs1, grid2vs1)
+    control_attackers = hj_contoller_attackers(game, value1vs0, grid1vs0)
+    attackers_controls.append(control_attackers.copy())
+    obs, reward, terminated, truncated, info = game.step(np.vstack((control_attackers, control_defenders)))
     
-#     if terminated or truncated:
-#         break
+    if terminated or truncated:
+        break
     
-# print(f"================ The game is over at the {step} step ({step / ctrl_freq} seconds). ================ \n")
-# current_status_check(game.attackers_status[-1], step)
-# # print(f"================ The number of 1 vs. 2 games happened: {counters_1vs2} ================")
+print(f"================ The game is over at the {step} step ({step / ctrl_freq} seconds). ================ \n")
+current_status_check(game.attackers_status[-1], step)
+# print(f"================ The number of 1 vs. 2 games happened: {counters_1vs2} ================")
 
-# #### Animation ####
-# animation(game.attackers_traj, game.defenders_traj, game.attackers_status)
+#### Animation ####
+animation(game.attackers_traj, game.defenders_traj, game.attackers_status)
