@@ -100,7 +100,7 @@ reach4_obsD2 = np.array(reach4_obsD2, dtype='float32')
 del reach4_obs1D2
 del reach4_obs2D2
 
-reach_set = np.maximum(np.minimum(reach1, reach2), np.maximum(reach3_obsD1, reach4_obsD2))
+reach_set = np.maximum(np.minimum(reach1, reach2), np.minimum(reach3_obsD1, reach4_obsD2))
 reach_set = np.array(reach_set, dtype='float32')
 del reach1
 del reach2
