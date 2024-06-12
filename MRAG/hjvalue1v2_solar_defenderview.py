@@ -43,7 +43,7 @@ print("1. Gigabytes consumed {}".format(process.memory_info().rss/1e9))  # in by
 agents_1v2 = AttackerDefender1v2(uMode="min", dMode="max", speed_a=1.0, speed_d=speed_d)  
 
 # 3. Avoid set, no constraint means inf
-avoid1 = ShapeRectangle(grids, [0.6, 0.1, -1000, -1000, -1000, -1000], [0.8, 0.3, 1000, 1000, 1000, 1000])  # avoid attacker arrives target
+avoid1 = ShapeRectangle(grids, [0.6, 0.1, -1000, -1000, -1000, -1000], [0.8, 0.3, 1000, 1000, 1000, 1000])  # avoid attacker arrives the target
 avoid1 = np.array(avoid1, dtype='float32')
 
 avoid2_escapeD1 = agents_1v2.capture_set1(grids, 0.1, "escape")  # avoid attacker escapes from defender 1
@@ -80,11 +80,20 @@ reach1 = - ShapeRectangle(grids, [0.6, 0.1, -1000, -1000, -1000, -1000], [0.8, 0
 reach1 = np.array(reach1, dtype='float32')
 
 reach2_captureD1 = agents_1v2.capture_set1(grids, 0.1, "capture")  # attacker is captured by defender 1
-reach2_captureD2 = agents_1v2.capture_set2(grids, 0.1, "capture")  # attacker is captured by defender 2
-reach2 = np.minimum(reach2_captureD1, reach2_captureD2)  # the union of being captured by defender 1 and 2
-reach2 = np.array(reach2, dtype='float32')
+reach_captureD1 = np.maximum(reach1, reach2_captureD1)  # the intersection of being captured by defender 1
+reach_captureD1 = np.array(reach_captureD1, dtype='float32')
 del reach2_captureD1
+
+reach2_captureD2 = agents_1v2.capture_set2(grids, 0.1, "capture")  # attacker is captured by defender 2
+reach_captureD2 = np.maximum(reach1, reach2_captureD2)  # the intersection of being captured by defender 2
+reach_captureD2 = np.array(reach_captureD2, dtype='float32')
 del reach2_captureD2
+
+reach2 = np.minimum(reach_captureD1, reach_captureD2)  # the union of being captured by defender 1 or 2, and the attacker has not arrived at the target
+reach2 = np.array(reach2, dtype='float32')
+del reach_captureD1
+del reach_captureD2
+del reach1
 
 reach3_obs1D1 =  - ShapeRectangle(grids, [-1000, -1000, -0.1, -1.0, -1000, -1000], [1000, 1000, 0.1, -0.3, 1000, 1000])  # defender 1 does not get stuck in obs1
 reach3_obs2D1 =  - ShapeRectangle(grids, [-1000, -1000, -0.1, 0.30, -1000, -1000], [1000, 1000, 0.1, 0.60, 1000, 1000])  # defender 1 does not get stuck in obs2
@@ -100,9 +109,8 @@ reach4_obsD2 = np.array(reach4_obsD2, dtype='float32')
 del reach4_obs1D2
 del reach4_obs2D2
 
-reach_set = np.maximum(np.minimum(reach1, reach2), np.minimum(reach3_obsD1, reach4_obsD2))
+reach_set = np.maximum(reach2, np.maximum(reach3_obsD1, reach4_obsD2))
 reach_set = np.array(reach_set, dtype='float32')
-del reach1
 del reach2
 del reach3_obsD1
 del reach4_obsD2
