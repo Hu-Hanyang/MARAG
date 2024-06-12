@@ -218,7 +218,6 @@ class DubinCarGameEnv(BaseRLGameEnv):
     ################################################################################
     
     def optDistb_1vs1(self, spat_deriv):
-        #TODO: Not finished yet, 20240606
         """Computes the optimal control (disturbance) for the defender in a 1 vs. 1 game.
         
         Parameters:
@@ -227,31 +226,20 @@ class DubinCarGameEnv(BaseRLGameEnv):
         Returns:
             tuple: a tuple of optimal control of the defender (disturbances)
         """
-        opt_d1 = self.defenders.uMax
-        opt_d2 = self.defenders.uMax
-        deriv3 = spat_deriv[2]
-        deriv4 = spat_deriv[3]
-        distb_len = np.sqrt(deriv3*deriv3 + deriv4*deriv4)
-        if self.dMode == "max":
-            if distb_len == 0:
-                opt_d1 = 0.0
-                opt_d2 = 0.0
-            else:
-                opt_d1 = self.defenders.speed * deriv3 / distb_len
-                opt_d2 = self.defenders.speed * deriv4 / distb_len
+        opt_d = self.defenders.uMax
+
+        if spat_deriv[5] > 0:
+            if self.dMode == "min":
+                opt_d = - self.defenders.uMax
         else:
-            if distb_len == 0:
-                opt_d1 = 0.0
-                opt_d2 = 0.0
-            else:
-                opt_d1 = -self.defenders.speed * deriv3 / distb_len
-                opt_d2 = -self.defenders.speed * deriv4 / distb_len
-        return (opt_d1, opt_d2)
+            if self.dMode == "max":
+                opt_d = - self.defenders.uMax
+        
+        return opt_d
 
     ################################################################################
 
     def optCtrl_1vs0(self, spat_deriv):
-        #TODO: Not finished yet, 20240606
         """Computes the optimal control (disturbance) for the attacker in a 1 vs. 0 game.
         
         Parameters:
@@ -260,26 +248,16 @@ class DubinCarGameEnv(BaseRLGameEnv):
         Returns:
             tuple: a tuple of optimal control of the defender (disturbances)
         """
-        opt_a1 = self.attackers.uMax
-        opt_a2 = self.attackers.uMax
-        deriv1 = spat_deriv[0]
-        deriv2 = spat_deriv[1]
-        ctrl_len = np.sqrt(deriv1*deriv1 + deriv2*deriv2)
-        if self.uMode == "min":
-            if ctrl_len == 0:
-                opt_a1 = 0.0
-                opt_a2 = 0.0
-            else:
-                opt_a1 = - self.attackers.speed * deriv1 / ctrl_len
-                opt_a2 = - self.attackers.speed * deriv2 / ctrl_len
+        opt_u = self.attackers.uMax
+
+        if spat_deriv[2] > 0:
+            if self.uMode == "min":
+                opt_u = - self.attackers.uMax
         else:
-            if ctrl_len == 0:
-                opt_a1 = 0.0
-                opt_a2 = 0.0
-            else:
-                opt_a1 = self.attackers.speed * deriv1 / ctrl_len
-                opt_a2 = self.attackers.speed * deriv2 / ctrl_len
-        return (opt_a1, opt_a2)
+            if self.uMode == "max":
+                opt_u = - self.attackers.uMax
+        
+        return opt_u
         
     ################################################################################
 
@@ -316,28 +294,69 @@ class DubinCar1vs0(DubinCarGameEnv):
         self.x = np.vstack((initial_attacker, initial_defender))
 
         self.uMax = uMax
-        self.dMax = dMax
         assert self.uMax == self.attackers.uMax, "The maximum control input for the attacker is not correct."
-        assert self.dMax == self.defenders.uMax, "The maximum disturbance input for the attacker is not correct."
-
+      
 
     def dynamics(self, t, state, uOpt, dOpt):
         xA_dot = hcl.scalar(0, "xA_dot")
         yA_dot = hcl.scalar(0, "yA_dot")
         thetaA_dot = hcl.scalar(0, "thetaA_dot")
-        xD_dot = hcl.scalar(0, "xD_dot")
-        yD_dot = hcl.scalar(0, "yD_dot")
-        thetaD_dot = hcl.scalar(0, "thetaD_dot")
 
         xA_dot[0] = self.speed_a*hcl.cos(state[2])
         yA_dot[0] = self.speed_a*hcl.sin(state[2])
         thetaA_dot[0] = uOpt[0]
-        xD_dot[0] = self.speed_d*hcl.cos(state[5])
-        yD_dot[0] = self.speed_d*hcl.sin(state[5])
-        thetaD_dot[0] = dOpt[0]
+       
+        return (xA_dot[0], yA_dot[0], thetaA_dot[0])  
+    
 
-        return (xA_dot[0], yA_dot[0], thetaA_dot[0], xD_dot[0], yD_dot[0], thetaD_dot[0])  
+    def opt_ctrl(self, t, state, spat_deriv):
+        """Computes the optimal control for the attacker in a 1 vs. 0 game.
+        
+        Parameters:
+            spat_deriv (tuple): spatial derivative in all dimensions
+        
+        Returns:
+            tuple: a tuple of optimal control of the defender (disturbances)
+        """
+        opt_u = hcl.scalar(self.uMax, "opt_w")
+        # Just create and pass back, even though they're not used
+        in2 = hcl.scalar(0, "in2")
+        in3 = hcl.scalar(0, "in3")
+        in4 = hcl.scalar(0, "in4")
 
+        with hcl.if_(spat_deriv[2] > 0):
+            with hcl.if_(self.uMode == "min"):
+                opt_u[0] = -opt_u
+        with hcl.elif_(spat_deriv[2] < 0):
+            with hcl.if_(self.uMode == "max"):
+                opt_u[0] = -opt_u
+                
+        return (opt_u[0], in2[0], in3[0], in4[0])
+    
+
+    def optCtrl_1vs0(self, spat_deriv):
+        """Computes the optimal control (disturbance) for the attacker in a 1 vs. 0 game.
+        
+        Parameters:
+            spat_deriv (tuple): spatial derivative in all dimensions
+        
+        Returns:
+            tuple: a tuple of optimal control of the defender (disturbances)
+        """
+        opt_u = self.attackers.uMax
+
+        if spat_deriv[2] > 0:
+            if self.uMode == "min":
+                opt_u = - self.attackers.uMax
+        else:
+            if self.uMode == "max":
+                opt_u = - self.attackers.uMax
+        
+        return opt_u
+
+
+#################################################################################
+    
 class DubinCar1vs1(DubinCarGameEnv):
     """1 vs. 1 reach-avoid game class with 2 DubinCar3D dynamics."""
     def __init__(self, 
@@ -391,3 +410,81 @@ class DubinCar1vs1(DubinCarGameEnv):
         thetaD_dot[0] = dOpt[0]
 
         return (xA_dot[0], yA_dot[0], thetaA_dot[0], xD_dot[0], yD_dot[0], thetaD_dot[0])  
+    
+
+    def opt_ctrl(self, t, state, spat_deriv):
+        """Computes the optimal control for the attacker in a 1 vs. 1 game.
+        
+        Parameters:
+            spat_deriv (tuple): spatial derivative in all dimensions
+        
+        Returns:
+            tuple: a tuple of optimal control of the defender (disturbances)
+        """
+        opt_u = hcl.scalar(self.uMax, "opt_w")
+        # Just create and pass back, even though they're not used
+        in2 = hcl.scalar(0, "in2")
+        in3 = hcl.scalar(0, "in3")
+        in4 = hcl.scalar(0, "in4")
+
+        with hcl.if_(spat_deriv[2] > 0):
+            with hcl.if_(self.uMode == "min"):
+                opt_u[0] = -opt_u
+        with hcl.elif_(spat_deriv[2] < 0):
+            with hcl.if_(self.uMode == "max"):
+                opt_u[0] = -opt_u
+                
+        return (opt_u[0], in2[0], in3[0], in4[0])
+
+
+    def opt_dstb(self, t, state, spat_deriv):
+        """
+        :param spat_deriv: tuple of spatial derivative in all dimensions
+        :return: a tuple of optimal disturbances
+        """
+        opt_d = hcl.scalar(self.dMax, "opt_d")
+        # Just create and pass back, even though they're not used
+        d2 = hcl.scalar(0, "d2")
+        d3 = hcl.scalar(0, "d3")
+        d4 = hcl.scalar(0, "d4")
+        
+        with hcl.if_(spat_deriv[5] > 0):
+            with hcl.if_(self.dMode == "min"):
+                opt_d[0] = -opt_d
+        with hcl.elif_(spat_deriv[5] < 0):
+            with hcl.if_(self.dMode == "max"):
+                opt_d[0] = -opt_d
+
+        return (opt_d, d2[0], d3[0], d4[0])
+    
+
+    def optDistb_1vs1(self, spat_deriv):
+        """Computes the optimal control (disturbance) for the defender in a 1 vs. 1 game.
+        
+        Parameters:
+            spat_deriv (tuple): spatial derivative in all dimensions
+        
+        Returns:
+            tuple: a tuple of optimal control of the defender (disturbances)
+        """
+        opt_d = self.defenders.uMax
+
+        if spat_deriv[5] > 0:
+            if self.dMode == "min":
+                opt_d = - self.defenders.uMax
+        else:
+            if self.dMode == "max":
+                opt_d = - self.defenders.uMax
+        
+        return opt_d
+    
+    
+    def capture_set(self, grid, capture_radius, mode):
+        #TODO: Hanyang: not finished yet, 20240606
+        xa, ya, xd, yd = np.meshgrid(grid.grid_points[0], grid.grid_points[1],
+                                     grid.grid_points[3], grid.grid_points[4], indexing='ij')
+        data = np.power(xa - xd, 2) + np.power(ya - yd, 2)
+        if mode == "capture":
+            return np.sqrt(data) - capture_radius
+        if mode == "escape":
+            return capture_radius - np.sqrt(data)

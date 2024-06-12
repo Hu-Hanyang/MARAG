@@ -52,6 +52,7 @@ def hj_preparations_sig():
     value2vs1 = np.load('MRAG/values/2vs1AttackDefend_g30_speed1.5.npy')
     # value1vs2 = np.load('MRAG/values/1vs2AttackDefend_g35_dspeed1.5.npy')
     value1vs2 = np.load('MRAG/values/1vs2AttackDefend_g35_dspeed1.5_defender.npy')
+    # value1vs2 = np.load('MRAG/values/1vs2AttackDefend_g35_dspeed1.5_defender2.npy')
     # value1vs2 = np.load('MRAG/values/1vs2AttackDefend_g35_dspeed1.5_attacker_test2.npy')
     end = time.time()
     print(f"============= HJ value functions loaded Successfully! (Time: {end-start :.4f} seconds) =============")
@@ -310,3 +311,19 @@ def current_status_check(current_attackers_status, step=None):
     print(f"================= The current status of the attackers: {status} =================")
 
     return status
+
+
+def check_current_value(attackers, defenders, value):
+    """ Check the value of the current state of the attackers and defenders.
+
+    Args:
+        attackers (np.ndarray): the attackers' states
+        defenders (np.ndarray): the defenders' states
+        value (np.ndarray): the value function for the game
+    
+    Returns:
+        value (float): the value of the current state of the attackers and defenders
+    """
+    joint_slice = po2slice1vs1(attackers[0], defenders[0], value.shape[0])
+
+    return value[joint_slice]
