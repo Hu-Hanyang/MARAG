@@ -5,6 +5,7 @@ from MRAG.dynamics.BaseDynamics import BaseDynamics
 
 
 class DubinsCar(BaseDynamics):
+    #TODO: need to change the parameters based on the hardware, 2024.6.12
     '''3D * num DubinsCar agents dynamics.
     x_dot = v * cos(theta)
     y_dot = v * sin(theta)

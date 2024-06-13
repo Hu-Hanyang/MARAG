@@ -7,7 +7,7 @@ import numpy as np
 from odp.Grid import Grid
 from odp.Shapes import *
 # Specify the  file that includes dynamic systems, AttackerDefender4D
-from MRAG.DubinCar1v1 import DubinsCar1v1
+from MRAG.envs.DubinCars import DubinCar1vs1
 # Plot options
 from odp.Plots import PlotOptions
 from odp.Plots.plotting_utilities import plot_2d, plot_isosurface
@@ -34,7 +34,7 @@ process = psutil.Process(os.getpid())
 print("1. Gigabytes consumed of the grids initialization {}".format(process.memory_info().rss/1e9))  # in bytes
 
 # 2. Initialize the dynamics
-agents_1v1 = DubinsCar1v1(uMode="min", dMode="max")  # 1v1 (6 dims dynamics)
+agents_1v1 = DubinCar1vs1(uMode="min", dMode="max")  # 1v1 (6 dims dynamics)
 
 # 3. Instruct the avoid set and reach set
 ## 3.1 Avoid set, no constraint means inf

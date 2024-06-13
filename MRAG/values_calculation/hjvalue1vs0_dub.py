@@ -77,7 +77,7 @@ print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
 print(f'The shape of the value function is {result.shape} \n')
 
 # 6. Save the value function
-np.save(f'MRAG/DubinCar1v1_grid{grid_size}.npy', result)
+np.save(f'MRAG/values/DubinCar1vs0_grid{grid_size}.npy', result)
 
 print(f"The value function has been saved successfully.")
 

@@ -313,7 +313,7 @@ def current_status_check(current_attackers_status, step=None):
     return status
 
 
-def check_current_value(attackers, defenders, value):
+def check_current_value(attackers, defenders, value_function):
     """ Check the value of the current state of the attackers and defenders.
 
     Args:
@@ -324,6 +324,13 @@ def check_current_value(attackers, defenders, value):
     Returns:
         value (float): the value of the current state of the attackers and defenders
     """
-    joint_slice = po2slice1vs1(attackers[0], defenders[0], value.shape[0])
+    if len(value_function.shape) == 4:  # 1vs1 game
+        joint_slice = po2slice1vs1(attackers[0], defenders[0], value_function.shape[0])
+    elif len(value_function.shape) == 6:  # 1vs2 or 2vs1 game
+        if attackers.shape[0] == 1:  # 1vs2 game
+            joint_slice = po2slice2vs1(attackers[0], defenders[0], defenders[1], value_function.shape[0])
+        else:  # 2vs1 game
+            joint_slice = po2slice2vs1(attackers[0], attackers[1], defenders[0], value_function.shape[0])
+    value = value_function[joint_slice]
 
-    return value[joint_slice]
+    return value
