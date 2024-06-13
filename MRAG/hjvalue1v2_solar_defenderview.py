@@ -68,11 +68,12 @@ del avoid4_obs1D2
 del avoid4_obs2D2
 
 avoid_set = np.minimum(np.maximum(avoid1, avoid2), np.minimum(avoid3_obsD1, avoid4_obsD2)) 
+# avoid_set = np.maximum(avoid1, avoid2)
 avoid_set = np.array(avoid_set, dtype='float32')
 del avoid1
 del avoid2
-del avoid3_obsD1
-del avoid4_obsD2
+# del avoid3_obsD1
+# del avoid4_obsD2
 print("2. After generaing avoid set, the Gigabytes consumed {}".format(process.memory_info().rss/1e9))  # in bytes
 
 # 4. Reach set, no constraint means inf
@@ -97,14 +98,14 @@ del reach1
 
 reach3_obs1D1 =  - ShapeRectangle(grids, [-1000, -1000, -0.1, -1.0, -1000, -1000], [1000, 1000, 0.1, -0.3, 1000, 1000])  # defender 1 does not get stuck in obs1
 reach3_obs2D1 =  - ShapeRectangle(grids, [-1000, -1000, -0.1, 0.30, -1000, -1000], [1000, 1000, 0.1, 0.60, 1000, 1000])  # defender 1 does not get stuck in obs2
-reach3_obsD1 = np.minimum(reach3_obs1D1, reach3_obs2D1)  # the union of defender 1 not getting stuck in obs1 or obs2
+reach3_obsD1 = np.maximum(reach3_obs1D1, reach3_obs2D1)  # the intersection of defender 1 not getting stuck in obs1 or obs2
 reach3_obsD1 = np.array(reach3_obsD1, dtype='float32')
 del reach3_obs1D1
 del reach3_obs2D1
 
 reach4_obs1D2 =  - ShapeRectangle(grids, [-1000, -1000, -1000, -1000, -0.1, -1.0], [1000, 1000, 1000, 1000, 0.1, -0.3])  # defender 2 does not get stuck in obs1
 reach4_obs2D2 =  - ShapeRectangle(grids, [-1000, -1000, -1000, -1000, -0.1, 0.30], [1000, 1000, 1000, 1000, 0.1, 0.60])  # defender 2 does not get stuck in obs2
-reach4_obsD2 = np.minimum(reach4_obs1D2, reach4_obs2D2)  # the union of defender 2 not getting stuck in obs1 or obs2
+reach4_obsD2 = np.maximum(reach4_obs1D2, reach4_obs2D2)  # the intersection of defender 2 not getting stuck in obs1 or obs2
 reach4_obsD2 = np.array(reach4_obsD2, dtype='float32')
 del reach4_obs1D2
 del reach4_obs2D2
@@ -147,7 +148,7 @@ print(f'The shape of the value function is {result.shape} \n')
 # save the value function
 # np.save('/localhome/hha160/optimized_dp/MRAG/1v1AttackDefend_speed15.npy', result)  # grid = 45
 # np.save(f'1v2AttackDefend_g{grid_size}_speed15.npy', result)  # grid = 30
-np.save(f'1vs2AttackDefend_g{grid_size}_dspeed{speed_d}_defender.npy', result)
+np.save(f'1vs2AttackDefend_g{grid_size}_dspeed{speed_d}_defender2.npy', result)
 
 print(f"The value function has been saved successfully.")
 # Record the time of whole process
