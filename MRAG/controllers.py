@@ -144,7 +144,26 @@ def attacker_control_1vs0(game, grid1vs0, value1vs0, attacker, neg2pos):
     return (opt_a1, opt_a2)
 
 
-def find_sign_change1v0(grid1vs0, value1vs0, attacker):
+def attacker_control_1vs1(game, grid1vs1, value1vs1, current_state, neg2pos):
+    """Return a list of 2-dimensional control inputs of one defender based on the value function
+    
+    Args:
+    grid1vs1 (class): the corresponding Grid instance
+    value1vs1 (ndarray): 1v1 HJ reachability value function with only final slice
+    current_state (ndarray, (dim,)): the current state of one attacker + one defender
+    neg2pos (list): the positions of the value function that change from negative to positive
+    """
+    current_value = grid1vs1.get_value(value1vs1[..., 0], list(current_state))
+    if current_value > 0:
+        value1vs1 = value1vs1 - current_value
+    v = value1vs1[..., neg2pos]
+    spat_deriv_vector = spa_deriv(grid1vs1.get_index(current_state), v, grid1vs1)
+    opt_a1, opt_a2 = game.optCtrl_1vs1(spat_deriv_vector)
+
+    return (opt_a1, opt_a2)
+
+
+def find_sign_change1vs0(grid1vs0, value1vs0, attacker):
     """Return two positions (neg2pos, pos2neg) of the value function
 
     Args:
@@ -154,6 +173,23 @@ def find_sign_change1v0(grid1vs0, value1vs0, attacker):
     """
     current_slices = grid1vs0.get_index(attacker)
     current_value = value1vs0[current_slices[0], current_slices[1], :]  # current value in all time slices
+    neg_values = (current_value<=0).astype(int)  # turn all negative values to 1, and all positive values to 0
+    checklist = neg_values - np.append(neg_values[1:], neg_values[-1])
+    # neg(True) - pos(False) = 1 --> neg to pos
+    # pos(False) - neg(True) = -1 --> pos to neg
+    return np.where(checklist==1)[0], np.where(checklist==-1)[0]
+
+
+def find_sign_change1vs1(grid1vs1, value1vs1, current_state):
+    """Return two positions (neg2pos, pos2neg) of the value function
+
+    Args:
+    grid1vs1 (class): the instance of grid
+    value1vs1 (ndarray): including all the time slices, shape = [45, 45, 45, 45, len(tau)]
+    current_state (ndarray, (dim,)): the current state of one attacker + one defender
+    """
+    current_slices = grid1vs1.get_index(current_state)
+    current_value = value1vs1[current_slices[0], current_slices[1], current_slices[2], current_slices[3], :]  # current value in all time slices
     neg_values = (current_value<=0).astype(int)  # turn all negative values to 1, and all positive values to 0
     checklist = neg_values - np.append(neg_values[1:], neg_values[-1])
     # neg(True) - pos(False) = 1 --> neg to pos
@@ -306,7 +342,7 @@ def hj_contoller_attackers(game, value1vs0, grid1vs0):
     control_attackers = np.zeros((num_attackers, 2))
     for i in range(num_attackers):
         if not current_attackers_status[i]:  # the attacker is free
-            neg2pos, pos2neg = find_sign_change1v0(grid1vs0, value1vs0, attackers[i])
+            neg2pos, pos2neg = find_sign_change1vs0(grid1vs0, value1vs0, attackers[i])
             if len(neg2pos):
                 control_attackers[i] = attacker_control_1vs0(game, grid1vs0, value1vs0, attackers[i], neg2pos)
             else:
@@ -318,4 +354,73 @@ def hj_contoller_attackers(game, value1vs0, grid1vs0):
 
 
 
+def hj_contoller_attackers_test(game, value1vs1, grid1vs1):
+    """This function computes the control for the attackers based on the control_attackers. 
+       Assume dynamics are single integrator.
 
+    Args:
+        game (class): the corresponding ReachAvoidGameEnv instance
+        value1vs0 (np.ndarray): the value function for 1 vs 0 game with all time slices
+        grid1vs0 (Grid): the grid for 1 vs 0 game
+    
+    Returns:
+        control_attackers (ndarray): the control of attackers
+    """
+    attackers = game.attackers.state
+    current_state = game.state.copy().flatten()
+    num_attackers = game.NUM_ATTACKERS
+    current_attackers_status = game.attackers_status[-1]
+    control_attackers = np.zeros((num_attackers, 2))
+    for i in range(num_attackers):
+        if not current_attackers_status[i]:  # the attacker is free
+            neg2pos, pos2neg = find_sign_change1vs1(grid1vs1, value1vs1, current_state)
+            if len(neg2pos):
+                control_attackers[i] = attacker_control_1vs1(game, grid1vs1, value1vs1, current_state, neg2pos)
+            else:
+                control_attackers[i] = (0.0, 0.0)
+        else:  # the attacker is captured or arrived
+            control_attackers[i] = (0.0, 0.0)
+            
+    return control_attackers
+
+
+def single_1vs1_controller_defender(game, value1vs1, grid1vs1):
+    attackers = game.attackers.state.copy()
+    defenders = game.defenders.state.copy()
+    assert game.NUM_ATTACKERS == 1, "The number of attacker should be 1."
+    assert game.NUM_DEFENDERS == 1, "The number of defender should be 1."
+    num_defenders = game.NUM_DEFENDERS 
+    control_defenders = np.zeros((num_defenders, 2))
+    
+    a1x, a1y = attackers[0]
+    d1x, d1y = defenders[0]
+    
+    jointstate_1vs1 = (a1x, a1y, d1x, d1y)
+    opt_d1, opt_d2 = defender_control_1vs1(game, grid1vs1, value1vs1, jointstate_1vs1)
+    
+    control_defenders[0] = (opt_d1, opt_d2)
+
+    return control_defenders
+
+
+def single_1vs1_controller_defender_noise(game, value1vs1, grid1vs1, epsilon=0.3):
+    attackers = game.attackers.state.copy()
+    defenders = game.defenders.state.copy()
+    assert game.NUM_ATTACKERS == 1, "The number of attacker should be 1."
+    assert game.NUM_DEFENDERS == 1, "The number of defender should be 1."
+    num_defenders = game.NUM_DEFENDERS 
+    control_defenders = np.zeros((num_defenders, 2))
+    
+    a1x, a1y = attackers[0]
+    d1x, d1y = defenders[0]
+    
+    jointstate_1vs1 = (a1x, a1y, d1x, d1y)
+    opt_d1, opt_d2 = defender_control_1vs1(game, grid1vs1, value1vs1, jointstate_1vs1)
+    
+    if np.random.rand() < epsilon:
+        # Generate random controls within the range [-1, 1]
+        control_defenders[0] = np.random.uniform(-1, 1, 2)
+    else:
+        control_defenders[0] = (opt_d1, opt_d2)
+
+    return control_defenders

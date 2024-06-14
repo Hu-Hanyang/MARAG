@@ -277,6 +277,38 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
                 opt_d1 = -self.defenders.speed * deriv3 / distb_len
                 opt_d2 = -self.defenders.speed * deriv4 / distb_len
         return (opt_d1, opt_d2)
+    
+    
+    def optCtrl_1vs1(self, spat_deriv):
+        """Computes the optimal control (disturbance) for the attacker in a 1 vs. 1 game.
+        
+        Parameters:
+            spat_deriv (tuple): spatial derivative in all dimensions
+        
+        Returns:
+            tuple: a tuple of optimal control of the defender (disturbances)
+        """
+        opt_u1 = self.attackers.uMax
+        opt_u2 = self.attackers.uMax
+        deriv1 = spat_deriv[0]
+        deriv2 = spat_deriv[1]
+        crtl_len = np.sqrt(deriv1*deriv1 + deriv2*deriv2)
+        if self.uMode == "min":
+            if crtl_len == 0:
+                opt_u1 = 0.0
+                opt_u2 = 0.0
+            else:
+                opt_u1 = - self.attackers.speed * deriv1 / crtl_len
+                opt_u2 = - self.attackers.speed * deriv2 / crtl_len
+        else:
+            if crtl_len == 0:
+                opt_u1 = 0.0
+                opt_u2 = 0.0
+            else:
+                opt_u1 = self.defenders.speed * deriv1 / crtl_len
+                opt_u2 = self.defenders.speed * deriv2 / crtl_len
+
+        return (opt_u1, opt_u2)
 
     ################################################################################
 
