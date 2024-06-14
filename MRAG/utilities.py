@@ -65,6 +65,29 @@ def hj_preparations_sig():
     return value1vs0, value1vs1, value2vs1, value1vs2, grid1vs0, grid1vs1, grid2vs1, grid1vs2
 
 
+def hj_preparations_dub():
+    """ Loads all calculated HJ value functions for the DubinCar agents.
+    This function needs to be called before any game starts.
+    
+    Returns:
+        value1vs0 (np.ndarray): the value function for 1 vs 0 game with all time slices
+        value1vs1 (np.ndarray): the value function for 1 vs 1 game
+        grid1vs0 (Grid): the grid for 1 vs 0 game
+        grid1vs1 (Grid): the grid for 1 vs 1 game
+    """
+    start = time.time()
+    value1vs0 = np.load('MRAG/values/DubinCar1vs0_grid100.npy')
+    # value1vs1 = np.load('MRAG/values/DubinCar1vs1_grid30.npy')
+    end = time.time()
+    print(f"============= HJ value functions loaded Successfully! (Time: {end-start :.4f} seconds) =============")
+    grid1vs0 = Grid(np.array([-1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi]), 3, np.array([100, 100, 100]), [2])
+    grid1vs1 = Grid(np.array([-1.0, -1.0, -math.pi, -1.0, -1.0, -math.pi]), 
+                    np.array([1.0, 1.0, math.pi, 1.0, 1.0, math.pi]), 4, np.array([30, 30, 30, 30, 30, 30]), [2, 5])
+    print(f"============= Grids created Successfully! =============")
+
+    return value1vs0, grid1vs0
+
+
 def po2slice1vs1(attacker, defender, grid_size):
     """ Convert the position of the attacker and defender to the slice of the value function for 1 vs 1 game.
 
@@ -278,6 +301,42 @@ def judges(attackers, defenders, current_attackers_status, value1vs1, value2vs1,
 
 
 def current_status_check(current_attackers_status, step=None):
+    """ Check the current status of the attackers.
+
+    Args:
+        current_attackers_status (np.ndarray): the current moment attackers' status, 0 stands for free, -1 stands for captured, 1 stands for arrived
+        step (int): the current step of the game
+    
+    Returns:
+        status (dic): the current status of the attackers
+    """
+    num_attackers = len(current_attackers_status)
+    num_free, num_arrived, num_captured = 0, 0, 0
+    status = {'free': [], 'arrived': [], 'captured': []}
+    
+    for i in range(num_attackers):
+        if current_attackers_status[i] == 0:
+            num_free += 1
+            status['free'].append(i)
+        elif current_attackers_status[i] == 1:
+            num_arrived += 1
+            status['arrived'].append(i)
+        elif current_attackers_status[i] == -1:
+            num_captured += 1
+            status['captured'].append(i)
+        else:
+            raise ValueError("Invalid status for the attackers.")
+    
+    print(f"================= Step {step}: {num_captured}/{num_attackers} attackers are captured \t"
+      f"{num_arrived}/{num_attackers} attackers have arrived \t"
+      f"{num_free}/{num_attackers} attackers are free =================")
+
+    print(f"================= The current status of the attackers: {status} =================")
+
+    return status
+
+
+def current_status_check_dub(current_attackers_status, step=None):
     """ Check the current status of the attackers.
 
     Args:

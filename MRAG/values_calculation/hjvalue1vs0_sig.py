@@ -59,7 +59,7 @@ compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithO
 
 solve_start_time = time.time()
 # initial_memory_usage = psutil.virtual_memory().used / (1024 ** 3)
-result = HJSolver(agents_1v0, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=True) # original one
+result = HJSolver(agents_1v0, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=True, accuracy="medium") # original one
 process = psutil.Process(os.getpid())
 print(f"The CPU memory used during the calculation of the value function is {process.memory_info().rss/(1024 ** 3): .2f} GB.")  # in bytes
 # result = HJSolver(agents_1v0, grids, reach_set, tau, compMethods, po, saveAllTimeSteps=True)

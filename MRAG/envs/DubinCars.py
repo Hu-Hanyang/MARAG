@@ -10,10 +10,9 @@ from MRAG.envs.BaseGame import Dynamics
 
 #TODO: Hanyang: not finished yet, 20240606
 class DubinCarGameEnv(BaseRLGameEnv):
-    """Multi-agent reach-avoid games class for DubinCar dynamics."""
+    """Multi-agent reach-avoid games class for DubinCar dynamics.
 
-    ################################################################################
-    
+    """
     def __init__(self,
                  num_attackers: int=1,
                  num_defenders: int=1,
@@ -82,7 +81,7 @@ class DubinCarGameEnv(BaseRLGameEnv):
         self.GAME_LENGTH_SEC = game_length_sec
         self.uMode = uMode
         self.dMode = dMode
-    ################################################################################
+
     
     def _getAttackersStatus(self):
         """Returns the current status of all attackers.
@@ -118,7 +117,7 @@ class DubinCarGameEnv(BaseRLGameEnv):
                                 break
 
             return new_status
-    ################################################################################
+    
 
     def _check_area(self, state, area):
         """Check if the state is inside the area.
@@ -138,7 +137,7 @@ class DubinCarGameEnv(BaseRLGameEnv):
                 return True
 
         return False
-    ################################################################################
+    
     
     def _computeReward(self):
         """Computes the current reward value.
@@ -162,7 +161,7 @@ class DubinCarGameEnv(BaseRLGameEnv):
             
         return reward
 
-    ################################################################################
+    
     
     def _computeTerminated(self):
         """Computes the current done value.
@@ -180,7 +179,6 @@ class DubinCarGameEnv(BaseRLGameEnv):
         
         return done
         
-    ################################################################################
     
     def _computeTruncated(self):
         """Computes the current truncated value.
@@ -196,7 +194,6 @@ class DubinCarGameEnv(BaseRLGameEnv):
         else:
             return False
 
-    ################################################################################
     
     def _computeInfo(self):
         """Computes the current info dict(s).
@@ -215,7 +212,6 @@ class DubinCarGameEnv(BaseRLGameEnv):
         
         return info 
     
-    ################################################################################
     
     def optDistb_1vs1(self, spat_deriv):
         """Computes the optimal control (disturbance) for the defender in a 1 vs. 1 game.
@@ -237,7 +233,6 @@ class DubinCarGameEnv(BaseRLGameEnv):
         
         return opt_d
 
-    ################################################################################
 
     def optCtrl_1vs0(self, spat_deriv):
         """Computes the optimal control (disturbance) for the attacker in a 1 vs. 0 game.
@@ -259,7 +254,6 @@ class DubinCarGameEnv(BaseRLGameEnv):
         
         return opt_u
         
-    ################################################################################
 
 
 class DubinCar1vs0(DubinCarGameEnv):
@@ -271,7 +265,7 @@ class DubinCar1vs0(DubinCarGameEnv):
                  defender_dynamics=Dynamics.DUB3D, 
                  initial_attacker=None, 
                  initial_defender=None, 
-                 uMax=1.0,  #TODO: Check the hardware ability
+                 uMax=1.0,
                  dMax=1.0,
                  uMode="min", 
                  dMode="max",
@@ -302,8 +296,8 @@ class DubinCar1vs0(DubinCarGameEnv):
         yA_dot = hcl.scalar(0, "yA_dot")
         thetaA_dot = hcl.scalar(0, "thetaA_dot")
 
-        xA_dot[0] = self.speed_a*hcl.cos(state[2])
-        yA_dot[0] = self.speed_a*hcl.sin(state[2])
+        xA_dot[0] = self.attackers.speed*hcl.cos(state[2])
+        yA_dot[0] = self.attackers.speed*hcl.sin(state[2])
         thetaA_dot[0] = uOpt[0]
        
         return (xA_dot[0], yA_dot[0], thetaA_dot[0])  
@@ -322,7 +316,6 @@ class DubinCar1vs0(DubinCarGameEnv):
         # Just create and pass back, even though they're not used
         in2 = hcl.scalar(0, "in2")
         in3 = hcl.scalar(0, "in3")
-        in4 = hcl.scalar(0, "in4")
 
         with hcl.if_(spat_deriv[2] > 0):
             with hcl.if_(self.uMode == "min"):
@@ -331,7 +324,20 @@ class DubinCar1vs0(DubinCarGameEnv):
             with hcl.if_(self.uMode == "max"):
                 opt_u[0] = -opt_u
                 
-        return (opt_u[0], in2[0], in3[0], in4[0])
+        return (opt_u[0], in2[0], in3[0])
+
+
+    def opt_dstb(self, t, state, spat_deriv):
+        """
+        :param spat_deriv: tuple of spatial derivative in all dimensions
+        :return: a tuple of optimal disturbances
+        """
+        opt_d = hcl.scalar(0, "d1")
+        # Just create and pass back, even though they're not used
+        d2 = hcl.scalar(0, "d2")
+        d3 = hcl.scalar(0, "d3")
+
+        return (opt_d, d2[0], d3[0])
     
 
     def optCtrl_1vs0(self, spat_deriv):
@@ -354,8 +360,6 @@ class DubinCar1vs0(DubinCarGameEnv):
         
         return opt_u
 
-
-#################################################################################
     
 class DubinCar1vs1(DubinCarGameEnv):
     """1 vs. 1 reach-avoid game class with 2 DubinCar3D dynamics."""
@@ -402,11 +406,11 @@ class DubinCar1vs1(DubinCarGameEnv):
         yD_dot = hcl.scalar(0, "yD_dot")
         thetaD_dot = hcl.scalar(0, "thetaD_dot")
 
-        xA_dot[0] = self.speed_a*hcl.cos(state[2])
-        yA_dot[0] = self.speed_a*hcl.sin(state[2])
+        xA_dot[0] = self.attackers.speed*hcl.cos(state[2])
+        yA_dot[0] = self.attackers.speed*hcl.sin(state[2])
         thetaA_dot[0] = uOpt[0]
-        xD_dot[0] = self.speed_d*hcl.cos(state[5])
-        yD_dot[0] = self.speed_d*hcl.sin(state[5])
+        xD_dot[0] = self.defenders.speed*hcl.cos(state[5])
+        yD_dot[0] = self.defenders.speed*hcl.sin(state[5])
         thetaD_dot[0] = dOpt[0]
 
         return (xA_dot[0], yA_dot[0], thetaA_dot[0], xD_dot[0], yD_dot[0], thetaD_dot[0])  

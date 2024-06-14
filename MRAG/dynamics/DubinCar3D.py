@@ -45,19 +45,25 @@ class DubinsCar(BaseDynamics):
             state (np.ndarray,  shape(3, )): the state of one agent
             action (np.ndarray, shape (1, )): the action of one agent
 
+        Returns:
+            next_state (np.ndarray, shape (3, )): the next state of one agent
         """
         x, y, theta = state
         u = action[0]
-        dx, dy, dtheta = self._dynamics(state, action)
+        dt = 1.0 / self.frequency
+        # dx, dy, dtheta = self._dynamics(state, action)
         # Compute the k1 terms
-        k1 = self._dynamics(state, action)
+        k1_state = self._dynamics(state, action)
+        k1_x, k1_y, k1_theta = k1_state
+        k2 = self._dynamics((x+0.5*dt*k1_x, y+0.5*dt*k1_y, theta+0.5*dt*k1_theta), action)
+        k2_x, k2_y, k2_theta = k2
+        k3 = self._dynamics((x+0.5*dt*k2_x, y+0.5*dt*k2_y, theta+0.5*dt*k2_theta), action)
+        k3_x, k3_y, k3_theta = k3
+        k4 = self._dynamics((x+dt*k3_x, y+dt*k3_y, theta+dt*k3_theta), action)
 
-        # Calculate the k values
-        k2 = self._dynamics(state + 0.5 * self.frequency * k1, action)
-        k3 = self._dynamics(state + 0.5 * self.frequency * k2, action)
-        k4 = self._dynamics(state + self.frequency * k3, action)
-
-        next_state = state + (self.frequency / 6.0) * (k1 + 2 * k2 + 2 * k3 + k4)
+        next_state = (x + dt/6*(k1_x + 2*k2_x + 2*k3_x + k4[0]),
+                               y + dt/6*(k1_y + 2*k2_y + 2*k3_y + k4[1]),
+                               theta + dt/6*(k1_theta + 2*k2_theta + 2*k3_theta + k4[2]))
         
         return next_state
 

@@ -13,10 +13,9 @@ from MRAG.envs.BaseGame import BaseGameEnv, Dynamics
 
 
 class BaseRLGameEnv(BaseGameEnv):
-    """Base single and multi-agent environment class for reinforcement learning."""
-    
-    ################################################################################
+    """Base single and multi-agent environment class for reinforcement learning.
 
+    """
     def __init__(self,
                  num_attackers: int=1,
                  num_defenders: int=1,
@@ -55,9 +54,6 @@ class BaseRLGameEnv(BaseGameEnv):
                          initial_attacker=initial_attacker, initial_defender=initial_defender, 
                          ctrl_freq=ctrl_freq, output_folder=output_folder
                          )
-       
-
-    ################################################################################
 
    
     def _actionSpace(self):
@@ -112,8 +108,6 @@ class BaseRLGameEnv(BaseGameEnv):
         return spaces.Box(low=act_lower_bound, high=act_upper_bound, dtype=np.float32)
  
 
-    ################################################################################
-
     def _observationSpace(self):
         """Returns the observation space of the environment.
         Formulation: [attackers' obs spaces, defenders' obs spaces]
@@ -165,7 +159,6 @@ class BaseRLGameEnv(BaseGameEnv):
         
         return spaces.Box(low=obs_lower_bound, high=obs_upper_bound, dtype=np.float32)
     
-    ################################################################################
 
     def _computeObs(self):
         """Returns the current observation of the environment.

@@ -9,10 +9,9 @@ from MRAG.envs.BaseGame import Dynamics
 
 
 class ReachAvoidGameEnv(BaseRLGameEnv):
-    """Multi-agent reach-avoid games class for SingleIntegrator dynamics."""
+    """Multi-agent reach-avoid games class for SingleIntegrator dynamics.
 
-    ################################################################################
-    
+    """
     def __init__(self,
                  num_attackers: int=1,
                  num_defenders: int=1,
@@ -81,7 +80,7 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
         self.GAME_LENGTH_SEC = game_length_sec
         self.uMode = uMode
         self.dMode = dMode
-    ################################################################################
+
     
     def _getAttackersStatus(self):
         """Returns the current status of all attackers.
@@ -117,7 +116,7 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
                                 break
 
             return new_status
-    ################################################################################
+
 
     def _check_area(self, state, area):
         """Check if the state is inside the area.
@@ -137,7 +136,7 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
                 return True
 
         return False
-    ################################################################################
+
     
     def _computeReward(self):
         """Computes the current reward value.
@@ -161,7 +160,6 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
             
         return reward
 
-    ################################################################################
     
     def _computeTerminated(self):
         """Computes the current done value.
@@ -179,7 +177,6 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
         
         return done
         
-    ################################################################################
     
     def _computeTruncated(self):
         """Computes the current truncated value.
@@ -195,7 +192,6 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
         else:
             return False
 
-    ################################################################################
     
     def _computeInfo(self):
         """Computes the current info dict(s).
@@ -214,7 +210,6 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
         
         return info 
     
-    ################################################################################
     
     def optDistb_2vs1(self, spat_deriv):
         """Computes the optimal control (disturbance) for the defender in a 2 vs. 1 game.
@@ -246,7 +241,6 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
                 opt_d2 = -self.defenders.speed * deriv6 / distb_len
         return (opt_d1, opt_d2)
     
-    ################################################################################
     
     def optDistb_1vs1(self, spat_deriv):
         """Computes the optimal control (disturbance) for the defender in a 1 vs. 1 game.
@@ -310,7 +304,6 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
 
         return (opt_u1, opt_u2)
 
-    ################################################################################
 
     def optCtrl_1vs0(self, spat_deriv):
         """Computes the optimal control (disturbance) for the attacker in a 1 vs. 0 game.
@@ -341,8 +334,7 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
                 opt_a1 = self.attackers.speed * deriv1 / ctrl_len
                 opt_a2 = self.attackers.speed * deriv2 / ctrl_len
         return (opt_a1, opt_a2)
-        
-    ################################################################################
+
     
     def optDistb_1vs2(self, spat_deriv):
         """Computes the optimal control (disturbance) for the attacker in a 1 vs. 2 game.

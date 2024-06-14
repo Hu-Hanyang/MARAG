@@ -1,4 +1,4 @@
-'''Controllers for the reach-avoid game.
+'''Controllers for the reach-avoid game with sig dynamics.
 
 '''
 import numpy as np
@@ -61,6 +61,7 @@ def spa_deriv(slice_index, value_function, grid, periodic_dims=[]):
             right_deriv = (value_function[next_index] - value_function[slice_index]) / grid.dx[dim]
 
         spa_derivatives.append(((left_deriv + right_deriv) / 2)[0])
+        
     return spa_derivatives
 
 
@@ -324,7 +325,7 @@ def single_1vs2_controller_defender(game, value1vs2, grid1vs2):
     return control_defenders
 
 
-def hj_contoller_attackers(game, value1vs0, grid1vs0):
+def hj_controller_attackers(game, value1vs0, grid1vs0):
     """This function computes the control for the attackers based on the control_attackers. 
        Assume dynamics are single integrator.
 

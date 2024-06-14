@@ -74,7 +74,6 @@ class BaseGameEnv(gym.Env):
         #### Update and all players' information #####
         self._updateAndLog()
     
-    ################################################################################
 
     def _housekeeping(self):
         """Housekeeping function.
@@ -94,7 +93,6 @@ class BaseGameEnv(gym.Env):
         self.attackers_actions = []
         self.defenders_actions = []
 
-    ################################################################################
 
     def _updateAndLog(self):
         """Update and log all players' information after inialization, reset(), or step.
@@ -107,7 +105,6 @@ class BaseGameEnv(gym.Env):
         self.defenders_traj.append(self.defenders._get_state().copy())
         self.attackers_status.append(self._getAttackersStatus().copy())
     
-    ################################################################################
 
     def reset(self, seed : int = None):
         """Resets the environment.
@@ -136,7 +133,6 @@ class BaseGameEnv(gym.Env):
         
         return self.state
     
-    ################################################################################
 
     def step(self,
              action
@@ -196,7 +192,6 @@ class BaseGameEnv(gym.Env):
         
         return obs, reward, terminated, truncated, info
     
-    ################################################################################
 
     def _getAttackersStatus(self):
         """Returns the current status of all attackers.
@@ -206,7 +201,6 @@ class BaseGameEnv(gym.Env):
         """
         raise NotImplementedError
     
-    ################################################################################
     
     def _actionSpace(self):
         """Returns the action space of the environment.
@@ -216,7 +210,6 @@ class BaseGameEnv(gym.Env):
         """
         raise NotImplementedError
            
-    ################################################################################
 
     def _observationSpace(self):
         """Returns the observation space of the environment.
@@ -226,7 +219,6 @@ class BaseGameEnv(gym.Env):
         """
         raise NotImplementedError
     
-    ################################################################################
     
     def _computeObs(self):
         """Returns the current observation of the environment.
@@ -236,7 +228,6 @@ class BaseGameEnv(gym.Env):
         """
         raise NotImplementedError
     
-    ################################################################################
 
     def _computeReward(self):
         """Computes the current reward value(s).
@@ -251,7 +242,6 @@ class BaseGameEnv(gym.Env):
         """
         raise NotImplementedError
 
-    ################################################################################
 
     def _computeTerminated(self):
         """Computes the current terminated value(s).
@@ -261,7 +251,6 @@ class BaseGameEnv(gym.Env):
         """
         raise NotImplementedError
     
-    ################################################################################
 
     def _computeTruncated(self):
         """Computes the current truncated value(s).
@@ -271,7 +260,6 @@ class BaseGameEnv(gym.Env):
         """
         raise NotImplementedError
 
-    ################################################################################
 
     def _computeInfo(self):
         """Computes the current info dict(s).
@@ -280,5 +268,3 @@ class BaseGameEnv(gym.Env):
 
         """
         raise NotImplementedError
-
-    ################################################################################

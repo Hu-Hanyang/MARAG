@@ -133,7 +133,7 @@ compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithO
 # compMethods = {"TargetSetMode": "minVWithVTarget"}
 solve_start_time = time.time()
 
-result = HJSolver(agents_1v2, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=None) # original one
+result = HJSolver(agents_1v2, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=None, accuracy="medium") # original one
 # result = HJSolver(my_2agents, g, avoid_set, tau, compMethods, po, saveAllTimeSteps=True)
 process = psutil.Process(os.getpid())
 print(f"The CPU memory used during the calculation of the value function is {process.memory_info().rss/(1024 ** 3): .2f} GB.")  # in bytes

@@ -180,7 +180,7 @@ po = PlotOptions(do_plot=True, plot_type="set", plotDims=[0, 1], slicesCut=[2, 2
 # 5. Call HJSolver function
 compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithObstacle"} # original one
 solve_start_time = time.time()
-result = HJSolver(agents_2v1, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=False) # original one
+result = HJSolver(agents_2v1, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=False, accuracy="medium") # original one
 
 process = psutil.Process(os.getpid())
 print(f"The CPU memory used during the calculation of the value function is {process.memory_info().rss/(1e9): .2f} GB.")  # in bytes

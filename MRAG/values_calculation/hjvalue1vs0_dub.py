@@ -27,7 +27,7 @@ from odp.solver import HJSolver
 start_time = time.time()
 
 # 1. Initialize the grids
-grid_size = 6
+grid_size = 100
 grids = Grid(np.array([-1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi]), 3, np.array([grid_size, grid_size, grid_size]), [2])
 
 # 2. Initialize the dynamics
@@ -47,10 +47,10 @@ del obs1_a
 del obs2_a
 
 ### 3.2 Reach set
-reach_set = ShapeRectangle(grids, [0.6, 0.1, -1000], [0.8, 0.3,  1000]) 
+reach_set = ShapeRectangle(grids, [0.6, 0.1, -1000], [0.8, 0.3, 1000]) 
 
 # 4. Set the look-back length and time step
-lookback_length = 2.5  
+lookback_length = 2.0 
 t_step = 0.025
 
 # Actual calculation process, needs to add new plot function to draw a 2D figure
@@ -58,14 +58,14 @@ small_number = 1e-5
 tau = np.arange(start=0, stop=lookback_length + small_number, step=t_step)
 
 # while plotting make sure the len(slicesCut) + len(plotDims) = grid.dims
-po = PlotOptions(do_plot=True, plot_type="set", plotDims=[0, 1], slicesCut=[2])
+po = PlotOptions(do_plot=True, plot_type="set", plotDims=[0, 1, 2], slicesCut=[])
 
 # 5. Call HJSolver function
-compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithObstacle"} # original one
+compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithObstacle"}
 # compMethods = {"TargetSetMode": "minVWithVTarget"}
 solve_start_time = time.time()
 
-result = HJSolver(agents_1vs0, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=None) # original one
+result = HJSolver(agents_1vs0, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=True, accuracy="medium")
 # result = HJSolver(my_2agents, g, avoid_set, tau, compMethods, po, saveAllTimeSteps=True)
 process = psutil.Process(os.getpid())
 print(f"The CPU memory used during the calculation of the value function is {process.memory_info().rss/1e9: .2f} GB.")  # in bytes
