@@ -10,8 +10,7 @@ from odp.Shapes import *
 from MRAG.envs.DubinCars import DubinCar1vs1
 # Plot options
 from odp.Plots import PlotOptions
-from odp.Plots.plotting_utilities import plot_2d, plot_isosurface
-# Solver core
+from odp.Plots.plotting_utilities import plot_isosurface, plot_valuefunction
 from odp.solver import HJSolver
 
 """ USER INTERFACES
@@ -98,7 +97,7 @@ small_number = 1e-5
 tau = np.arange(start=0, stop=lookback_length + small_number, step=t_step)
 
 # while plotting make sure the len(slicesCut) + len(plotDims) = grid.dims
-po = PlotOptions(do_plot=False, plot_type="2d_plot", plotDims=[0, 1], slicesCut=[22, 22])
+po = PlotOptions(do_plot=False, plot_type="set", plotDims=[0, 1], slicesCut=[2, 2, 2, 2])
 
 # 5. Call HJSolver function
 compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithObstacle"} # original one
@@ -117,7 +116,8 @@ print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
 print(f'The shape of the value function is {result.shape} \n')
 
 # 6. Save the value function
-np.save(f'MRAG/DubinCar1v1_grid{grid_size}.npy', result)
+np.save(f'MRAG/values/DubinCar1vs1_grid{grid_size}.npy', result)
+
 
 print(f"The value function has been saved successfully.")
 
