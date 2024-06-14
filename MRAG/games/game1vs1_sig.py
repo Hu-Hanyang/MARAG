@@ -11,8 +11,10 @@ from MRAG.plots import animation, plot_value_1vs1
 value1vs0, value1vs1, value2vs1, value1vs2, grid1vs0, grid1vs1, grid2vs1, grid1vs2  = hj_preparations_sig()
 num_attackers = 1
 num_defenders = 1
-initial_attacker = np.array([[-0.4, -0.8]])
-initial_defender = np.array([[0.3, -0.8]])
+# initial_attacker = np.array([[-0.4, -0.8]])
+# initial_defender = np.array([[0.3, -0.8]])
+initial_attacker = np.array([[0.4, 0.0]])
+initial_defender = np.array([[0.3, -0.8]]) 
 assert num_attackers == initial_attacker.shape[0], "The number of attackers should be equal to the number of initial attacker states."
 assert num_defenders == initial_defender.shape[0], "The number of defenders should be equal to the number of initial defender states."
 T = 10.0  # time for the game
@@ -26,9 +28,9 @@ game = ReachAvoidGameEnv(num_attackers=num_attackers, num_defenders=num_defender
 
 
 
-# plot_value_1vs1(game.attackers.state, game.defenders.state, 
-#                 plot_attacker=0, plot_defender=0, 
-#                 fix_agent=1, value1vs1=value1vs1, grid1vs1=grid1vs1)
+plot_value_1vs1(game.attackers.state, game.defenders.state, 
+                plot_attacker=0, plot_defender=0, 
+                fix_agent=1, value1vs1=value1vs1, grid1vs1=grid1vs1)
 
 #### Game Loop ####
 print(f"================ The game starts now. ================")
@@ -47,6 +49,3 @@ current_status_check(game.attackers_status[-1], step)
 
 #### Animation ####
 animation(game.attackers_traj, game.defenders_traj, game.attackers_status)
-
-
-
