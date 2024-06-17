@@ -7,7 +7,7 @@ from MRAG.dub_controllers import hj_contoller_attackers_dub, hj_contoller_defend
 from MRAG.plots_dub import check_current_value_dub
 from MRAG.plots import animation
 
-#TODO: The defender would cross the obstacle to capture the attacker.
+#TODO: The 1vs1 value function is wrong, need to recompute it
 #### Game Settings ####
 value1vs0_dub, grid1vs0_dub, value1vs1_dub, grid1vs1_dub = hj_preparations_dub()
 
