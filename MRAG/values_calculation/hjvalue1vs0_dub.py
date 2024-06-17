@@ -20,7 +20,6 @@ from odp.solver import HJSolver
 - 5. Call HJSolver function
 - 6. Save the value function
 """
-#TODO: Hanyang: not started yet, 2024.6.10
 ##################################################### EXAMPLE 2 1v0AttackerDefender ####################################
 
 # Record the time of whole process
@@ -50,7 +49,7 @@ del obs2_a
 reach_set = ShapeRectangle(grids, [0.6, 0.1, -1000], [0.8, 0.3, 1000]) 
 
 # 4. Set the look-back length and time step
-lookback_length = 2.0 
+lookback_length = 2.5 
 t_step = 0.025
 
 # Actual calculation process, needs to add new plot function to draw a 2D figure
