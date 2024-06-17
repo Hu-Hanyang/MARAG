@@ -325,7 +325,7 @@ def single_1vs2_controller_defender(game, value1vs2, grid1vs2):
     return control_defenders
 
 
-def hj_controller_attackers(game, value1vs0, grid1vs0):
+def hj_controller_attackers_1vs0(game, value1vs0, grid1vs0):
     """This function computes the control for the attackers based on the control_attackers. 
        Assume dynamics are single integrator.
 
@@ -355,7 +355,7 @@ def hj_controller_attackers(game, value1vs0, grid1vs0):
 
 
 
-def hj_contoller_attackers_test(game, value1vs1, grid1vs1):
+def hj_contoller_attackers_1vs1(game, value1vs1, grid1vs1):
     """This function computes the control for the attackers based on the control_attackers. 
        Assume dynamics are single integrator.
 

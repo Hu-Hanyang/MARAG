@@ -46,7 +46,7 @@ obs2_defend = ShapeRectangle(grids, [-1000, -1000, -0.1, 0.30], [1000, 1000, 0.1
 reach_set = np.minimum(np.maximum(goal1_destination, goal2_escape), np.minimum(obs1_defend, obs2_defend)) # original
 
 # 4. Set the look-back length and time step
-lookback_length = 10  # the same as 2014Mo
+lookback_length = 4.5  # the same as 2014Mo
 t_step = 0.025
 
 # Actual calculation process, needs to add new plot function to draw a 2D figure
@@ -61,7 +61,8 @@ compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithO
 # compMethods = {"TargetSetMode": "minVWithVTarget"}
 solve_start_time = time.time()
 
-result = HJSolver(agents_1v1, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=True, accuracy="medium") # original one
+accuracy = "medium"
+result = HJSolver(agents_1v1, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=False, accuracy=accuracy) # original one
 # result = HJSolver(my_2agents, g, avoid_set, tau, compMethods, po, saveAllTimeSteps=True)
 process = psutil.Process(os.getpid())
 print(f"The CPU memory used during the calculation of the value function is {process.memory_info().rss/1e9: .2f} GB.")  # in bytes
@@ -73,7 +74,7 @@ print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
 print(f'The shape of the value function is {result.shape} \n')
 
 # 6. Save the value function
-np.save(f'MRAG/values/1vs1Attacker_g{grid_size}_dspeed1.5.npy', result) 
+np.save(f'MRAG/values/1vs1_SIG_g{grid_size}_{accuracy}_dspeed1.5.npy', result) 
 print("The value function has been saved successfully.")
 
 # Record the time of whole process

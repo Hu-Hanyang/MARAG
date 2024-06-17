@@ -25,7 +25,8 @@ from odp.solver import HJSolver
 start_time = time.time()
 
 # 1. Initialize the grids
-grids = Grid(np.array([-1.0, -1.0]), np.array([1.0, 1.0]), 2, np.array([100, 100]))
+grid_size = 100
+grids = Grid(np.array([-1.0, -1.0]), np.array([1.0, 1.0]), 2, np.array([grid_size, grid_size]))
 
 # 2. Initialize the dynamics
 agents_1v0 = AttackerDefender1vs0(uMode="min", dMode="max") 
@@ -70,24 +71,8 @@ print(f"The size of the value function is {result.nbytes / (1024 ** 3): .2f} GB 
 print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
 
 # 6. Save the value function
-# np.save('MRAG/values/1vs0AttackDefend.npy', result)
+np.save(f'MRAG/values/1vs0_SIG_g{grid_size}_speed1.0.npy', result)
 
 # Record the time of whole process
 end_time = time.time()
 print(f"The time of whole process is {end_time - start_time} seconds.")
-# # Get the memory usage
-# value_function_calculation_memory_usage = initial_memory_usage - final_memory_usage
-# print(f"The CPU memory usage is {value_function_calculation_memory_usage: .2f} GB.")
-# print(f"The CPU memory usage is {psutil.virtual_memory().used / (1024 ** 3): .2f} GB.")
-
-# # compute spatial derivatives at every state
-# x_derivative = computeSpatDerivArray(grids, result, deriv_dim=1, accuracy="low")
-# y_derivative = computeSpatDerivArray(grids, result, deriv_dim=2, accuracy="low")
-
-# # Let's compute optimal control at some random idices
-# spat_deriv_vector = (x_derivative[10,20], y_derivative[10,20])
-
-# # Compute the optimal control
-# opt_a1, opt_a2 = agents_1v0.optCtrl_inPython(spat_deriv_vector)
-# print("Optimal accel is {}\n".format(opt_a1))
-# print("Optimal rotation is {}\n".format(opt_a2))

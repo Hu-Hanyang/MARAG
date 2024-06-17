@@ -3,7 +3,7 @@ import numpy as np
 from MRAG.envs.ReachAvoidGame import ReachAvoidGameEnv
 from MRAG.solvers import mip_solver, extend_mip_solver
 from MRAG.utilities import *
-from MRAG.sig_controllers import hj_controller_attackers, hj_controller_defenders, extend_hj_controller_defenders
+from MRAG.sig_controllers import hj_controller_attackers_1vs0, hj_controller_defenders, extend_hj_controller_defenders
 from MRAG.plots import animation
 
 
@@ -40,7 +40,7 @@ for step in range(total_steps):
     if flag_1vs2:
         counters_1vs2 += 1
     # control_defenders = hj_controller_defenders(game, assignments, value1vs1, value2vs1, grid1vs1, grid2vs1)
-    control_attackers = hj_controller_attackers(game, value1vs0, grid1vs0)
+    control_attackers = hj_controller_attackers_1vs0(game, value1vs0, grid1vs0)
     obs, reward, terminated, truncated, info = game.step(np.vstack((control_attackers, control_defenders)))
     
     if terminated or truncated:

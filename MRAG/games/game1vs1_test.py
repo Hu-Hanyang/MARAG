@@ -3,16 +3,16 @@ import numpy as np
 from MRAG.envs.ReachAvoidGame import ReachAvoidGameEnv
 from MRAG.solvers import mip_solver, extend_mip_solver
 from MRAG.utilities import *
-from MRAG.sig_controllers import hj_controller_attackers, hj_contoller_attackers_test, single_1vs1_controller_defender, single_1vs1_controller_defender_noise
+from MRAG.sig_controllers import hj_controller_attackers_1vs0, hj_contoller_attackers_1vs1, single_1vs1_controller_defender, single_1vs1_controller_defender_noise
 from MRAG.plots import animation, plot_value_1vs1, record_video
 
 #### Game Settings ####
 value1vs0, value1vs1, value2vs1, value1vs2, grid1vs0, grid1vs1, grid2vs1, grid1vs2  = hj_preparations_sig()
-value1vs1_attacker = np.load('MRAG/values/1vs1Attacker.npy')
+value1vs1_attacker = np.load('MRAG/values/1vs1_SIG_g45_medium_speed1.0_attacker.npy')
 print(f"================ The shape of the value1vs1_attacker is {value1vs1_attacker.shape}. ================")
 num_attackers = 1
 num_defenders = 1
-initial_attacker = np.array([[-0.95, -0.95]])
+initial_attacker = np.array([[-0.5, -0.5]])
 initial_defender = np.array([[-0.5, 0.5]]) 
 assert num_attackers == initial_attacker.shape[0], "The number of attackers should be equal to the number of initial attacker states."
 assert num_defenders == initial_defender.shape[0], "The number of defenders should be equal to the number of initial defender states."
@@ -44,15 +44,15 @@ for step in range(total_steps):
     
     
     # if current_value >= 0.0:
-    control_attackers = hj_controller_attackers(game, value1vs0, grid1vs0)
+    control_attackers = hj_controller_attackers_1vs0(game, value1vs0, grid1vs0)
     #     value1vs0_counter += 1
     #     controller_usage.append(0)
     # else:
-    #     control_attackers = hj_contoller_attackers_test(game, value1vs1_attacker, grid1vs1)
+        # control_attackers = hj_contoller_attackers_1vs1(game, value1vs1_attacker, grid1vs1)
     #     value1vs1_counter += 1
     #     controller_usage.append(1)
     # control_attackers = np.array([[0.0, 0.0]])
-    
+    # 
     # control_defenders = single_1vs1_controller_defender(game, value1vs1, grid1vs1)
     control_defenders = np.array([[0.0, 0.0]])
     

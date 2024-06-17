@@ -47,13 +47,12 @@ def hj_preparations_sig():
         grid1vs2 (Grid): the grid for 1 vs 2 game
     """
     start = time.time()
-    value1vs0 = np.load('MRAG/values/1vs0AttackDefend_g100_speed1.0.npy')
-    value1vs1 = np.load('MRAG/values/1vs1AttackDefend_g45_dspeed1.5.npy')
+    value1vs0 = np.load('MRAG/values/1vs0_SIG_g100_medium_speed1.0.npy')
+    value1vs1 = np.load('MRAG/values/1vs1_SIG_g45_medium_dspeed1.5.npy')
     value2vs1 = np.load('MRAG/values/2vs1AttackDefend_g30_speed1.5.npy')
     # value1vs2 = np.load('MRAG/values/1vs2AttackDefend_g35_dspeed1.5.npy')
     # value1vs2 = np.load('MRAG/values/1vs2AttackDefend_g35_dspeed1.5_defender.npy')
     value1vs2 = np.load('MRAG/values/1vs2AttackDefend_g35_dspeed1.5_defender2.npy')
-    # value1vs2 = np.load('MRAG/values/1vs2AttackDefend_g35_dspeed1.5_attacker_test2.npy')
     end = time.time()
     print(f"============= HJ value functions loaded Successfully! (Time: {end-start :.4f} seconds) =============")
     grid1vs0 = Grid(np.array([-1.0, -1.0]), np.array([1.0, 1.0]), 2, np.array([100, 100])) 

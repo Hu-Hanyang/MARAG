@@ -100,7 +100,8 @@ compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithO
 # compMethods = {"TargetSetMode": "minVWithVTarget"}
 solve_start_time = time.time()
 
-result = HJSolver(agents_1vs1, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=None, accuracy="medium") # original one
+accuracy = "medium"
+result = HJSolver(agents_1vs1, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=None, accuracy=accuracy) # original one
 # result = HJSolver(my_2agents, g, avoid_set, tau, compMethods, po, saveAllTimeSteps=True)
 process = psutil.Process(os.getpid())
 print(f"The CPU memory used during the calculation of the value function is {process.memory_info().rss/1e9: .2f} GB.")  # in bytes
@@ -112,7 +113,7 @@ print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
 print(f'The shape of the value function is {result.shape} \n')
 
 # 6. Save the value function
-np.save(f'MRAG/values/DubinCar1vs1_grid{grid_size}.npy', result)
+np.save(f'MRAG/values/DubinCar1vs1_grid{grid_size}_{accuracy}.npy', result)
 
 
 print(f"The value function has been saved successfully.")

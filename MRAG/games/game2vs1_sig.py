@@ -3,7 +3,7 @@ import numpy as np
 from MRAG.envs.ReachAvoidGame import ReachAvoidGameEnv
 from MRAG.solvers import mip_solver, extend_mip_solver
 from MRAG.utilities import *
-from MRAG.sig_controllers import hj_controller_attackers, hj_controller_defenders
+from MRAG.sig_controllers import hj_controller_attackers_1vs0, hj_controller_defenders
 from MRAG.plots import animation, plot_scene, plot_value_1vs1, plot_value_3agents
 
 
