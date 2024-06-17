@@ -2,8 +2,6 @@ import os
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from matplotlib.animation import FuncAnimation
 import plotly.graph_objects as go
 from plotly.graph_objects import Layout
 
