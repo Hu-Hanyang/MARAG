@@ -1,11 +1,13 @@
 import numpy as np
 
-from MRAG.envs.DubinCars import DubinCar1vs0
+from MRAG.envs.DubinCars import DubinCar1vs0, DubinCar1vs1
 from MRAG.solvers import mip_solver, extend_mip_solver
 from MRAG.utilities import *
-from MRAG.dub_controllers import hj_contoller_attackers_dub
-from MRAG.plots import animation, plot_value_1vs1, record_video
+from MRAG.dub_controllers import hj_contoller_attackers_dub, hj_contoller_defenders_dub_1vs1
+from MRAG.plots_dub import check_current_value_dub
+from MRAG.plots import animation
 
+#TODO: The defender would cross the obstacle to capture the attacker.
 #### Game Settings ####
 value1vs0_dub, grid1vs0_dub, value1vs1_dub, grid1vs1_dub = hj_preparations_dub()
 
@@ -21,13 +23,13 @@ ctrl_freq = 200  # control frequency
 total_steps = int(T * ctrl_freq)
 
 #### Game Initialization ####
-game = DubinCar1vs0(num_attackers=num_attackers, num_defenders=num_defenders, 
+game = DubinCar1vs1(num_attackers=num_attackers, num_defenders=num_defenders, 
                          initial_attacker=initial_attacker, initial_defender=initial_defender, 
                          ctrl_freq=ctrl_freq)
 
 
 
-# print(f"The initial value of the initial states is {check_current_value(game.attackers.state, game.defenders.state, value1vs1_dub)}")
+print(f"The initial value of the initial states is {check_current_value_dub(game.attackers.state, game.defenders.state, value1vs1_dub)}")
 
 #### Game Loop ####
 value1vs0_counter, value1vs1_counter = 0, 0
@@ -50,7 +52,7 @@ for step in range(total_steps):
     # # control_attackers = np.array([[0.0, 0.0]])
     
     # # control_defenders = single_1vs1_controller_defender(game, value1vs1, grid1vs1)
-    control_defenders = np.array([[0.0]])
+    control_defenders = hj_contoller_defenders_dub_1vs1(game, value1vs1_dub, grid1vs1_dub)
     
     obs, reward, terminated, truncated, info = game.step(np.vstack((control_attackers, control_defenders)))
     

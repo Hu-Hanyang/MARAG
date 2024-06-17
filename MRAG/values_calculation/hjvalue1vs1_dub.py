@@ -1,6 +1,7 @@
 import os
 import gc
 import time
+import math
 import psutil
 import numpy as np
 # Utility functions to initialize the problem
@@ -26,9 +27,9 @@ from odp.solver import HJSolver
 start_time = time.time()
 
 # 1. Initialize the grids
-grid_size = 25
-grids = Grid(np.array([-1.0, -1.0, -1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]),
-             6, np.array([grid_size, grid_size, grid_size, grid_size, grid_size, grid_size]))
+grid_size = 29
+grids = Grid(np.array([-1.0, -1.0, -math.pi, -1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi, 1.0, 1.0, math.pi]),
+             6, np.array([grid_size, grid_size, grid_size, grid_size, grid_size, grid_size]), [2, 5])
 process = psutil.Process(os.getpid())
 print("1. Gigabytes consumed of the grids initialization {}".format(process.memory_info().rss/1e9))  # in bytes
 
@@ -68,10 +69,10 @@ a_win = np.array(a_win, dtype='float32')
 del goal1_destination
 del goal2_escape
 
-obs1_d = ShapeRectangle(grids, [-1000, -1000, -1000, -1000, -0.1, -1.0],
-                                    [1000, 1000, 1000, 1000, 0.1, -0.3])  # defender stuck in obs1
-obs2_d = ShapeRectangle(grids, [-1000, -1000, -1000, -1000, -0.1, 0.30],
-                                    [1000, 1000, 1000, 1000, 0.1, 0.60])  # defender stuck in obs2
+obs1_d = ShapeRectangle(grids, [-1000, -1000, -1000, -0.1, -1.0 -1000],
+                                    [1000, 1000, 1000, 0.1, -0.3, 1000])  # defender stuck in obs1
+obs2_d = ShapeRectangle(grids, [-1000, -1000, -1000, -0.1, 0.30, -1000],
+                                    [1000, 1000, 1000, 0.1, 0.60, 1000])  # defender stuck in obs2
 d_lose = np.minimum(obs1_d, obs2_d)
 d_lose = np.array(d_lose, dtype='float32')
 del obs2_d

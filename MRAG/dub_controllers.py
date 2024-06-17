@@ -102,7 +102,7 @@ def attacker_control_1vs0_dub(game, grid1vs0, value1vs0, attacker, neg2pos):
     return (opt_u)
 
 
-def hj_contoller_attackers_dub(game, value1vs0, grid1vs0):
+def hj_contoller_attackers_dub(game, value1vs0_dub, grid1vs0_dub):
     """This function computes the control for the attackers based on the control_attackers. 
        Assume dynamics are single integrator.
 
@@ -120,9 +120,9 @@ def hj_contoller_attackers_dub(game, value1vs0, grid1vs0):
     control_attackers = np.zeros((num_attackers, 1))
     for i in range(num_attackers):
         if not current_attackers_status[i]:  # the attacker is free
-            neg2pos, pos2neg = find_sign_change1vs0_dub(grid1vs0, value1vs0, attackers[i])
+            neg2pos, pos2neg = find_sign_change1vs0_dub(grid1vs0_dub, value1vs0_dub, attackers[i])
             if len(neg2pos):
-                control_attackers[i] = attacker_control_1vs0_dub(game, grid1vs0, value1vs0, attackers[i], neg2pos)
+                control_attackers[i] = attacker_control_1vs0_dub(game, grid1vs0_dub, value1vs0_dub, attackers[i], neg2pos)
             else:
                 control_attackers[i] = (0.0)
         else:  # the attacker is captured or arrived
@@ -131,3 +131,50 @@ def hj_contoller_attackers_dub(game, value1vs0, grid1vs0):
     return control_attackers
 
 
+def hj_contoller_defenders_dub_1vs1(game, value1vs1_dub, grid1vs1_dub):
+    """Return a tuple of 2-dimensional control inputs of one defender based on the value function
+    
+    Args:
+        game (class): the corresponding ReachAvoidGameEnv instance
+        grid1v1 (class): the corresponding Grid instance
+        value1v1 (ndarray): 1vs1 HJ reachability value function with only final slice
+        agents_1v1 (class): the corresponding AttackerDefender instance
+    
+    Returns:
+        opt_d (tuple): the optimal control of the defender
+    """
+    attackers = game.attackers.state.copy()
+    defenders = game.defenders.state.copy()
+    assert game.NUM_ATTACKERS == 1, "The number of attacker should be 1."
+    assert game.NUM_DEFENDERS == 1, "The number of defender should be 1."
+    num_defenders = game.NUM_DEFENDERS 
+    control_defenders = np.zeros((1, 1))
+
+    a1x, a1y, a1o = attackers[0]
+    d1x, d1y, d1o = defenders[0]
+    jointstate_1vs1 = (a1x, a1y, a1o, d1x, d1y, d1o)
+
+    opt_d = defender_control_1vs1_dub(game, grid1vs1_dub, value1vs1_dub, jointstate_1vs1)
+    control_defenders[0] = (opt_d)
+
+    return control_defenders
+
+
+def defender_control_1vs1_dub(game, grid1vs1_dub, value1vs1_dub, jointstate_1vs1):
+    """Return a tuple of 2-dimensional control inputs of one defender based on the value function
+    
+    Args:
+        game (class): the corresponding ReachAvoidGameEnv instance
+        grid1v1 (class): the corresponding Grid instance
+        value1v1 (ndarray): 1vs1 HJ reachability value function with only final slice
+        agents_1v1 (class): the corresponding AttackerDefender instance
+        joint_states1v1 (tuple): the corresponding positions of (A1, D1)
+    
+    Returns:
+        opt_d1, opt_d2 (tuple): the optimal control of the defender
+    """
+    value1vs1s = value1vs1_dub[..., np.newaxis] 
+    spat_deriv_vector = spa_deriv(grid1vs1_dub.get_index(jointstate_1vs1), value1vs1s, grid1vs1_dub)
+    opt_d = game.optDistb_1vs1(spat_deriv_vector) 
+
+    return (opt_d)

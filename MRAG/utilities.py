@@ -75,16 +75,18 @@ def hj_preparations_dub():
         grid1vs1 (Grid): the grid for 1 vs 1 game
     """
     start = time.time()
-    value1vs0 = np.load('MRAG/values/DubinCar1vs0_grid100.npy')
-    # value1vs1 = np.load('MRAG/values/DubinCar1vs1_grid30.npy')
+    value1vs0_dub = np.load('MRAG/values/DubinCar1vs0_grid100_medium.npy')
+    value1vs1_dub = np.load('MRAG/values/DubinCar1vs1_grid25_medium.npy')
     end = time.time()
     print(f"============= HJ value functions loaded Successfully! (Time: {end-start :.4f} seconds) =============")
-    grid1vs0 = Grid(np.array([-1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi]), 3, np.array([100, 100, 100]), [2])
-    grid1vs1 = Grid(np.array([-1.0, -1.0, -math.pi, -1.0, -1.0, -math.pi]), 
-                    np.array([1.0, 1.0, math.pi, 1.0, 1.0, math.pi]), 4, np.array([30, 30, 30, 30, 30, 30]), [2, 5])
+    grid_size_1vs1 = value1vs1_dub.shape[0]
+    grid1vs0_dub = Grid(np.array([-1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi]), 3, np.array([100, 100, 100]), [2])
+    grid1vs1_dub = Grid(np.array([-1.0, -1.0, -math.pi, -1.0, -1.0, -math.pi]), 
+                    np.array([1.0, 1.0, math.pi, 1.0, 1.0, math.pi]), 6, 
+                    np.array([grid_size_1vs1, grid_size_1vs1, grid_size_1vs1, grid_size_1vs1, grid_size_1vs1, grid_size_1vs1]), [2, 5])
     print(f"============= Grids created Successfully! =============")
 
-    return value1vs0, grid1vs0
+    return value1vs0_dub, grid1vs0_dub, value1vs1_dub, grid1vs1_dub
 
 
 def po2slice1vs1(attacker, defender, grid_size):

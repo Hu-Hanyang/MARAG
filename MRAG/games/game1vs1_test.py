@@ -53,7 +53,7 @@ for step in range(total_steps):
     #     controller_usage.append(1)
     # control_attackers = np.array([[0.0, 0.0]])
     # 
-    # control_defenders = single_1vs1_controller_defender(game, value1vs1, grid1vs1)
+    control_defenders = single_1vs1_controller_defender(game, value1vs1, grid1vs1)
     control_defenders = np.array([[0.0, 0.0]])
     
     obs, reward, terminated, truncated, info = game.step(np.vstack((control_attackers, control_defenders)))

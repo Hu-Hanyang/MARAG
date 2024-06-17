@@ -484,7 +484,6 @@ class DubinCar1vs1(DubinCarGameEnv):
     
     
     def capture_set(self, grid, capture_radius, mode):
-        #TODO: Hanyang: not finished yet, 20240606
         xa, ya, xd, yd = np.meshgrid(grid.grid_points[0], grid.grid_points[1],
                                      grid.grid_points[3], grid.grid_points[4], indexing='ij')
         data = np.power(xa - xd, 2) + np.power(ya - yd, 2)
