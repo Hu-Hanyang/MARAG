@@ -29,7 +29,7 @@ game = ReachAvoidGameEnv(num_attackers=num_attackers, num_defenders=num_defender
 
 plot_value_3agents(game.attackers.state, game.defenders.state, plot_agents=[0, 1, 2], free_dim=0, value_function=value1vs2, grids=grid1vs2)
 
-print((f"================ The initial value of the game is {check_current_value(game.attackers.state, game.defenders.state, value1vs2)}. ================ \n"))
+print((f"================ The initial value of the game is {check_current_value(game.attackers.state, game.defenders.state, value1vs2, grid1vs2)}. ================ \n"))
 
 defenders_controls = []
 attackers_controls = []

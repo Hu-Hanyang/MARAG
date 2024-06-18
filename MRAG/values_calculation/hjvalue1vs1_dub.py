@@ -28,7 +28,7 @@ start_time = time.time()
 
 # 1. Initialize the grids
 grid_size = 26
-grids = Grid(np.array([-1.0, -1.0, -math.pi, -1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi, 1.0, 1.0, math.pi]),
+grids = Grid(np.array([-0.5, -0.5, -math.pi, -0.5, -0.5, -math.pi]), np.array([0.5, 0.5, math.pi, 0.5, 0.5, math.pi]),
              6, np.array([grid_size, grid_size, grid_size, grid_size, grid_size, grid_size]), [2, 5])
 process = psutil.Process(os.getpid())
 print("1. Gigabytes consumed of the grids initialization {}".format(process.memory_info().rss/1e9))  # in bytes
@@ -38,10 +38,10 @@ agents_1vs1 = DubinCar1vs1(uMode="min", dMode="max")  # 1v1 (6 dims dynamics)
 
 # 3. Instruct the avoid set and reach set
 ## 3.1 Avoid set, no constraint means inf
-obs1_a = ShapeRectangle(grids, [-0.1, -1.0, -1000, -1000, -1000, -1000], [0.1, -0.3, 1000, 1000, 1000, 1000])  # a1 get stuck in the obs1
+obs1_a = ShapeRectangle(grids, [-0.05, -0.5, -1000, -1000, -1000, -1000], [0.05, -0.15, 1000, 1000, 1000, 1000])  # a1 get stuck in the obs1
 obs1_a = np.array(obs1_a, dtype='float32')
 
-obs2_a = ShapeRectangle(grids, [-0.1, 0.30, -1000, -1000, -1000, -1000], [0.1, 0.60, 1000, 1000, 1000, 1000])  # a1 get stuck in the obs2
+obs2_a = ShapeRectangle(grids, [-0.05, 0.15, -1000, -1000, -1000, -1000], [0.05, 0.30, 1000, 1000, 1000, 1000])  # a1 get stuck in the obs2
 obs2_a = np.array(obs2_a, dtype='float32')
 
 obs_a = np.minimum(obs1_a, obs2_a)  # the union of the two obstacles
@@ -49,7 +49,7 @@ obs_a = np.array(obs_a, dtype='float32')
 del obs1_a
 del obs2_a
 
-capture_a = agents_1vs1.capture_set(grids, 0.1, "capture")  # a1 is captured
+capture_a = agents_1vs1.capture_set(grids, 0.15, "capture")  # a1 is captured
 capture_a = np.array(capture_a, dtype='float32')
 
 avoid_set = np.minimum(capture_a, obs_a)
@@ -61,16 +61,16 @@ process = psutil.Process(os.getpid())
 print("2. Gigabytes consumed of the avoid_set {}".format(process.memory_info().rss/1e9))  # in bytes
 
 ### 3.2 Reach set
-goal1_destination = ShapeRectangle(grids, [0.6, 0.1, -1000, -1000, -1000, -1000],
-                                [0.8, 0.3, 1000, 1000, 1000, 1000])  # a1 is at goal
-goal2_escape = agents_1vs1.capture_set(grids, 0.1, "escape")  # a1 is 0.1 away from defender
+goal1_destination = ShapeRectangle(grids, [0.3, 0.05, -1000, -1000, -1000, -1000],
+                                [0.4, 0.15, 1000, 1000, 1000, 1000])  # a1 is at goal
+goal2_escape = agents_1vs1.capture_set(grids, 0.15, "escape")  # a1 is 0.05 away from defender
 a_win = np.maximum(goal1_destination, goal2_escape)
 a_win = np.array(a_win, dtype='float32')
 del goal1_destination
 del goal2_escape
 
-obs1_d = ShapeRectangle(grids, [-1000, -1000, -1000, -0.1, -1.0, -1000], [1000, 1000, 1000, 0.1, -0.30, 1000])  # defender stuck in obs1
-obs2_d = ShapeRectangle(grids, [-1000, -1000, -1000, -0.1, 0.30, -1000], [1000, 1000, 1000, 0.1, 0.60, 1000])  # defender stuck in obs2
+obs1_d = ShapeRectangle(grids, [-1000, -1000, -1000, -0.05, -0.5, -1000], [1000, 1000, 1000, 0.05, -0.15, 1000])  # defender stuck in obs1
+obs2_d = ShapeRectangle(grids, [-1000, -1000, -1000, -0.05, 0.15, -1000], [1000, 1000, 1000, 0.05, 0.30, 1000])  # defender stuck in obs2
 d_lose = np.minimum(obs1_d, obs2_d)
 d_lose = np.array(d_lose, dtype='float32')
 del obs2_d
@@ -84,7 +84,7 @@ process = psutil.Process(os.getpid())
 print("3. Gigabytes consumed of the reach_set {}".format(process.memory_info().rss/1e9))  # in bytes
 
 # 4. Set the look-back length and time step
-lookback_length = 2.5  
+lookback_length = 10.0  
 t_step = 0.025
 
 # Actual calculation process, needs to add new plot function to draw a 2D figure

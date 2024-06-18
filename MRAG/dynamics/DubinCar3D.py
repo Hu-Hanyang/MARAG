@@ -5,13 +5,12 @@ from MRAG.dynamics.BaseDynamics import BaseDynamics
 
 
 class DubinsCar(BaseDynamics):
-    #TODO: need to change the parameters based on the hardware, 2024.6.12
     '''3D * num DubinsCar agents dynamics.
     x_dot = v * cos(theta)
     y_dot = v * sin(theta)
     theta_dot = u
     '''
-    def __init__(self, number, initials, frequency, uMin=-1, uMax=1, speed=1.0):
+    def __init__(self, number, initials, frequency, uMin=-2.84, uMax=2.84, speed=0.22):
         ''' Initialize the dynamics of the agents.
         
         Args:

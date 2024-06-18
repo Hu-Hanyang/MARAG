@@ -1,7 +1,7 @@
 '''Utility functions for the reach-avoid game.
 
 '''
-
+#TODO: Hanyang: not started yet
 import math
 import time
 import numpy as np
@@ -80,7 +80,7 @@ def hj_preparations_dub():
     end = time.time()
     print(f"============= HJ value functions loaded Successfully! (Time: {end-start :.4f} seconds) =============")
     grid_size_1vs1 = value1vs1_dub.shape[0]
-    grid1vs0_dub = Grid(np.array([-0.5, -0.5, -math.pi]), np.array([0.5, 0.5, math.pi]), 3, np.array([100, 100, 200]), [2])
+    grid1vs0_dub = Grid(np.array([-0.5, -0.5, -math.pi]), np.array([0.5, 0.5, math.pi]), 3, np.array([100, 100, 100]), [2])
     grid1vs1_dub = Grid(np.array([-0.5, -0.5, -math.pi, -0.5, -0.5, -math.pi]), 
                     np.array([0.5, 0.5, math.pi, 0.5, 0.5, math.pi]), 6, 
                     np.array([grid_size_1vs1, grid_size_1vs1, grid_size_1vs1, grid_size_1vs1, grid_size_1vs1, grid_size_1vs1]), [2, 5])
@@ -373,29 +373,24 @@ def current_status_check_dub(current_attackers_status, step=None):
     return status
 
 
-def check_current_value(attackers, defenders, value_function, grids):
+def check_current_value(attackers, defenders, value_function):
     """ Check the value of the current state of the attackers and defenders.
 
     Args:
         attackers (np.ndarray): the attackers' states
         defenders (np.ndarray): the defenders' states
         value (np.ndarray): the value function for the game
-        grid (Grid): the grid for the game
-
+    
     Returns:
         value (float): the value of the current state of the attackers and defenders
     """
     if len(value_function.shape) == 4:  # 1vs1 game
-        # joint_slice = po2slice1vs1(attackers[0], defenders[0], value_function.shape[0])
-        joint_slice = grids.get_index(np.concatenate((attackers[0], defenders[0])))
+        joint_slice = po2slice1vs1(attackers[0], defenders[0], value_function.shape[0])
     elif len(value_function.shape) == 6:  # 1vs2 or 2vs1 game
         if attackers.shape[0] == 1:  # 1vs2 game
-            # joint_slice = po2slice2vs1(attackers[0], defenders[0], defenders[1], value_function.shape[0])
-            joint_slice = grids.get_index(np.concatenate((attackers[0], defenders[0], defenders[1])))
+            joint_slice = po2slice2vs1(attackers[0], defenders[0], defenders[1], value_function.shape[0])
         else:  # 2vs1 game
-            # joint_slice = po2slice2vs1(attackers[0], attackers[1], defenders[0], value_function.shape[0])
-            joint_slice = grids.get_index(np.concatenate((attackers[0], attackers[1], defenders[0])))
-
+            joint_slice = po2slice2vs1(attackers[0], attackers[1], defenders[0], value_function.shape[0])
     value = value_function[joint_slice]
 
     return value

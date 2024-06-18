@@ -31,7 +31,7 @@ plot_value_1vs1(game.attackers.state, game.defenders.state,
                 plot_attacker=0, plot_defender=0, 
                 fix_agent=1, value1vs1=value1vs1, grid1vs1=grid1vs1)
 
-print(f"The initial value of the initial states is {check_current_value(game.attackers.state, game.defenders.state, value1vs1)}")
+print(f"The initial value of the initial states is {check_current_value(game.attackers.state, game.defenders.state, value1vs1, grid1vs1)}")
 
 #### Game Loop ####
 value1vs0_counter, value1vs1_counter = 0, 0

@@ -30,7 +30,7 @@ game = DubinCar1vs1(num_attackers=num_attackers, num_defenders=num_defenders,
 plot_value_1vs1_dub(game.attackers.state, game.defenders.state, 0, 0, 1, value1vs1_dub, grid1vs1_dub)
 
 
-print(f"The initial value of the initial states is {check_current_value_dub(game.attackers.state, game.defenders.state, value1vs1_dub)}")
+print(f"The initial value of the initial states is {check_current_value_dub(game.attackers.state, game.defenders.state, value1vs1_dub, grid1vs1_dub)}")
 
 #### Game Loop ####
 value1vs0_counter, value1vs1_counter = 0, 0

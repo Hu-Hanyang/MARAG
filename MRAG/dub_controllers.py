@@ -3,6 +3,8 @@
 '''
 import numpy as np
 
+from MRAG.plots_dub import po2slice1vs0_dub
+
 
 def spa_deriv(slice_index, value_function, grid, periodic_dims=[]):
     """
@@ -70,10 +72,11 @@ def find_sign_change1vs0_dub(grid1vs0, value1vs0, attacker):
 
     Args:
     grid1vs0 (class): the instance of grid
-    value1vs0 (ndarray): including all the time slices, shape = [100, 100, 100, len(tau)]
+    value1vs0 (ndarray): including all the time slices, shape = [100, 100, 200, len(tau)]
     attacker (ndarray, (dim,)): the current state of one attacker
     """
     current_slices = grid1vs0.get_index(attacker)
+    # current_slices = po2slice1vs0_dub(attacker, value1vs0.shape[0])
     current_value = value1vs0[current_slices[0], current_slices[1], current_slices[2], :]  # current value in all time slices
     neg_values = (current_value<=0).astype(int)  # turn all negative values to 1, and all positive values to 0
     checklist = neg_values - np.append(neg_values[1:], neg_values[-1])
@@ -96,7 +99,9 @@ def attacker_control_1vs0_dub(game, grid1vs0, value1vs0, attacker, neg2pos):
     if current_value > 0:
         value1vs0 = value1vs0 - current_value
     v = value1vs0[..., neg2pos] # Minh: v = value1v0[..., neg2pos[0]]
+    # current_slices = po2slice1vs0_dub(attacker, value1vs0.shape[0])
     spat_deriv_vector = spa_deriv(grid1vs0.get_index(attacker), v, grid1vs0)
+    # spat_deriv_vector = spa_deriv(current_slices, v, grid1vs0)
     opt_u = game.optCtrl_1vs0(spat_deriv_vector)
 
     return (opt_u)
@@ -149,7 +154,6 @@ def hj_contoller_defenders_dub_1vs1(game, value1vs1_dub, grid1vs1_dub):
     assert game.NUM_DEFENDERS == 1, "The number of defender should be 1."
     num_defenders = game.NUM_DEFENDERS 
     control_defenders = np.zeros((num_defenders, 1))
-
     a1x, a1y, a1o = attackers[0]
     d1x, d1y, d1o = defenders[0]
     jointstate_1vs1 = (a1x, a1y, a1o, d1x, d1y, d1o)

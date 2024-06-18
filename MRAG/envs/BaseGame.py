@@ -13,8 +13,8 @@ class Dynamics:
 
     SIG = {'id': 'sig', 'action_dim': 2, 'state_dim': 2, 'speed': 1.0}           # Base single integrator dynamics
     FSIG = {'id': 'fsig', 'action_dim': 2, 'state_dim': 2, 'speed': 1.5}         # Faster single integrator dynamics with feedback
-    DUB3D = {'id': 'dub3d', 'action_dim': 1, 'state_dim': 3, 'speed': 1.0}       # 3D Dubins car dynamics
-    FDUB3D = {'id': 'fdub3d', 'action_dim': 1, 'state_dim': 3, 'speed': 1.5}     # Faster 3D Dubins car dynamics with feedback
+    DUB3D = {'id': 'dub3d', 'action_dim': 1, 'state_dim': 3, 'speed': 0.22}       # 3D Dubins car dynamics
+    FDUB3D = {'id': 'fdub3d', 'action_dim': 1, 'state_dim': 3, 'speed': 0.22}     # Faster 3D Dubins car dynamics with feedback
     
     
 class BaseGameEnv(gym.Env):

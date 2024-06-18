@@ -8,7 +8,7 @@ import heterocl as hcl
 from MRAG.envs.BaseRLGame import BaseRLGameEnv
 from MRAG.envs.BaseGame import Dynamics
 
-#TODO: Hanyang: not finished yet, 20240606
+
 class DubinCarGameEnv(BaseRLGameEnv):
     """Multi-agent reach-avoid games class for DubinCar dynamics.
 
@@ -25,8 +25,8 @@ class DubinCarGameEnv(BaseRLGameEnv):
                  dMode="max",
                  output_folder='results',
                  game_length_sec=20,
-                 map={'map': [-1., 1., -1., 1.]},  # Hanyang: rectangele [xmin, xmax, ymin, ymax]
-                 des={'goal0': [0.6, 0.8, 0.1, 0.3]},  # Hanyang: rectangele [xmin, xmax, ymin, ymax]
+                 map={'map': [-0.5, 0.5, -0.5, 0.5]},  # Hanyang: rectangele [xmin, xmax, ymin, ymax]
+                 des={'goal0': [0.3, 0.4, 0.05, 0.15]},  # Hanyang: rectangele [xmin, xmax, ymin, ymax]
                  obstacles: dict = None,  
                  ):
         """Initialization of a generic aviary environment.
@@ -265,8 +265,8 @@ class DubinCar1vs0(DubinCarGameEnv):
                  defender_dynamics=Dynamics.DUB3D, 
                  initial_attacker=None, 
                  initial_defender=None, 
-                 uMax=1.0,
-                 dMax=1.0,
+                 uMax=2.84,
+                 dMax=2.84,
                  uMode="min", 
                  dMode="max",
                  ctrl_freq=200): 
@@ -371,8 +371,8 @@ class DubinCar1vs1(DubinCarGameEnv):
                  defender_dynamics=Dynamics.DUB3D, 
                  initial_attacker=None, 
                  initial_defender=None, 
-                 uMax=1.0,  #TODO: Check the hardware ability
-                 dMax=1.0,
+                 uMax=2.84, 
+                 dMax=2.84,
                  uMode="min", 
                  dMode="max",
                  ctrl_freq=200): 
