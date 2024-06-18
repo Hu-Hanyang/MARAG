@@ -76,7 +76,7 @@ def hj_preparations_dub():
     """
     start = time.time()
     value1vs0_dub = np.load('MRAG/values/DubinCar1vs0_grid100_medium.npy')
-    value1vs1_dub = np.load('MRAG/values/DubinCar1vs1_grid25_medium.npy')
+    value1vs1_dub = np.load('MRAG/values/DubinCar1vs1_grid26_medium.npy')
     end = time.time()
     print(f"============= HJ value functions loaded Successfully! (Time: {end-start :.4f} seconds) =============")
     grid_size_1vs1 = value1vs1_dub.shape[0]
