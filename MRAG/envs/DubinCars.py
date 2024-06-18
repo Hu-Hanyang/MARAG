@@ -319,10 +319,10 @@ class DubinCar1vs0(DubinCarGameEnv):
 
         with hcl.if_(spat_deriv[2] > 0):
             with hcl.if_(self.uMode == "min"):
-                opt_u[0] = -opt_u
+                opt_u[0] = - opt_u
         with hcl.elif_(spat_deriv[2] < 0):
             with hcl.if_(self.uMode == "max"):
-                opt_u[0] = -opt_u
+                opt_u[0] = - opt_u
                 
         return (opt_u[0], in2[0], in3[0])
 
@@ -360,6 +360,7 @@ class DubinCar1vs0(DubinCarGameEnv):
         
         return opt_u
 
+    
     
 class DubinCar1vs1(DubinCarGameEnv):
     """1 vs. 1 reach-avoid game class with 2 DubinCar3D dynamics."""

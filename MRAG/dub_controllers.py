@@ -148,7 +148,7 @@ def hj_contoller_defenders_dub_1vs1(game, value1vs1_dub, grid1vs1_dub):
     assert game.NUM_ATTACKERS == 1, "The number of attacker should be 1."
     assert game.NUM_DEFENDERS == 1, "The number of defender should be 1."
     num_defenders = game.NUM_DEFENDERS 
-    control_defenders = np.zeros((1, 1))
+    control_defenders = np.zeros((num_defenders, 1))
 
     a1x, a1y, a1o = attackers[0]
     d1x, d1y, d1o = defenders[0]
@@ -171,7 +171,7 @@ def defender_control_1vs1_dub(game, grid1vs1_dub, value1vs1_dub, jointstate_1vs1
         joint_states1v1 (tuple): the corresponding positions of (A1, D1)
     
     Returns:
-        opt_d1, opt_d2 (tuple): the optimal control of the defender
+        opt_d (tuple): the optimal control of the defender
     """
     value1vs1s = value1vs1_dub[..., np.newaxis] 
     spat_deriv_vector = spa_deriv(grid1vs1_dub.get_index(jointstate_1vs1), value1vs1s, grid1vs1_dub)

@@ -44,7 +44,7 @@ obs1_a = np.array(obs1_a, dtype='float32')
 obs2_a = ShapeRectangle(grids, [-0.1, 0.30, -1000, -1000, -1000, -1000], [0.1, 0.60, 1000, 1000, 1000, 1000])  # a1 get stuck in the obs2
 obs2_a = np.array(obs2_a, dtype='float32')
 
-obs_a = np.minimum(obs1_a, obs2_a)
+obs_a = np.minimum(obs1_a, obs2_a)  # the union of the two obstacles
 obs_a = np.array(obs_a, dtype='float32')
 del obs1_a
 del obs2_a
@@ -62,7 +62,7 @@ print("2. Gigabytes consumed of the avoid_set {}".format(process.memory_info().r
 
 ### 3.2 Reach set
 goal1_destination = ShapeRectangle(grids, [0.6, 0.1, -1000, -1000, -1000, -1000],
-                                [0.8, 0.3,  1000,  1000,  1000,  1000])  # a1 is at goal
+                                [0.8, 0.3, 1000, 1000, 1000, 1000])  # a1 is at goal
 goal2_escape = agents_1vs1.capture_set(grids, 0.1, "escape")  # a1 is 0.1 away from defender
 a_win = np.maximum(goal1_destination, goal2_escape)
 a_win = np.array(a_win, dtype='float32')

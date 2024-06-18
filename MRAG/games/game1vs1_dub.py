@@ -4,7 +4,7 @@ from MRAG.envs.DubinCars import DubinCar1vs0, DubinCar1vs1
 from MRAG.solvers import mip_solver, extend_mip_solver
 from MRAG.utilities import *
 from MRAG.dub_controllers import hj_contoller_attackers_dub, hj_contoller_defenders_dub_1vs1
-from MRAG.plots_dub import check_current_value_dub
+from MRAG.plots_dub import check_current_value_dub, plot_value_1vs1_dub
 from MRAG.plots import animation
 
 #TODO: The 1vs1 value function is wrong, need to recompute it
@@ -13,8 +13,8 @@ value1vs0_dub, grid1vs0_dub, value1vs1_dub, grid1vs1_dub = hj_preparations_dub()
 
 num_attackers = 1
 num_defenders = 1
-initial_attacker = np.array([[-0.5, 0.0, 0.0]])
-initial_defender = np.array([[-0.8, 0.8, 0.0]])
+initial_attacker = np.array([[-0.8, 0.0, math.pi/2]])
+initial_defender = np.array([[0.3, 0.0, 3*math.pi/2]])
 
 assert num_attackers == initial_attacker.shape[0], "The number of attackers should be equal to the number of initial attacker states."
 assert num_defenders == initial_defender.shape[0], "The number of defenders should be equal to the number of initial defender states."
@@ -27,6 +27,7 @@ game = DubinCar1vs1(num_attackers=num_attackers, num_defenders=num_defenders,
                          initial_attacker=initial_attacker, initial_defender=initial_defender, 
                          ctrl_freq=ctrl_freq)
 
+plot_value_1vs1_dub(game.attackers.state, game.defenders.state, 0, 0, 1, value1vs1_dub, grid1vs1_dub)
 
 
 print(f"The initial value of the initial states is {check_current_value_dub(game.attackers.state, game.defenders.state, value1vs1_dub)}")
