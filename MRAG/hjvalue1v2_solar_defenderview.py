@@ -96,16 +96,16 @@ del reach_captureD1
 del reach_captureD2
 del reach1
 
-reach3_obs1D1 =  - ShapeRectangle(grids, [-1000, -1000, -0.1, -1.0, -1000, -1000], [1000, 1000, 0.1, -0.3, 1000, 1000])  # defender 1 does not get stuck in obs1
-reach3_obs2D1 =  - ShapeRectangle(grids, [-1000, -1000, -0.1, 0.30, -1000, -1000], [1000, 1000, 0.1, 0.60, 1000, 1000])  # defender 1 does not get stuck in obs2
-reach3_obsD1 = np.maximum(reach3_obs1D1, reach3_obs2D1)  # the intersection of defender 1 not getting stuck in obs1 or obs2
+reach3_obs1D1 = ShapeRectangle(grids, [-1000, -1000, -0.1, -1.0, -1000, -1000], [1000, 1000, 0.1, -0.3, 1000, 1000])  # defender 1 does not get stuck in obs1
+reach3_obs2D1 = ShapeRectangle(grids, [-1000, -1000, -0.1, 0.30, -1000, -1000], [1000, 1000, 0.1, 0.60, 1000, 1000])  # defender 1 does not get stuck in obs2
+reach3_obsD1 =  - np.minimum(reach3_obs1D1, reach3_obs2D1)  # the intersection of defender 1 not getting stuck in obs1 or obs2
 reach3_obsD1 = np.array(reach3_obsD1, dtype='float32')
 del reach3_obs1D1
 del reach3_obs2D1
 
-reach4_obs1D2 =  - ShapeRectangle(grids, [-1000, -1000, -1000, -1000, -0.1, -1.0], [1000, 1000, 1000, 1000, 0.1, -0.3])  # defender 2 does not get stuck in obs1
-reach4_obs2D2 =  - ShapeRectangle(grids, [-1000, -1000, -1000, -1000, -0.1, 0.30], [1000, 1000, 1000, 1000, 0.1, 0.60])  # defender 2 does not get stuck in obs2
-reach4_obsD2 = np.maximum(reach4_obs1D2, reach4_obs2D2)  # the intersection of defender 2 not getting stuck in obs1 or obs2
+reach4_obs1D2 = ShapeRectangle(grids, [-1000, -1000, -1000, -1000, -0.1, -1.0], [1000, 1000, 1000, 1000, 0.1, -0.3])  # defender 2 does not get stuck in obs1
+reach4_obs2D2 = ShapeRectangle(grids, [-1000, -1000, -1000, -1000, -0.1, 0.30], [1000, 1000, 1000, 1000, 0.1, 0.60])  # defender 2 does not get stuck in obs2
+reach4_obsD2 = - np.minimum(reach4_obs1D2, reach4_obs2D2)  # the intersection of defender 2 not getting stuck in obs1 or obs2
 reach4_obsD2 = np.array(reach4_obsD2, dtype='float32')
 del reach4_obs1D2
 del reach4_obs2D2
