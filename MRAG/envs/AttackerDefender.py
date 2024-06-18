@@ -586,8 +586,8 @@ class AttackerDefender1vs2(ReachAvoidGameEnv):
                  initial_defender=None, 
                  uMax=1.0,
                  dMax=1.0,
-                 uMode="min", 
-                 dMode="max",
+                 uMode="max", # "min" or "max"
+                 dMode="min", # "max" or "min"
                  ctrl_freq=200): 
         
         if initial_attacker is None:
