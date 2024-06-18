@@ -69,10 +69,8 @@ a_win = np.array(a_win, dtype='float32')
 del goal1_destination
 del goal2_escape
 
-obs1_d = ShapeRectangle(grids, [-1000, -1000, -1000, -0.1, -1.0 -1000],
-                                    [1000, 1000, 1000, 0.1, -0.3, 1000])  # defender stuck in obs1
-obs2_d = ShapeRectangle(grids, [-1000, -1000, -1000, -0.1, 0.30, -1000],
-                                    [1000, 1000, 1000, 0.1, 0.60, 1000])  # defender stuck in obs2
+obs1_d = ShapeRectangle(grids, [-1000, -1000, -1000, -0.1, -1.0, -1000], [1000, 1000, 1000, 0.1, -0.30, 1000])  # defender stuck in obs1
+obs2_d = ShapeRectangle(grids, [-1000, -1000, -1000, -0.1, 0.30, -1000], [1000, 1000, 1000, 0.1, 0.60, 1000])  # defender stuck in obs2
 d_lose = np.minimum(obs1_d, obs2_d)
 d_lose = np.array(d_lose, dtype='float32')
 del obs2_d
