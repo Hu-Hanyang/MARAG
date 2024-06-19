@@ -80,10 +80,13 @@ def hj_preparations_dub():
     value1vs1_dub = np.load('MRAG/values/DubinCar1vs1_grid26_medium.npy')
     end = time.time()
     print(f"============= HJ value functions loaded Successfully! (Time: {end-start :.4f} seconds) =============")
+    grid_size_1vs0_0 = value1vs0_dub.shape[0]
+    grid_size_1vs0_2 = value1vs0_dub.shape[2]
     grid_size_1vs1 = value1vs1_dub.shape[0]
-    grid1vs0_dub = Grid(np.array([-0.5, -0.5, -math.pi]), np.array([0.5, 0.5, math.pi]), 3, np.array([100, 100, 200]), [2])
-    grid1vs1_dub = Grid(np.array([-0.5, -0.5, -math.pi, -0.5, -0.5, -math.pi]), 
-                    np.array([0.5, 0.5, math.pi, 0.5, 0.5, math.pi]), 6, 
+    grid1vs0_dub = Grid(np.array([-1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi]), 3, 
+                        np.array([grid_size_1vs0_0, grid_size_1vs0_0, grid_size_1vs0_2]), [2])
+    grid1vs1_dub = Grid(np.array([-1.0, -1.0, -math.pi, -1.0, -1.0, -math.pi]), 
+                    np.array([1.0, 1.0, math.pi, 1.0, 1.0, math.pi]), 6, 
                     np.array([grid_size_1vs1, grid_size_1vs1, grid_size_1vs1, grid_size_1vs1, grid_size_1vs1, grid_size_1vs1]), [2, 5])
     print(f"============= Grids created Successfully! =============")
 

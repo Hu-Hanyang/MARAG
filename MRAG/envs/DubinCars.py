@@ -25,8 +25,8 @@ class DubinCarGameEnv(BaseRLGameEnv):
                  dMode="max",
                  output_folder='results',
                  game_length_sec=20,
-                 map={'map': [-0.5, 0.5, -0.5, 0.5]},  # Hanyang: rectangele [xmin, xmax, ymin, ymax]
-                 des={'goal0': [0.3, 0.4, 0.05, 0.15]},  # Hanyang: rectangele [xmin, xmax, ymin, ymax]
+                 map={'map': [-1.0, 1.0, -1.0, 1.0]},  # Hanyang: rectangele [xmin, xmax, ymin, ymax]
+                 des={'goal0': [0.6, 0.8, 0.1, 0.3]},  # Hanyang: rectangele [xmin, xmax, ymin, ymax]
                  obstacles: dict = None,  
                  ):
         """Initialization of a generic aviary environment.
@@ -112,7 +112,7 @@ class DubinCarGameEnv(BaseRLGameEnv):
                     else:
                         # check if the attacker is captured
                         for j in range(self.NUM_DEFENDERS):
-                            if np.linalg.norm(current_attacker_state[num][:3] - current_defender_state[j][:3]) <= 0.15:
+                            if np.linalg.norm(current_attacker_state[num][:3] - current_defender_state[j][:3]) <= 0.30:
                                 new_status[num] = -1
                                 break
 
