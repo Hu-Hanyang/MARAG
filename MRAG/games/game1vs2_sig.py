@@ -12,10 +12,10 @@ value1vs0, value1vs1, value2vs1, value1vs2, grid1vs0, grid1vs1, grid2vs1, grid1v
 num_attackers = 1
 num_defenders = 2
 #TODO: Defender crossing through the obstacle
-initial_attacker = np.array([[-0.5, 0.8]])
-initial_defender = np.array([[0.5, 0.3], [0.5, -0.3]])
-# initial_attacker = np.array([[-0.15, 0.0]])   # np.array([[-0.5, 0.8]])
-# initial_defender = np.array([[-0.5, 0.8], [-0.5, -0.6]]) # np.array([[0.5, 0.3], [0.5, -0.3]])
+# initial_attacker = np.array([[-0.5, 0.8]])
+# initial_defender = np.array([[0.5, 0.3], [0.5, -0.3]])
+initial_attacker = np.array([[0.0, 0.0]])   # np.array([[-0.5, 0.8]])
+initial_defender = np.array([[-0.5, 0.8], [-0.5, -0.6]]) # np.array([[0.5, 0.3], [0.5, -0.3]])
 assert num_attackers == initial_attacker.shape[0], "The number of attackers should be equal to the number of initial attacker states."
 assert num_defenders == initial_defender.shape[0], "The number of defenders should be equal to the number of initial defender states."
 T = 10.0  # time for the game
@@ -34,21 +34,21 @@ print((f"================ The initial value of the game is {check_current_value(
 defenders_controls = []
 attackers_controls = []
 #### Game Loop ####
-print(f"================ The game starts now. ================")
-for step in range(total_steps):
-    control_defenders = single_1vs2_controller_defender(game, value1vs2, grid1vs2)
-    defenders_controls.append(control_defenders.copy())
-    # control_defenders = hj_controller_defenders(game, assignments, value1vs1, value2vs1, grid1vs1, grid2vs1)
-    control_attackers = hj_controller_attackers_1vs0(game, value1vs0, grid1vs0)
-    attackers_controls.append(control_attackers.copy())
-    obs, reward, terminated, truncated, info = game.step(np.vstack((control_attackers, control_defenders)))
+# print(f"================ The game starts now. ================")
+# for step in range(total_steps):
+#     control_defenders = single_1vs2_controller_defender(game, value1vs2, grid1vs2)
+#     defenders_controls.append(control_defenders.copy())
+#     # control_defenders = hj_controller_defenders(game, assignments, value1vs1, value2vs1, grid1vs1, grid2vs1)
+#     control_attackers = hj_controller_attackers_1vs0(game, value1vs0, grid1vs0)
+#     attackers_controls.append(control_attackers.copy())
+#     obs, reward, terminated, truncated, info = game.step(np.vstack((control_attackers, control_defenders)))
     
-    if terminated or truncated:
-        break
+#     if terminated or truncated:
+#         break
     
-print(f"================ The game is over at the {step} step ({step / ctrl_freq} seconds). ================ \n")
-current_status_check(game.attackers_status[-1], step)
-# print(f"================ The number of 1 vs. 2 games happened: {counters_1vs2} ================")
+# print(f"================ The game is over at the {step} step ({step / ctrl_freq} seconds). ================ \n")
+# current_status_check(game.attackers_status[-1], step)
+# # print(f"================ The number of 1 vs. 2 games happened: {counters_1vs2} ================")
 
-#### Animation ####
-animation(game.attackers_traj, game.defenders_traj, game.attackers_status)
+# #### Animation ####
+# animation(game.attackers_traj, game.defenders_traj, game.attackers_status)

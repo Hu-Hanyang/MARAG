@@ -103,7 +103,9 @@ def plot_value_3agents(attackers, defenders, plot_agents, free_dim, value_functi
             defender_counter += 1
     
     players = np.vstack((attackers, defenders))
-    p1x_slice, p1y_slice, p2x_slice, p2y_slice, p3x_silce, p3y_slice = po2slice2vs1(players[plot_agents[0]], players[plot_agents[1]], players[plot_agents[2]], value_function.shape[0])
+    # p1x_slice, p1y_slice, p2x_slice, p2y_slice, p3x_silce, p3y_slice = po2slice2vs1(players[plot_agents[0]], players[plot_agents[1]], players[plot_agents[2]], value_function.shape[0])
+    p1x_slice, p1y_slice, p2x_slice, p2y_slice, p3x_silce, p3y_slice = grids.get_index(np.concatenate((players[plot_agents[0]], players[plot_agents[1]], players[plot_agents[2]]), axis=0))
+    # po2slice2vs1(players[plot_agents[0]], players[plot_agents[1]], players[plot_agents[2]], value_function.shape[0])
 
     if plot_agents.index(free_dim) == 0:
         value_function3agents = value_function[:, :, p2x_slice, p2y_slice, p3x_silce, p3y_slice]

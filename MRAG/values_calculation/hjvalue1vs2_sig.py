@@ -71,24 +71,24 @@ del avoid2
 print("2. After generaing avoid set, the Gigabytes consumed {}".format(process.memory_info().rss/1e9))  # in bytes
 
 # 4. Reach set, no constraint means inf
-reach1 = - ShapeRectangle(grids, [0.6, 0.1, -1000, -1000, -1000, -1000], [0.8, 0.3, 1000, 1000, 1000, 1000])  # attacker has not arrived at the target
-reach1 = np.array(reach1, dtype='float32')
+# reach1 = - ShapeRectangle(grids, [0.6, 0.1, -1000, -1000, -1000, -1000], [0.8, 0.3, 1000, 1000, 1000, 1000])  # attacker has not arrived at the target
+# reach1 = np.array(reach1, dtype='float32')
 
 reach2_captureD1 = agents_1v2.capture_set1(grids, 0.1, "capture")  # attacker is captured by defender 1
-reach_captureD1 = np.maximum(reach1, reach2_captureD1)  # the intersection of being captured by defender 1
-reach_captureD1 = np.array(reach_captureD1, dtype='float32')
+# reach_captureD1 = np.maximum(reach1, reach2_captureD1)  # the intersection of being captured by defender 1
+reach_captureD1 = np.array(reach2_captureD1, dtype='float32')
 del reach2_captureD1
 
 reach2_captureD2 = agents_1v2.capture_set2(grids, 0.1, "capture")  # attacker is captured by defender 2
-reach_captureD2 = np.maximum(reach1, reach2_captureD2)  # the intersection of being captured by defender 2
-reach_captureD2 = np.array(reach_captureD2, dtype='float32')
+# reach_captureD2 = np.maximum(reach1, reach2_captureD2)  # the intersection of being captured by defender 2
+reach_captureD2 = np.array(reach2_captureD2, dtype='float32')
 del reach2_captureD2
 
 reach2 = np.minimum(reach_captureD1, reach_captureD2)  # the union of being captured by defender 1 or 2, and the attacker has not arrived at the target
 reach2 = np.array(reach2, dtype='float32')
 del reach_captureD1
 del reach_captureD2
-del reach1
+# del reach1
 
 reach3_obs1D1 = -ShapeRectangle(grids, [-1000, -1000, -0.1, -1.0, -1000, -1000], [1000, 1000, 0.1, -0.3, 1000, 1000])  # defender 1 does not get stuck in obs1
 reach3_obs2D1 = -ShapeRectangle(grids, [-1000, -1000, -0.1, 0.30, -1000, -1000], [1000, 1000, 0.1, 0.60, 1000, 1000])  # defender 1 does not get stuck in obs2
@@ -129,7 +129,8 @@ compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithO
 # compMethods = {"TargetSetMode": "minVWithVTarget"}
 solve_start_time = time.time()
 
-result = HJSolver(agents_1v2, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=None, accuracy="medium") # original one
+accuracy = "medium"
+result = HJSolver(agents_1v2, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=None, accuracy=accuracy) # original one
 # result = HJSolver(my_2agents, g, avoid_set, tau, compMethods, po, saveAllTimeSteps=True)
 process = psutil.Process(os.getpid())
 print(f"The CPU memory used during the calculation of the value function is {process.memory_info().rss/(1024 ** 3): .2f} GB.")  # in bytes
@@ -140,7 +141,7 @@ print(f"The size of the value function is {result.nbytes / (1024 ** 3): .2f} GB 
 print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
 print(f'The shape of the value function is {result.shape} \n')
 # save the value function
-np.save(f'MRAG/values/1vs2AttackDefend_g{grid_size}_dspeed{speed_d}.npy', result)
+np.save(f'MRAG/values/1vs2AttackDefend_g{grid_size}_{accuracy}_dspeed{speed_d}.npy', result)
 print("The value function has been saved successfully.")
 
 # Record the time of whole process
