@@ -21,21 +21,21 @@ from odp.solver import HJSolver
 - 6. Save the value function
 """
 ##################################################### EXAMPLE 2 1v0AttackerDefender ####################################
-
+#TODO: Resize the map and other corresponding sizes in the functions
 # Record the time of whole process
 start_time = time.time()
 
 # 1. Initialize the grids
 grid_size = 100
-grid_size_theta = 200
-grids = Grid(np.array([-0.5, -0.5, -math.pi]), np.array([0.5, 0.5, math.pi]), 3, np.array([grid_size, grid_size, grid_size_theta]), [2])
+grid_size_theta = 100
+grids = Grid(np.array([-1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi]), 3, np.array([grid_size, grid_size, grid_size_theta]), [2])
 
 # 2. Initialize the dynamics
 agents_1vs0 = DubinCar1vs0(uMode="min", dMode="max")  
 
 # 3. Instruct the avoid set and reach set
 ## 3.1 Avoid set, no constraint means inf
-obs1_a = ShapeRectangle(grids, [-0.05, -0.5, -1000], [0.05, -0.15, 1000])  # not sure about the third dimension
+obs1_a = ShapeRectangle(grids, [-0.1, -0.1, -1000], [0.1, -0.3, 1000])  # not sure about the third dimension
 obs1_a = np.array(obs1_a, dtype='float32')
 
 obs2_a = ShapeRectangle(grids, [-0.05, 0.15, -1000], [0.05, 0.30, 1000]) 

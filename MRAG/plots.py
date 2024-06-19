@@ -109,6 +109,7 @@ def plot_value_3agents(attackers, defenders, plot_agents, free_dim, value_functi
 
     if plot_agents.index(free_dim) == 0:
         value_function3agents = value_function[:, :, p2x_slice, p2y_slice, p3x_silce, p3y_slice]
+        # value_function3agents = value_function[:, :, p2x_slice, p2y_slice, 0, 0]
     elif plot_agents.index(free_dim) == 1:
         value_function3agents = value_function[p1x_slice, p1y_slice, :, :, p3x_silce, p3y_slice]
     else:

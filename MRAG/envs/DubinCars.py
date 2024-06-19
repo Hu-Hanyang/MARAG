@@ -112,7 +112,7 @@ class DubinCarGameEnv(BaseRLGameEnv):
                     else:
                         # check if the attacker is captured
                         for j in range(self.NUM_DEFENDERS):
-                            if np.linalg.norm(current_attacker_state[num][:3] - current_defender_state[j][:3]) <= 0.1:
+                            if np.linalg.norm(current_attacker_state[num][:3] - current_defender_state[j][:3]) <= 0.15:
                                 new_status[num] = -1
                                 break
 

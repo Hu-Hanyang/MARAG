@@ -11,7 +11,7 @@ value1vs0_dub, grid1vs0_dub, value1vs1_dub, grid1vs1_dub = hj_preparations_dub()
 
 num_attackers = 1
 num_defenders = 1
-initial_attacker = np.array([[0.4, 0.0, math.pi]]) 
+initial_attacker = np.array([[-0.3, 0.0, -math.pi]]) 
 initial_defender = np.array([[-0.4, 0.4, 0.0]])
 
 initial_attacker, initial_defender = dubin_inital_check(initial_attacker, initial_defender)
