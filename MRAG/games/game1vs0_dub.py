@@ -11,8 +11,11 @@ value1vs0_dub, grid1vs0_dub, value1vs1_dub, grid1vs1_dub = hj_preparations_dub()
 
 num_attackers = 1
 num_defenders = 1
-initial_attacker = np.array([[0.0, 0.0, 0.0]])  #TODO: Hanyang: there's a bug in the get_index function
+initial_attacker = np.array([[0.4, 0.0, math.pi]]) 
 initial_defender = np.array([[-0.4, 0.4, 0.0]])
+
+initial_attacker, initial_defender = dubin_inital_check(initial_attacker, initial_defender)
+print(f"The initial attacker states are {initial_attacker}, and the initial defender states are {initial_defender}.")
 
 assert num_attackers == initial_attacker.shape[0], "The number of attackers should be equal to the number of initial attacker states."
 assert num_defenders == initial_defender.shape[0], "The number of defenders should be equal to the number of initial defender states."

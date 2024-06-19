@@ -399,3 +399,32 @@ def check_current_value(attackers, defenders, value_function, grids):
     value = value_function[joint_slice]
 
     return value
+
+
+def dubin_inital_check(initial_attacker, initial_defender):
+    """ Make sure the angle is in the range of [-pi, pi), if not, change it.
+    
+    Args:
+        inital_attacker (np.ndarray, (num_attacker, 3)): the initial state of the attacker
+        initial_defender (np.ndarray, (num_defender, 3)): the initial state of the defender
+    
+    Returns:
+        initial_attacker (np.ndarray, (num_attacker, 3)): the initial state of the attacker after revision if necessary
+        initial_defender (np.ndarray, (num_defender, 3)): the initial state of the defender after revision if necessary
+    """
+    def normalize_angle(angle):
+        while angle >= np.pi:
+            angle -= 2 * np.pi
+        while angle < -np.pi:
+            angle += 2 * np.pi
+        return angle
+    
+    def normalize_states(states):
+        for state in states:
+            state[2] = normalize_angle(state[2])
+        return states
+    
+    initial_attacker = normalize_states(initial_attacker)
+    initial_defender = normalize_states(initial_defender)
+    
+    return initial_attacker, initial_defender

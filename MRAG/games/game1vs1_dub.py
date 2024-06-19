@@ -16,6 +16,9 @@ num_defenders = 1
 initial_attacker = np.array([[-0.8, 0.0, math.pi/2]])
 initial_defender = np.array([[0.3, 0.0, 3*math.pi/2]])
 
+initial_attacker, initial_defender = dubin_inital_check(initial_attacker, initial_defender)
+print(f"The initial attacker states are {initial_attacker}, and the initial defender states are {initial_defender}.")
+
 assert num_attackers == initial_attacker.shape[0], "The number of attackers should be equal to the number of initial attacker states."
 assert num_defenders == initial_defender.shape[0], "The number of defenders should be equal to the number of initial defender states."
 T = 10.0  # time for the game

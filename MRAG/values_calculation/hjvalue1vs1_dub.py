@@ -22,7 +22,7 @@ from odp.solver import HJSolver
 - 5. Call HJSolver function
 - 6. Save the value function
 """
-
+##################################################### Remember to check the compGraph 6D ####################################
 # Record the time of whole process
 start_time = time.time()
 
