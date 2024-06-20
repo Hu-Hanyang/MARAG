@@ -30,7 +30,7 @@ replace the original odp/computeGraphs/graph_6D.py with the MRAG_6D.py, also cha
 start_time = time.time()
 
 # 1. Define grid
-grid_size = 30
+grid_size = 25
 speed_d = 1.5
 
 grids = Grid(np.array([-1.0, -1.0, -1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]), 
