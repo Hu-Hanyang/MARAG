@@ -30,7 +30,7 @@ replace the original odp/computeGraphs/graph_6D.py with the MRAG_6D.py, also cha
 start_time = time.time()
 
 # 1. Define grid
-grid_size = 32
+grid_size = 30
 speed_d = 1.5
 
 grids = Grid(np.array([-1.0, -1.0, -1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]), 
@@ -108,7 +108,7 @@ process = psutil.Process(os.getpid())
 print("3. After generating reach set, the Gigabytes consumed {}".format(process.memory_info().rss/1e9))  # in bytes
 
 # 4. Look-back length and time step
-lookback_length = 4.5  # the same as 2014Mo
+lookback_length = 3.5  # the same as 2014Mo
 t_step = 0.025
 
 # Actual calculation process, needs to add new plot function to draw a 2D figure
@@ -124,7 +124,7 @@ compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithO
 solve_start_time = time.time()
 
 accuracy = "medium"
-result = HJSolver(agents_1v2, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=None, accuracy=accuracy) # original one
+result = HJSolver(agents_1v2, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=True, accuracy=accuracy) # original one
 
 # initial_attacker = np.array([[0.0, 0.2]])
 # initial_defender = np.array([[0.0, 0.0], [-0.5, -0.5]])

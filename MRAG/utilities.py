@@ -52,14 +52,14 @@ def hj_preparations_sig():
     value2vs1 = np.load('MRAG/values/2vs1AttackDefend_g30_speed1.5.npy')
     # value1vs2 = np.load('MRAG/values/1vs2AttackDefend_g35_dspeed1.5.npy')
     # value1vs2 = np.load('MRAG/values/1vs2AttackDefend_g35_dspeed1.5_defender.npy')
-    value1vs2 = np.load('MRAG/values/1vs2_SIG_g30_medium_dspeed1.5.npy')
+    value1vs2 = np.load('MRAG/values/1vs2_SIG_g32_medium_dspeed1.5.npy')
     end = time.time()
     print(f"============= HJ value functions loaded Successfully! (Time: {end-start :.4f} seconds) =============")
     grid1vs0 = Grid(np.array([-1.0, -1.0]), np.array([1.0, 1.0]), 2, np.array([100, 100])) 
     grid1vs1 = Grid(np.array([-1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0, 1.0]), 4, np.array([45, 45, 45, 45]))
     grid2vs1 = Grid(np.array([-1.0, -1.0, -1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]), 6, np.array([30, 30, 30, 30, 30, 30]))
     # grid1vs2 = Grid(np.array([-1.0, -1.0, -1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]), 6, np.array([35, 35, 35, 35, 35, 35]))
-    grid1vs2 = Grid(np.array([-1.0, -1.0, -1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]), 6, np.array([30, 30, 30, 30, 30, 30]))
+    grid1vs2 = Grid(np.array([-1.0, -1.0, -1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]), 6, np.array([32, 32, 32, 32, 32, 32]))
     print(f"============= Grids created Successfully! =============")
 
     return value1vs0, value1vs1, value2vs1, value1vs2, grid1vs0, grid1vs1, grid2vs1, grid1vs2
