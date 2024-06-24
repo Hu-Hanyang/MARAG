@@ -21,7 +21,6 @@ from odp.solver import HJSolver
 - 6. Save the value function
 """
 ##################################################### EXAMPLE 2 1v0AttackerDefender ####################################
-#TODO: Resize the map and other corresponding sizes in the functions
 # Record the time of whole process
 start_time = time.time()
 

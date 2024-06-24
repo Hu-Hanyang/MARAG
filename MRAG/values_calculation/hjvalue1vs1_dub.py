@@ -27,14 +27,15 @@ from odp.solver import HJSolver
 start_time = time.time()
 
 # 1. Initialize the grids
-grid_size = 26
+grid_size = 28
 grids = Grid(np.array([-1.0, -1.0, -math.pi, -1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi, 1.0, 1.0, math.pi]),
              6, np.array([grid_size, grid_size, grid_size, grid_size, grid_size, grid_size]), [2, 5])
 process = psutil.Process(os.getpid())
 print("1. Gigabytes consumed of the grids initialization {}".format(process.memory_info().rss/1e9))  # in bytes
 
 # 2. Initialize the dynamics
-agents_1vs1 = DubinCar1vs1(uMode="min", dMode="max")  # 1v1 (6 dims dynamics)
+angularv = 1.0
+agents_1vs1 = DubinCar1vs1(uMode="min", dMode="max", uMax=angularv, dMax=angularv)  # 1v1 (6 dims dynamics)
 
 # 3. Instruct the avoid set and reach set
 ## 3.1 Avoid set, no constraint means inf
@@ -112,7 +113,7 @@ print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
 print(f'The shape of the value function is {result.shape} \n')
 
 # 6. Save the value function
-np.save(f'MRAG/values/DubinCar1vs1_grid{grid_size}_{accuracy}.npy', result)
+np.save(f'MRAG/values/DubinCar1vs1_grid{grid_size}_{accuracy}_{angularv}angularv.npy', result)
 
 
 print(f"The value function has been saved successfully.")
