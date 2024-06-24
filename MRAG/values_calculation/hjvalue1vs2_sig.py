@@ -30,7 +30,7 @@ replace the original odp/computeGraphs/graph_6D.py with the MRAG_6D.py, also cha
 start_time = time.time()
 
 # 1. Define grid
-grid_size = 25
+grid_size = 35
 speed_d = 1.5
 
 grids = Grid(np.array([-1.0, -1.0, -1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]), 
@@ -52,8 +52,8 @@ avoid2 = np.array(avoid2, dtype='float32')
 del avoid2_escapeD1
 del avoid2_escapeD2
 
-avoid3_obs1D1 = ShapeRectangle(grids, [-1000, -1000, -0.1, -1.0, -1000, -1000], [1000, 1000, 0.1, -0.3, 1000, 1000])  # avoid attacker gets stuck in obs1
-avoid3_obs2D1 = ShapeRectangle(grids, [-1000, -1000, -0.1, 0.30, -1000, -1000], [1000, 1000, 0.1, 0.60, 1000, 1000])  # avoid attacker gets stuck in obs2
+avoid3_obs1D1 = ShapeRectangle(grids, [-1000, -1000, -0.1, -1.0, -1000, -1000], [1000, 1000, 0.1, -0.3, 1000, 1000])  # avoid defender 1 gets stuck in obs1
+avoid3_obs2D1 = ShapeRectangle(grids, [-1000, -1000, -0.1, 0.30, -1000, -1000], [1000, 1000, 0.1, 0.60, 1000, 1000])  # avoid defender 1 gets stuck in obs2
 avoid3_obsD1 = np.minimum(avoid3_obs1D1, avoid3_obs2D1)  # the union of getting stuck in obs1 or obs2
 avoid3_obsD1 = np.array(avoid3_obsD1, dtype='float32')
 del avoid3_obs1D1
@@ -85,12 +85,12 @@ reach2_captureD2 = agents_1v2.capture_set2(grids, 0.1, "capture")  # attacker is
 reach_captureD2 = np.maximum(reach1, reach2_captureD2)  # the intersection of being captured by defender 2
 reach_captureD2 = np.array(reach_captureD2, dtype='float32')
 del reach2_captureD2
+del reach1
 
 reach2 = np.minimum(reach_captureD1, reach_captureD2)  # the union of being captured by defender 1 or 2, and the attacker has not arrived at the target
 reach2 = np.array(reach2, dtype='float32')
 del reach_captureD1
 del reach_captureD2
-del reach1
 
 reach3_obs1A = ShapeRectangle(grids, [-0.1, -1.0, -1000, -1000, -1000, -1000], [0.1, -0.3, 1000, 1000, 1000, 1000])
 reach3_obs2A = ShapeRectangle(grids, [-0.1, 0.30, -1000, -1000, -1000, -1000], [0.1, 0.60, 1000, 1000, 1000, 1000])
@@ -108,7 +108,7 @@ process = psutil.Process(os.getpid())
 print("3. After generating reach set, the Gigabytes consumed {}".format(process.memory_info().rss/1e9))  # in bytes
 
 # 4. Look-back length and time step
-lookback_length = 2.5  # the same as 2014Mo
+lookback_length = 4.5  # the same as 2014Mo
 t_step = 0.025
 
 # Actual calculation process, needs to add new plot function to draw a 2D figure
@@ -124,7 +124,7 @@ compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithO
 solve_start_time = time.time()
 
 accuracy = "medium"
-result = HJSolver(agents_1v2, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=True, accuracy=accuracy) # original one
+result = HJSolver(agents_1v2, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=False, accuracy=accuracy) # original one
 
 # initial_attacker = np.array([[0.0, 0.2]])
 # initial_defender = np.array([[0.0, 0.0], [-0.5, -0.5]])

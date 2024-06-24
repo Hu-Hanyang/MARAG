@@ -118,8 +118,8 @@ def defender_control_1vs2(game, grid1vs2, value1vs2, jointstate_1vs2):
     Returns:
         opt_d1, opt_d2 (tuple): the optimal control of the defender
     """
-    value2vs1s = value1vs2[..., np.newaxis] 
-    spat_deriv_vector = spa_deriv(grid1vs2.get_index(jointstate_1vs2), value2vs1s, grid1vs2)
+    value1vs2s = value1vs2[..., np.newaxis] 
+    spat_deriv_vector = spa_deriv(grid1vs2.get_index(jointstate_1vs2), value1vs2s, grid1vs2)
     opt_d1, opt_d2, opt_d3, opt_d4 = game.optDistb_1vs2(spat_deriv_vector)
 
     return (opt_d1, opt_d2, opt_d3, opt_d4)
@@ -425,3 +425,68 @@ def single_1vs1_controller_defender_noise(game, value1vs1, grid1vs1, epsilon=0.3
         control_defenders[0] = (opt_d1, opt_d2)
 
     return control_defenders
+
+
+def optCtrl_1vs0(spat_deriv, uMax, uMode, speed):
+    """Computes the optimal control (disturbance) for the attacker in a 1 vs. 0 game.
+
+    Parameters:
+        spat_deriv (tuple): spatial derivative in all dimensions
+    
+    Returns:
+        tuple: a tuple of optimal control of the defender (disturbances)
+    """
+    opt_a1 = uMax
+    opt_a2 = uMax
+    deriv1 = spat_deriv[0]
+    deriv2 = spat_deriv[1]
+    ctrl_len = np.sqrt(deriv1*deriv1 + deriv2*deriv2)
+    if uMode == "min":
+        if ctrl_len == 0:
+            opt_a1 = 0.0
+            opt_a2 = 0.0
+        else:
+            opt_a1 = - speed * deriv1 / ctrl_len
+            opt_a2 = - speed * deriv2 / ctrl_len
+    else:
+        if ctrl_len == 0:
+            opt_a1 = 0.0
+            opt_a2 = 0.0
+        else:
+            opt_a1 = speed * deriv1 / ctrl_len
+            opt_a2 = speed * deriv2 / ctrl_len
+    return (opt_a1, opt_a2)
+
+
+def hj_controller_1vs0(uMode, dMode, uMax, speed, value1vs0, grid1vs0, current_states, current_status):
+    """This function computes the control for the attackers based on the control_attackers. 
+       Assume dynamics are single integrator.   
+
+    Args:
+        game (class): the corresponding ReachAvoidGameEnv instance
+        value1vs0 (np.ndarray): the value function for 1 vs 0 game with all time slices
+        grid1vs0 (Grid): the grid for 1 vs 0 game
+        current_states (np.ndarray, (num_players, 2)): the current states of attackers
+        current_status (np.ndarray): the current status of attackers
+    """
+    #TODO: Implement the control for the 1 vs 0 game that independent of the game
+    attackers = current_states
+    num_attackers = current_states.shape[0]
+    current_attackers_status = current_status
+    control_attackers = np.zeros((num_attackers, 2))
+    for i in range(num_attackers):
+        if not current_attackers_status[i]:  # the attacker is free
+            neg2pos, pos2neg = find_sign_change1vs0(grid1vs0, value1vs0, attackers[i])
+            if len(neg2pos):
+                current_value = grid1vs0.get_value(value1vs0[..., 0], list(attackers[i]))
+                if current_value > 0:
+                    value1vs0 = value1vs0 - current_value
+                v = value1vs0[..., neg2pos] 
+                spat_deriv_vector = spa_deriv(grid1vs0.get_index(attackers[i]), v, grid1vs0)
+                control_attackers[i] = optCtrl_1vs0(spat_deriv_vector, uMax, uMode, speed)
+            else:
+                control_attackers[i] = (0.0, 0.0)
+        else:  # the attacker is captured or arrived
+            control_attackers[i] = (0.0, 0.0)
+            
+    return control_attackers

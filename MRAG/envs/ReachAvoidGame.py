@@ -368,7 +368,7 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
             else:
                 opt_d3 = self.defenders.speed*deriv5 / distb_len2
                 opt_d4 = self.defenders.speed*deriv6 / distb_len2
-        else:
+        else:  # dMode == "min"
             if distb_len1 == 0:
                 opt_d1 = 0.0
                 opt_d2 = 0.0

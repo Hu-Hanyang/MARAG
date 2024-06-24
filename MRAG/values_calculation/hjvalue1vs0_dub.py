@@ -31,7 +31,8 @@ grid_size_theta = 200
 grids = Grid(np.array([-1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi]), 3, np.array([grid_size, grid_size, grid_size_theta]), [2])
 
 # 2. Initialize the dynamics
-agents_1vs0 = DubinCar1vs0(uMode="min", dMode="max")  
+angularv = 1.0
+agents_1vs0 = DubinCar1vs0(uMode="min", dMode="max", uMax=angularv, dMax=angularv)  
 
 # 3. Instruct the avoid set and reach set
 ## 3.1 Avoid set, no constraint means inf
@@ -78,7 +79,7 @@ print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
 print(f'The shape of the value function is {result.shape} \n')
 
 # 6. Save the value function
-np.save(f'MRAG/values/DubinCar1vs0_grid{grid_size}_{accuracy}.npy', result)
+np.save(f'MRAG/values/DubinCar1vs0_grid{grid_size}_{accuracy}_{angularv}angularv.npy', result)
 
 print(f"The value function has been saved successfully.")
 
