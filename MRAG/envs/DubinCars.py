@@ -265,8 +265,8 @@ class DubinCar1vs0(DubinCarGameEnv):
                  defender_dynamics=Dynamics.DUB3D, 
                  initial_attacker=None, 
                  initial_defender=None, 
-                 uMax=2.84,
-                 dMax=2.84,
+                 uMax=1.0,
+                 dMax=1.0,
                  uMode="min", 
                  dMode="max",
                  ctrl_freq=200): 

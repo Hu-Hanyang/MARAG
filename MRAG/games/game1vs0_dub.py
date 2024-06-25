@@ -11,7 +11,7 @@ value1vs0_dub, grid1vs0_dub, value1vs1_dub, grid1vs1_dub = hj_preparations_dub()
 
 num_attackers = 1
 num_defenders = 1
-initial_attacker = np.array([[0.6, 0.0, -math.pi]]) # TODO: np.array([[0.5, 0.0, -math.pi]]) doesn't work!
+initial_attacker = np.array([[0.6, 0.0, -math.pi/2]]) # TODO: np.array([[0.5, 0.0, -math.pi]]) doesn't work!
 initial_defender = np.array([[-0.8, 0.8, 0.0]])
 
 initial_attacker, initial_defender = dubin_inital_check(initial_attacker, initial_defender)
@@ -26,7 +26,7 @@ total_steps = int(T * ctrl_freq)
 #### Game Initialization ####
 game = DubinCar1vs0(num_attackers=num_attackers, num_defenders=num_defenders, 
                          initial_attacker=initial_attacker, initial_defender=initial_defender, 
-                         ctrl_freq=ctrl_freq)
+                         ctrl_freq=ctrl_freq, uMax=1.0,dMax=1.0,)
 
 
 plot_value_1vs0_dub(game.attackers.state, game.defenders.state, value1vs0_dub, grid1vs0_dub)

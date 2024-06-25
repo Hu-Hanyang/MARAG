@@ -50,8 +50,6 @@ def hj_preparations_sig():
     value1vs0 = np.load('MRAG/values/1vs0_SIG_g100_medium_speed1.0.npy')
     value1vs1 = np.load('MRAG/values/1vs1_SIG_g45_medium_dspeed1.5.npy')
     value2vs1 = np.load('MRAG/values/2vs1AttackDefend_g30_speed1.5.npy')
-    # value1vs2 = np.load('MRAG/values/1vs2AttackDefend_g35_dspeed1.5.npy')
-    # value1vs2 = np.load('MRAG/values/1vs2AttackDefend_g35_dspeed1.5_defender.npy')
     value1vs2 = np.load('MRAG/values/1vs2_SIG_g32_medium_dspeed1.5.npy')
     end = time.time()
     print(f"============= HJ value functions loaded Successfully! (Time: {end-start :.4f} seconds) =============")
@@ -76,7 +74,8 @@ def hj_preparations_dub():
         grid1vs1 (Grid): the grid for 1 vs 1 game
     """
     start = time.time()
-    value1vs0_dub = np.load('MRAG/values/DubinCar1vs0_grid100_medium.npy')
+    # value1vs0_dub = np.load('MRAG/values/DubinCar1vs0_grid100_medium.npy')
+    value1vs0_dub = np.load("MRAG/values/DubinCar1vs0_grid100_medium_1.0angularv.npy")
     value1vs1_dub = np.load('MRAG/values/DubinCar1vs1_grid26_medium.npy')
     end = time.time()
     print(f"============= HJ value functions loaded Successfully! (Time: {end-start :.4f} seconds) =============")

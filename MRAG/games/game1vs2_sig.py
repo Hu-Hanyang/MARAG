@@ -11,11 +11,16 @@ from MRAG.plots import animation, plot_scene, plot_value_1vs1, plot_value_3agent
 value1vs0, value1vs1, value2vs1, value1vs2, grid1vs0, grid1vs1, grid2vs1, grid1vs2  = hj_preparations_sig()
 num_attackers = 1
 num_defenders = 2
-#TODO: Defender crossing through the obstacle
+# # This example, captured, everything seems correct
 # initial_attacker = np.array([[-0.3, 0.0]])
 # initial_defender = np.array([[-0.7, 0.5], [-0.7, -0.5]])
+#TODO This example, captured, but one defender moves to a wierd position
+# initial_attacker = np.array([[0.0, 0.0]])
+# initial_defender = np.array([[0.5, 0.3], [0.5, -0.3]])
+#TODO This example, captured, but one defender moves out of the map
 initial_attacker = np.array([[-0.8, 0.0]])
 initial_defender = np.array([[0.5, 0.3], [0.5, -0.3]])
+# # This example, captured, everything seems correct
 # initial_attacker = np.array([[-0.5, 0.0]])
 # initial_defender = np.array([[0.4, 0.3], [0.4, -0.3]])
 assert num_attackers == initial_attacker.shape[0], "The number of attackers should be equal to the number of initial attacker states."
@@ -27,7 +32,6 @@ total_steps = int(T * ctrl_freq)
 print(f"The shape of the value1vs2 is {value1vs2.shape}.")
 
 #### Game Initialization ####
-#TODO: Maybe derive the control since some modes are conflicting with each other, for example, 1vs2 and 1vs0 the uMode is different
 game = ReachAvoidGameEnv(num_attackers=num_attackers, num_defenders=num_defenders, 
                          initial_attacker=initial_attacker, initial_defender=initial_defender, 
                          uMode="max",dMode="min",ctrl_freq=ctrl_freq)
@@ -44,7 +48,7 @@ for step in range(total_steps):
     control_defenders = single_1vs2_controller_defender(game, value1vs2, grid1vs2)
     defenders_controls.append(control_defenders.copy())
     # control_defenders = hj_controller_defenders(game, assignments, value1vs1, value2vs1, grid1vs1, grid2vs1)
-    # control_attackers = hj_controller_attackers_1vs0(game, value1vs0, grid1vs0)
+
     # control_attackers = np.array([0.0, 0.0])
     control_attackers = hj_controller_1vs0(uMode="min", dMode="max", uMax=1.0, speed=1.0, 
                                            value1vs0=value1vs0, grid1vs0=grid1vs0, 

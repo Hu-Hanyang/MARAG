@@ -108,7 +108,7 @@ process = psutil.Process(os.getpid())
 print("3. After generating reach set, the Gigabytes consumed {}".format(process.memory_info().rss/1e9))  # in bytes
 
 # 4. Look-back length and time step
-lookback_length = 4.5  # the same as 2014Mo
+lookback_length = 10.0  # the same as 2014Mo
 t_step = 0.025
 
 # Actual calculation process, needs to add new plot function to draw a 2D figure
@@ -116,7 +116,7 @@ small_number = 1e-5
 tau = np.arange(start=0, stop=lookback_length + small_number, step=t_step)
 
 # while plotting make sure the len(slicesCut) + len(plotDims) = grid.dims
-po = PlotOptions(do_plot=True, plot_type="set", plotDims=[0, 1], slicesCut=[2, 2, 2, 2])
+po = PlotOptions(do_plot=False, plot_type="set", plotDims=[0, 1], slicesCut=[2, 2, 2, 2])
 
 # In this example, we compute a Reach-Avoid Tube
 compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithObstacle"} # original one
