@@ -9,6 +9,7 @@ from odp.Grid import Grid
 from odp.Shapes import *
 # Specify the  file that includes dynamic systems, AttackerDefender4D
 from MRAG.envs.DubinCars import DubinCar1vs1
+from MRAG.plots import plot_value_1vs1_dub
 # Plot options
 from odp.Plots import PlotOptions
 from odp.Plots.plotting_utilities import plot_isosurface, plot_valuefunction
@@ -53,10 +54,10 @@ del obs2_a
 capture_a = agents_1vs1.capture_set(grids, 0.30, "capture")  # a1 is captured
 capture_a = np.array(capture_a, dtype='float32')
 
-avoid_set = np.minimum(capture_a, obs_a)
+avoid_set = np.minimum(capture_a, obs_a)  # the attacker either gets captured or stuck in the obstacles
 avoid_set = np.array(avoid_set, dtype='float32')
-del capture_a
-del obs_a
+# del capture_a
+# del obs_a
 gc.collect()
 process = psutil.Process(os.getpid())
 print("2. Gigabytes consumed of the avoid_set {}".format(process.memory_info().rss/1e9))  # in bytes
@@ -100,9 +101,15 @@ compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithO
 # compMethods = {"TargetSetMode": "minVWithVTarget"}
 solve_start_time = time.time()
 
+
+# Before computation test
+# initial_attacker = np.array([[0.0, 0.0, math.pi/2]])
+# initial_defender = np.array([[-0.5, 0.0, 0.0]])
+# target = np.maximum(reach_set, -avoid_set)
+# plot_value_1vs1_dub(initial_attacker, initial_defender, 0, 0, 1, capture_a, grids)
+
 accuracy = "medium"
 result = HJSolver(agents_1vs1, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=None, accuracy=accuracy) # original one
-# result = HJSolver(my_2agents, g, avoid_set, tau, compMethods, po, saveAllTimeSteps=True)
 process = psutil.Process(os.getpid())
 print(f"The CPU memory used during the calculation of the value function is {process.memory_info().rss/1e9: .2f} GB.")  # in bytes
 

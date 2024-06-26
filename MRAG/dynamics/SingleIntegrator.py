@@ -64,6 +64,11 @@ class SingleIntegrator(BaseDynamics):
         x_new = state[0] + (1/6) * (k1_x + 2 * k2_x + 2 * k3_x + k4_x)
         y_new = state[1] + (1/6) * (k1_y + 2 * k2_y + 2 * k3_y + k4_y)
         
+        # Check the boundary
+        x_min, x_max, y_min, y_max = -1.0, 1.0, -1.0, 1.0
+        x_new = max(min(x_new, x_max), x_min)
+        y_new = max(min(y_new, y_max), y_min)
+        
         return x_new, y_new
 
 

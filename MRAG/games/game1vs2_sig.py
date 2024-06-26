@@ -4,7 +4,7 @@ from MRAG.envs.ReachAvoidGame import ReachAvoidGameEnv
 from MRAG.solvers import mip_solver, extend_mip_solver
 from MRAG.utilities import *
 from MRAG.sig_controllers import hj_controller_attackers_1vs0, hj_controller_defenders, extend_hj_controller_defenders, single_1vs2_controller_defender, hj_controller_1vs0
-from MRAG.plots import animation, plot_scene, plot_value_1vs1, plot_value_3agents
+from MRAG.plots import animation, plot_scene, plot_value_1vs1_sig, plot_value_3agents
 
 
 #### Game Settings ####
@@ -12,17 +12,21 @@ value1vs0, value1vs1, value2vs1, value1vs2, grid1vs0, grid1vs1, grid2vs1, grid1v
 num_attackers = 1
 num_defenders = 2
 # # This example, captured, everything seems correct
-# initial_attacker = np.array([[-0.3, 0.0]])
-# initial_defender = np.array([[-0.7, 0.5], [-0.7, -0.5]])
+initial_attacker = np.array([[-0.3, 0.0]])
+initial_defender = np.array([[-0.7, 0.5], [-0.7, -0.5]])
 #TODO This example, captured, but one defender moves to a wierd position
 # initial_attacker = np.array([[0.0, 0.0]])
 # initial_defender = np.array([[0.5, 0.3], [0.5, -0.3]])
 #TODO This example, captured, but one defender moves out of the map
-initial_attacker = np.array([[-0.8, 0.0]])
-initial_defender = np.array([[0.5, 0.3], [0.5, -0.3]])
+# initial_attacker = np.array([[-0.3, 0.0]])
+# initial_defender = np.array([[0.5, 0.3], [0.5, -0.3]])
 # # This example, captured, everything seems correct
 # initial_attacker = np.array([[-0.5, 0.0]])
 # initial_defender = np.array([[0.4, 0.3], [0.4, -0.3]])
+# Random test here
+# initial_attacker = np.array([[-0.1, 0.0]])
+# initial_defender = np.array([[-0.5, 0.3], [-0.5, -0.3]])
+
 assert num_attackers == initial_attacker.shape[0], "The number of attackers should be equal to the number of initial attacker states."
 assert num_defenders == initial_defender.shape[0], "The number of defenders should be equal to the number of initial defender states."
 T = 10.0  # time for the game

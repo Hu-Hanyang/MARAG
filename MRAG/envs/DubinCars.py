@@ -27,7 +27,7 @@ class DubinCarGameEnv(BaseRLGameEnv):
                  game_length_sec=20,
                  map={'map': [-1.0, 1.0, -1.0, 1.0]},  # Hanyang: rectangele [xmin, xmax, ymin, ymax]
                  des={'goal0': [0.6, 0.8, 0.1, 0.3]},  # Hanyang: rectangele [xmin, xmax, ymin, ymax]
-                 obstacles: dict = None,  
+                 obstacles: dict = {'obs1': [-0.1, 0.1, -1.0, -0.3], 'obs2': [-0.1, 0.1, 0.3, 0.6]},  # Hanyang: rectangele [xmin, xmax, ymin, ymax],  
                  ):
         """Initialization of a generic aviary environment.
 
@@ -112,7 +112,7 @@ class DubinCarGameEnv(BaseRLGameEnv):
                     else:
                         # check if the attacker is captured
                         for j in range(self.NUM_DEFENDERS):
-                            if np.linalg.norm(current_attacker_state[num][:3] - current_defender_state[j][:3]) <= 0.30:
+                            if np.linalg.norm(current_attacker_state[num][:2] - current_defender_state[j][:2]) <= 0.30:
                                 new_status[num] = -1
                                 break
 
@@ -161,7 +161,6 @@ class DubinCarGameEnv(BaseRLGameEnv):
             
         return reward
 
-    
     
     def _computeTerminated(self):
         """Computes the current done value.
@@ -371,8 +370,8 @@ class DubinCar1vs1(DubinCarGameEnv):
                  defender_dynamics=Dynamics.DUB3D, 
                  initial_attacker=None, 
                  initial_defender=None, 
-                 uMax=2.84, 
-                 dMax=2.84,
+                 uMax=1.0, 
+                 dMax=1.0,
                  uMode="min", 
                  dMode="max",
                  ctrl_freq=200): 
@@ -485,9 +484,11 @@ class DubinCar1vs1(DubinCarGameEnv):
     
     
     def capture_set(self, grid, capture_radius, mode):
-        xa, ya, xd, yd = np.meshgrid(grid.grid_points[0], grid.grid_points[1],
-                                     grid.grid_points[3], grid.grid_points[4], indexing='ij')
-        data = np.power(xa - xd, 2) + np.power(ya - yd, 2)
+        # xa, ya, theta_a, xd, yd, theta_d = np.meshgrid(grid.grid_points[0], grid.grid_points[1],
+        #                              grid.grid_points[3], grid.grid_points[4], indexing='ij')
+        
+        data = np.power(grid.vs[0] - grid.vs[3], 2) + np.power(grid.vs[1] -grid.vs[4], 2)
+        # data = np.power(xa - xd, 2) + np.power(ya - yd, 2)
         if mode == "capture":
             return np.sqrt(data) - capture_radius
         if mode == "escape":

@@ -10,8 +10,7 @@ from MRAG.envs.AttackerDefender import AttackerDefender1vs2
 from odp.Plots import PlotOptions
 from odp.Plots.plotting_utilities import plot_isosurface, plot_valuefunction
 from odp.solver import HJSolver
-
-from MRAG.plots import animation, plot_scene, plot_value_1vs1, plot_value_3agents
+from MRAG.plots import animation, plot_scene, plot_value_1vs1_sig, plot_value_3agents
 
 
 """ USER INTERFACES
@@ -123,15 +122,14 @@ compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithO
 # compMethods = {"TargetSetMode": "minVWithVTarget"}
 solve_start_time = time.time()
 
-accuracy = "medium"
-result = HJSolver(agents_1v2, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=False, accuracy=accuracy) # original one
-
+# # Before computation test
 # initial_attacker = np.array([[0.0, 0.2]])
 # initial_defender = np.array([[0.0, 0.0], [-0.5, -0.5]])
 # target = np.maximum(reach_set, -avoid_set)
+# plot_value_3agents(initial_attacker, initial_defender, [0, 1, 2], 0, avoid_set, grids)
 
-# plot_value_3agents(initial_attacker, initial_defender, [0, 1, 2], 0, target, grids)
-
+accuracy = "medium"
+result = HJSolver(agents_1v2, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=False, accuracy=accuracy) # original one
 process = psutil.Process(os.getpid())
 print(f"The CPU memory used during the calculation of the value function is {process.memory_info().rss/(1024 ** 3): .2f} GB.")  # in bytes
 

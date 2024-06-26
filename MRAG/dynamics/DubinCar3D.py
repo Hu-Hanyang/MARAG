@@ -64,6 +64,13 @@ class DubinsCar(BaseDynamics):
                                y + dt/6*(k1_y + 2*k2_y + 2*k3_y + k4[1]),
                                theta + dt/6*(k1_theta + 2*k2_theta + 2*k3_theta + k4[2]))
         
+        # Check the boundary
+        x_min, x_max, y_min, y_max = -1.0, 1.0, -1.0, 1.0
+        x_new = max(min(next_state[0], x_max), x_min)
+        y_new = max(min(next_state[1], y_max), y_min)
+        theta_new = next_state[2]
+        next_state = (x_new, y_new, theta_new)
+        
         return next_state
 
 

@@ -159,12 +159,12 @@ def plot_value_1vs1_dub(attackers, defenders, plot_attacker, plot_defender, fix_
         zmax=0.0,
     ), layout=Layout(plot_bgcolor='rgba(0,0,0,0)')) #,paper_bgcolor='rgba(0,0,0,0)'
     # plot target
-    fig.add_shape(type='rect', x0=0.3, y0=0.05, x1=0.4, y1=0.15, line=dict(color='purple', width=3.0), name="Target")
-    fig.add_trace(go.Scatter(x=[0.3, 0.4], y=[0.05, 0.05], mode='lines', name='Target', line=dict(color='purple')))
+    fig.add_shape(type='rect', x0=0.6, y0=0.1, x1=0.8, y1=0.3, line=dict(color='purple', width=3.0), name="Target")
+    fig.add_trace(go.Scatter(x=[0.6, 0.8], y=[0.1, 0.1], mode='lines', name='Target', line=dict(color='purple')))
     # plot obstacles
-    fig.add_shape(type='rect', x0=-0.05, y0=0.15, x1=0.05, y1=0.3, line=dict(color='black', width=3.0))
-    fig.add_shape(type='rect', x0=-0.05, y0=-0.5, x1=0.05, y1=-0.15, line=dict(color='black', width=3.0))
-    fig.add_trace(go.Scatter(x=[-0.05, 0.05], y=[0.15, 0.15], mode='lines', name='Obstacle', line=dict(color='black')))
+    fig.add_shape(type='rect', x0=-0.1, y0=0.3, x1=0.1, y1=0.6, line=dict(color='black', width=3.0))
+    fig.add_shape(type='rect', x0=-0.1, y0=-1.0, x1=0.1, y1=-0.3, line=dict(color='black', width=3.0))
+    fig.add_trace(go.Scatter(x=[-0.1, 0.1], y=[0.3, 0.3], mode='lines', name='Obstacle', line=dict(color='black')))
     # plot attackers
     fig.add_trace(go.Scatter(x=x_attackers, y=y_attackers, mode="markers", name='Attacker', marker=dict(symbol="triangle-up", size=10, color='red')))
     # plot defenders
@@ -172,7 +172,7 @@ def plot_value_1vs1_dub(attackers, defenders, plot_attacker, plot_defender, fix_
    
     # figure settings
     fig.update_layout(title={'text': f"<b>1 vs. 1 value function<b>", 'y':0.85, 'x':0.4, 'xanchor': 'center','yanchor': 'top', 'font_size': 20})
-    fig.update_layout(autosize=False, width=580, height=500, margin=dict(l=50, r=50, b=100, t=100, pad=0), paper_bgcolor="White", xaxis_range=[-0.5, 0.5], yaxis_range=[-0.5, 0.5], font=dict(size=20)) # $\mathcal{R} \mathcal{A}_{\infty}^{21}$
+    fig.update_layout(autosize=False, width=580, height=500, margin=dict(l=50, r=50, b=100, t=100, pad=0), paper_bgcolor="White", xaxis_range=[-1.0, 1.0], yaxis_range=[-1.0, 1.0], font=dict(size=20)) # $\mathcal{R} \mathcal{A}_{\infty}^{21}$
     fig.update_xaxes(showline = True, linecolor = 'black', linewidth = 2.0, griddash = 'dot', zeroline=False, gridcolor = 'Lightgrey', mirror=True, ticks='outside') # showgrid=False
     fig.update_yaxes(showline = True, linecolor = 'black', linewidth = 2.0, griddash = 'dot', zeroline=False, gridcolor = 'Lightgrey', mirror=True, ticks='outside') # showgrid=False,
     fig.show()

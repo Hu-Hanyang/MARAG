@@ -5,6 +5,7 @@ This module also contains enumerations for cost functions, tasks, disturbances, 
 
 
 import os
+import math
 import numpy as np
 from gymnasium import spaces
 from collections import deque
@@ -132,8 +133,8 @@ class BaseRLGameEnv(BaseGameEnv):
             defender_lower_bound = np.array([-1.0, -1.0])
             defender_upper_bound = np.array([+1.0, +1.0])
         elif self.DEFENDER_PHYSICS == Dynamics.DUB3D:
-            defender_lower_bound = np.array([-1.0, -1.0, -1.0])
-            defender_upper_bound = np.array([+1.0, +1.0, +1.0])
+            defender_lower_bound = np.array([-1.0, -1.0, -math.pi])
+            defender_upper_bound = np.array([+1.0, +1.0, +math.pi])
         else:
             print("[ERROR] in Defender Obs Space, BaseRLGameEnv._observationSpace()")
             exit()

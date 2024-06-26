@@ -9,7 +9,7 @@ from MRAG.utilities import po2slice1vs1,  po2slice2vs1
 
 
 
-def plot_value_1vs1(attackers, defenders, plot_attacker, plot_defender, fix_agent, value1vs1, grid1vs1):
+def plot_value_1vs1_sig(attackers, defenders, plot_attacker, plot_defender, fix_agent, value1vs1, grid1vs1):
     """Plot the value function of the game.
 
     Args:
@@ -73,6 +73,77 @@ def plot_value_1vs1(attackers, defenders, plot_attacker, plot_defender, fix_agen
     fig.update_yaxes(showline = True, linecolor = 'black', linewidth = 2.0, griddash = 'dot', zeroline=False, gridcolor = 'Lightgrey', mirror=True, ticks='outside') # showgrid=False,
     fig.show()
     print("Please check the plot on your browser.")
+
+
+def plot_value_1vs1_dub(attackers, defenders, plot_attacker, plot_defender, fix_agent, value1vs1, grid1vs1):
+    """Plot the value function of the game.
+
+    Args:
+        attackers (np.ndarray): The attackers' states.
+        defenders (np.ndarray): The defenders' states.
+        plot_attacker (int): The attacker to plot the value function, other attackers are ignored.
+        plot_defender (int): The defender to plot the value function, other defenders are ignored.
+        fix_agent (int): The agent to fix (1 for defender, 0 for attacker).
+        value1vs1 (np.ndarray): The value function of the 1 vs. 1 game.
+        grid1vs1 (Grid): The grid of the 1 vs. 1 game.
+
+    Returns:
+        None
+    """
+    joint_states1vs1 = (attackers[plot_attacker][0], attackers[plot_attacker][1], attackers[plot_attacker][2],
+                        defenders[plot_defender][0], defenders[plot_defender][1], defenders[plot_defender][2])
+    a1x_slice, a1y_slice, a1o_slice, d1x_slice, d1y_slice, d1o_slice = grid1vs1.get_index(joint_states1vs1)
+
+    if fix_agent == 1:  # fix the defender
+        # value_function1vs1 = value1vs1[:, :, a1o_slice, d1x_slice, d1y_slice, d1o_slice]
+        value_function1vs1 = value1vs1[:, :,0, d1x_slice, d1y_slice, 0]
+
+        dims_plot = [0, 1]
+        dim1, dim2 = dims_plot[0], dims_plot[1]
+    else:
+        value_function1vs1 = value1vs1[a1x_slice, a1y_slice, a1o_slice, :, :, d1o_slice]
+        dims_plot = [3, 4]
+        dim1, dim2 = dims_plot[0], dims_plot[1]
+
+    complex_x = complex(0, grid1vs1.pts_each_dim[dim1])
+    complex_y = complex(0, grid1vs1.pts_each_dim[dim2])
+    mg_X, mg_Y = np.mgrid[grid1vs1.min[dim1]:grid1vs1.max[dim1]: complex_x, grid1vs1.min[dim2]:grid1vs1.max[dim2]: complex_y]
+    x_attackers = attackers[:, 0]
+    y_attackers = attackers[:, 1]
+    x_defenders = defenders[:, 0]
+    y_defenders = defenders[:, 1]
+    print("Plotting beautiful 2D plots. Please wait\n")
+    fig = go.Figure(data=go.Contour(
+        x=mg_X.flatten(),
+        y=mg_Y.flatten(),
+        z=value_function1vs1.flatten(),
+        zmin=0.0,
+        ncontours=1,
+        contours_coloring = 'none', # former: lines 
+        name= "Zero-Level", # zero level
+        line_width = 1.5,
+        line_color = 'magenta',
+        zmax=0.0,
+    ), layout=Layout(plot_bgcolor='rgba(0,0,0,0)')) #,paper_bgcolor='rgba(0,0,0,0)'
+    # plot target
+    fig.add_shape(type='rect', x0=0.6, y0=0.1, x1=0.8, y1=0.3, line=dict(color='purple', width=3.0), name="Target")
+    fig.add_trace(go.Scatter(x=[0.6, 0.8], y=[0.1, 0.1], mode='lines', name='Target', line=dict(color='purple')))
+    # plot obstacles
+    fig.add_shape(type='rect', x0=-0.1, y0=0.3, x1=0.1, y1=0.6, line=dict(color='black', width=3.0))
+    fig.add_shape(type='rect', x0=-0.1, y0=-1.0, x1=0.1, y1=-0.3, line=dict(color='black', width=3.0))
+    fig.add_trace(go.Scatter(x=[-0.1, 0.1], y=[0.3, 0.3], mode='lines', name='Obstacle', line=dict(color='black')))
+    # plot attackers
+    fig.add_trace(go.Scatter(x=x_attackers, y=y_attackers, mode="markers", name='Attacker', marker=dict(symbol="triangle-up", size=10, color='red')))
+    # plot defenders
+    fig.add_trace(go.Scatter(x=x_defenders, y=y_defenders, mode="markers", name='Fixed Defender', marker=dict(symbol="square", size=10, color='green')))
+   
+    # figure settings
+    fig.update_layout(title={'text': f"<b>1 vs. 1 value function<b>", 'y':0.85, 'x':0.4, 'xanchor': 'center','yanchor': 'top', 'font_size': 20})
+    fig.update_layout(autosize=False, width=580, height=500, margin=dict(l=50, r=50, b=100, t=100, pad=0), paper_bgcolor="White", xaxis_range=[-1, 1], yaxis_range=[-1, 1], font=dict(size=20)) # $\mathcal{R} \mathcal{A}_{\infty}^{21}$
+    fig.update_xaxes(showline = True, linecolor = 'black', linewidth = 2.0, griddash = 'dot', zeroline=False, gridcolor = 'Lightgrey', mirror=True, ticks='outside') # showgrid=False
+    fig.update_yaxes(showline = True, linecolor = 'black', linewidth = 2.0, griddash = 'dot', zeroline=False, gridcolor = 'Lightgrey', mirror=True, ticks='outside') # showgrid=False,
+    fig.show()
+    print("Please check the plot on your browser.")
     
 
 def plot_value_3agents(attackers, defenders, plot_agents, free_dim, value_function, grids):
@@ -82,7 +153,7 @@ def plot_value_3agents(attackers, defenders, plot_agents, free_dim, value_functi
         attackers (np.ndarray): The attackers' states.
         defenders (np.ndarray): The defenders' states.
         plot_agents (list): The agents to plot the value function, in the sequence of [all attackers, all defenders]
-        fix_agent (int): The agent to fix (1 and 2 for defender, 0 for attacker).
+        free_dim (int): The free dimension to plot the value function.
         value1vs2 (np.ndarray): The value function of the 1 vs. 2 game.
         grid1vs2 (Grid): The grid of the 1 vs. 2 game.
 

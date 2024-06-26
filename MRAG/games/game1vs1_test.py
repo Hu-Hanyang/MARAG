@@ -4,7 +4,7 @@ from MRAG.envs.ReachAvoidGame import ReachAvoidGameEnv
 from MRAG.solvers import mip_solver, extend_mip_solver
 from MRAG.utilities import *
 from MRAG.sig_controllers import hj_controller_attackers_1vs0, hj_contoller_attackers_1vs1, single_1vs1_controller_defender, single_1vs1_controller_defender_noise
-from MRAG.plots import animation, plot_value_1vs1, record_video
+from MRAG.plots import animation, plot_value_1vs1_sig, record_video
 
 #### Game Settings ####
 value1vs0, value1vs1, value2vs1, value1vs2, grid1vs0, grid1vs1, grid2vs1, grid1vs2  = hj_preparations_sig()
@@ -27,7 +27,7 @@ game = ReachAvoidGameEnv(num_attackers=num_attackers, num_defenders=num_defender
 
 
 
-plot_value_1vs1(game.attackers.state, game.defenders.state, 
+plot_value_1vs1_sig(game.attackers.state, game.defenders.state, 
                 plot_attacker=0, plot_defender=0, 
                 fix_agent=1, value1vs1=value1vs1, grid1vs1=grid1vs1)
 
