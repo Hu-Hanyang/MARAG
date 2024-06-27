@@ -469,7 +469,6 @@ def hj_controller_1vs0(uMode, dMode, uMax, speed, value1vs0, grid1vs0, current_s
         current_states (np.ndarray, (num_players, 2)): the current states of attackers
         current_status (np.ndarray): the current status of attackers
     """
-    #TODO: Implement the control for the 1 vs 0 game that independent of the game
     attackers = current_states
     num_attackers = current_states.shape[0]
     current_attackers_status = current_status
