@@ -484,10 +484,7 @@ class DubinCar1vs1(DubinCarGameEnv):
     
     
     def capture_set(self, grid, capture_radius, mode):
-        # xa, ya, theta_a, xd, yd, theta_d = np.meshgrid(grid.grid_points[0], grid.grid_points[1],
-        #                              grid.grid_points[3], grid.grid_points[4], indexing='ij')
-        
-        data = np.power(grid.vs[0] - grid.vs[3], 2) + np.power(grid.vs[1] -grid.vs[4], 2)
+        data = np.power(grid.vs[0] - grid.vs[3], 2) + np.power(grid.vs[1] - grid.vs[4], 2)
         # data = np.power(xa - xd, 2) + np.power(ya - yd, 2)
         if mode == "capture":
             return np.sqrt(data) - capture_radius

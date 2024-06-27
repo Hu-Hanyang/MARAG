@@ -95,8 +95,8 @@ def plot_value_1vs1_dub(attackers, defenders, plot_attacker, plot_defender, fix_
     a1x_slice, a1y_slice, a1o_slice, d1x_slice, d1y_slice, d1o_slice = grid1vs1.get_index(joint_states1vs1)
 
     if fix_agent == 1:  # fix the defender
-        # value_function1vs1 = value1vs1[:, :, a1o_slice, d1x_slice, d1y_slice, d1o_slice]
-        value_function1vs1 = value1vs1[:, :,0, d1x_slice, d1y_slice, 0]
+        value_function1vs1 = value1vs1[:, :, a1o_slice, d1x_slice, d1y_slice, d1o_slice]
+        # value_function1vs1 = value1vs1[:, :,0, d1x_slice, d1y_slice, 0]
 
         dims_plot = [0, 1]
         dim1, dim2 = dims_plot[0], dims_plot[1]

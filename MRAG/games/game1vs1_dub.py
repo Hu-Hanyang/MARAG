@@ -15,9 +15,9 @@ num_attackers = 1
 num_defenders = 1
 # initial_attacker = np.array([[-0.2, 0.2, 0.0]])
 # initial_defender = np.array([[0.2, 0.0, 0.0]])
-
-initial_attacker = np.array([[-0.1, 0.0, math.pi/2]])
-initial_defender = np.array([[0.3, 0.0, 0.0]])
+#TODO The value function is not correct: the defender crossed the obstacles
+initial_attacker = np.array([[-0.4, -0.5, math.pi/2]])
+initial_defender = np.array([[0.2, 0.0, math.pi]])  # 
 
 initial_attacker, initial_defender = dubin_inital_check(initial_attacker, initial_defender)
 print(f"The initial attacker states are {initial_attacker}, and the initial defender states are {initial_defender}.")

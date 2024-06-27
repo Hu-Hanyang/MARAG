@@ -28,7 +28,7 @@ from odp.solver import HJSolver
 start_time = time.time()
 
 # 1. Initialize the grids
-grid_size = 28
+grid_size = 18
 grids = Grid(np.array([-1.0, -1.0, -math.pi, -1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi, 1.0, 1.0, math.pi]),
              6, np.array([grid_size, grid_size, grid_size, grid_size, grid_size, grid_size]), [2, 5])
 process = psutil.Process(os.getpid())
@@ -63,8 +63,7 @@ process = psutil.Process(os.getpid())
 print("2. Gigabytes consumed of the avoid_set {}".format(process.memory_info().rss/1e9))  # in bytes
 
 ### 3.2 Reach set
-goal1_destination = ShapeRectangle(grids, [0.6, 0.1, -1000, -1000, -1000, -1000],
-                                [0.8, 0.3, 1000, 1000, 1000, 1000])  # a1 is at goal
+goal1_destination = ShapeRectangle(grids, [0.6, 0.1, -1000, -1000, -1000, -1000], [0.8, 0.3, 1000, 1000, 1000, 1000])  # a1 is at goal
 goal2_escape = agents_1vs1.capture_set(grids, 0.30, "escape")  # a1 is 0.05 away from defender
 a_win = np.maximum(goal1_destination, goal2_escape)
 a_win = np.array(a_win, dtype='float32')
@@ -81,7 +80,7 @@ del obs1_d
 reach_set = np.minimum(a_win, d_lose) # original
 reach_set = np.array(reach_set, dtype='float32')
 del a_win
-del d_lose
+# del d_lose
 process = psutil.Process(os.getpid())
 print("3. Gigabytes consumed of the reach_set {}".format(process.memory_info().rss/1e9))  # in bytes
 
@@ -103,28 +102,28 @@ solve_start_time = time.time()
 
 
 # Before computation test
-# initial_attacker = np.array([[0.0, 0.0, math.pi/2]])
-# initial_defender = np.array([[-0.5, 0.0, 0.0]])
-# target = np.maximum(reach_set, -avoid_set)
-# plot_value_1vs1_dub(initial_attacker, initial_defender, 0, 0, 1, capture_a, grids)
+initial_attacker = np.array([[0.0, 0.0, math.pi/2]])
+initial_defender = np.array([[-0.4, 0.4, 0.0]])
+target = np.maximum(reach_set, -avoid_set)
+plot_value_1vs1_dub(initial_attacker, initial_defender, 0, 0, 1, target, grids)
 
-accuracy = "medium"
-result = HJSolver(agents_1vs1, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=None, accuracy=accuracy) # original one
-process = psutil.Process(os.getpid())
-print(f"The CPU memory used during the calculation of the value function is {process.memory_info().rss/1e9: .2f} GB.")  # in bytes
+# accuracy = "medium"
+# result = HJSolver(agents_1vs1, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=None, accuracy=accuracy) # original one
+# process = psutil.Process(os.getpid())
+# print(f"The CPU memory used during the calculation of the value function is {process.memory_info().rss/1e9: .2f} GB.")  # in bytes
 
-solve_end_time = time.time()
-print(f'The shape of the value function is {result.shape} \n')
-print(f"The size of the value function is {result.nbytes / 1e9: .2f} GB or {result.nbytes/(1e6)} MB.")
-print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
-print(f'The shape of the value function is {result.shape} \n')
+# solve_end_time = time.time()
+# print(f'The shape of the value function is {result.shape} \n')
+# print(f"The size of the value function is {result.nbytes / 1e9: .2f} GB or {result.nbytes/(1e6)} MB.")
+# print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
+# print(f'The shape of the value function is {result.shape} \n')
 
-# 6. Save the value function
-np.save(f'MRAG/values/DubinCar1vs1_grid{grid_size}_{accuracy}_{angularv}angularv.npy', result)
+# # 6. Save the value function
+# np.save(f'MRAG/values/DubinCar1vs1_grid{grid_size}_{accuracy}_{angularv}angularv.npy', result)
 
 
-print(f"The value function has been saved successfully.")
+# print(f"The value function has been saved successfully.")
 
-# Record the time of whole process
-end_time = time.time()
-print(f"The time of whole process is {end_time - start_time} seconds.")
+# # Record the time of whole process
+# end_time = time.time()
+# print(f"The time of whole process is {end_time - start_time} seconds.")
