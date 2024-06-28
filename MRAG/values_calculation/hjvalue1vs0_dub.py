@@ -11,6 +11,8 @@ from MRAG.envs.DubinCars import DubinCar1vs0
 from odp.Plots import PlotOptions
 from odp.Plots.plotting_utilities import plot_isosurface, plot_valuefunction
 from odp.solver import HJSolver
+from MRAG.plots_dub import plot_value_1vs0_dub_debug
+
 
 """ USER INTERFACES
 - 1. Initialize the grids
@@ -25,8 +27,8 @@ from odp.solver import HJSolver
 start_time = time.time()
 
 # 1. Initialize the grids
-grid_size = 100
-grid_size_theta = 200
+grid_size = 50
+grid_size_theta = 100
 grids = Grid(np.array([-1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi]), 3, np.array([grid_size, grid_size, grid_size_theta]), [2])
 
 # 2. Initialize the dynamics
@@ -50,7 +52,7 @@ del obs2_a
 reach_set = ShapeRectangle(grids, [0.6, 0.1, -1000], [0.8, 0.3, 1000]) 
 
 # 4. Set the look-back length and time step
-lookback_length = 8.0 
+lookback_length = 12.0 
 t_step = 0.025
 
 # Actual calculation process, needs to add new plot function to draw a 2D figure
@@ -58,16 +60,19 @@ small_number = 1e-5
 tau = np.arange(start=0, stop=lookback_length + small_number, step=t_step)
 
 # while plotting make sure the len(slicesCut) + len(plotDims) = grid.dims
-po = PlotOptions(do_plot=True, plot_type="set", plotDims=[0, 1, 2], slicesCut=[])
+po = PlotOptions(do_plot=False, plot_type="set", plotDims=[0, 1, 2], slicesCut=[])
 
 # 5. Call HJSolver function
 compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithObstacle"}
 # compMethods = {"TargetSetMode": "minVWithVTarget"}
 solve_start_time = time.time()
 
+# # Before computation test
+# initial_attacker = np.array([[0.0, 0.0, math.pi/2]])
+# target = np.maximum(reach_set, -avoid_set)
+# plot_value_1vs0_dub_debug(initial_attacker, avoid_set, grids)
 accuracy = "medium"
 result = HJSolver(agents_1vs0, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=True, accuracy=accuracy)
-# result = HJSolver(my_2agents, g, avoid_set, tau, compMethods, po, saveAllTimeSteps=True)
 process = psutil.Process(os.getpid())
 print(f"The CPU memory used during the calculation of the value function is {process.memory_info().rss/1e9: .2f} GB.")  # in bytes
 

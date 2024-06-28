@@ -84,14 +84,20 @@ class BaseGameEnv(gym.Env):
         """
         #### Set attackers and defenders ##########################
         self.attackers = make_agents(self.ATTACKER_PHYSICS, self.NUM_ATTACKERS, self.init_attackers, self.CTRL_FREQ)
-        self.defenders = make_agents(self.DEFENDER_PHYSICS, self.NUM_DEFENDERS, self.init_defenders, self.CTRL_FREQ)
+        if self.NUM_DEFENDERS != 0:
+            self.defenders = make_agents(self.DEFENDER_PHYSICS, self.NUM_DEFENDERS, self.init_defenders, self.CTRL_FREQ)
+            self.defenders_traj = []
+            self.defenders_actions = []
+        else:
+            self.defenders = make_agents(self.DEFENDER_PHYSICS, 1, np.zeros((1, 3)), self.CTRL_FREQ)
+            self.defenders_traj = None
         #### Initialize/reset counters, players' trajectories and attackers status ###
         self.step_counter = 0
         self.attackers_traj = []
-        self.defenders_traj = []
+        # self.defenders_traj = []
         self.attackers_status = []  # 0 stands for free, -1 stands for captured, 1 stands for arrived 
         self.attackers_actions = []
-        self.defenders_actions = []
+        # self.defenders_actions = []
 
 
     def _updateAndLog(self):
@@ -99,11 +105,16 @@ class BaseGameEnv(gym.Env):
 
         """
         # Update the state
-        self.state = np.vstack([self.attackers._get_state().copy(), self.defenders._get_state().copy()])
-        # Log the state and trajectory information
-        self.attackers_traj.append(self.attackers._get_state().copy())
-        self.defenders_traj.append(self.defenders._get_state().copy())
-        self.attackers_status.append(self._getAttackersStatus().copy())
+        if self.NUM_DEFENDERS == 0:
+            self.state = self.attackers._get_state().copy()
+            self.attackers_traj.append(self.attackers._get_state().copy())
+            self.attackers_status.append(self._getAttackersStatus().copy())
+        else:
+            self.state = np.vstack([self.attackers._get_state().copy(), self.defenders._get_state().copy()])
+            # Log the state and trajectory information
+            self.attackers_traj.append(self.attackers._get_state().copy())
+            self.defenders_traj.append(self.defenders._get_state().copy())
+            self.attackers_status.append(self._getAttackersStatus().copy())
     
 
     def reset(self, seed : int = None):
@@ -172,9 +183,13 @@ class BaseGameEnv(gym.Env):
         
         action = action.copy()
         attackers_action = action[:self.NUM_ATTACKERS]  # ndarray, shape (num_attackers, dim_action)
-        defenders_action = action[-self.NUM_DEFENDERS:]  # ndarray, shape (num_defenders, dim_action)
         self.attackers.step(attackers_action)
-        self.defenders.step(defenders_action)
+        if self.NUM_DEFENDERS == 0:
+            defenders_action = None
+        else:
+            defenders_action = action[-self.NUM_DEFENDERS:]  # ndarray, shape (num_defenders, dim_action)
+            self.defenders.step(defenders_action)
+            self.defenders_actions.append(defenders_action)
         #### Update and all players' information #####
         self._updateAndLog()
         #### Prepare the return values #############################
@@ -188,7 +203,6 @@ class BaseGameEnv(gym.Env):
         self.step_counter += 1
         #### Log the actions taken by the attackers and defenders ################
         self.attackers_actions.append(attackers_action)
-        self.defenders_actions.append(defenders_action)
         
         return obs, reward, terminated, truncated, info
     

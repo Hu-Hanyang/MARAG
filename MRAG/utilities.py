@@ -76,7 +76,8 @@ def hj_preparations_dub():
     start = time.time()
     # value1vs0_dub = np.load('MRAG/values/DubinCar1vs0_grid100_medium.npy')
     value1vs0_dub = np.load("MRAG/values/DubinCar1vs0_grid100_medium_1.0angularv.npy")
-    value1vs1_dub = np.load(('MRAG/values/DubinCar1vs1_grid28_medium_1.0angularv.npy'))
+    value1vs1_dub = np.load('MRAG/values/DubinCar1vs1_grid28_medium_1.0angularv.npy')
+    # value1vs1_dub = np.load('MRAG/values/DubinCar1vs1_grid28_medium_1.0angularv_defenderview.npy')
     end = time.time()
     print(f"============= HJ value functions loaded Successfully! (Time: {end-start :.4f} seconds) =============")
     grid_size_1vs0_0 = value1vs0_dub.shape[0]
@@ -423,8 +424,9 @@ def dubin_inital_check(initial_attacker, initial_defender):
         return angle
     
     def normalize_states(states):
-        for state in states:
-            state[2] = normalize_angle(state[2])
+        if states is not None:
+            for state in states:
+                state[2] = normalize_angle(state[2])
         return states
     
     initial_attacker = normalize_states(initial_attacker)

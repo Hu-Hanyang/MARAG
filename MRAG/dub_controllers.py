@@ -72,7 +72,7 @@ def find_sign_change1vs0_dub(grid1vs0, value1vs0, attacker):
 
     Args:
     grid1vs0 (class): the instance of grid
-    value1vs0 (ndarray): including all the time slices, shape = [100, 100, 200, len(tau)]
+    value1vs0 (ndarray): including all the time slices, shape = [100, 100, 100, len(tau)]
     attacker (ndarray, (dim,)): the current state of one attacker
     """
     current_slices = grid1vs0.get_index(attacker)

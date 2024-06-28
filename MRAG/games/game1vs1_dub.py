@@ -4,8 +4,7 @@ from MRAG.envs.DubinCars import DubinCar1vs0, DubinCar1vs1
 from MRAG.solvers import mip_solver, extend_mip_solver
 from MRAG.utilities import *
 from MRAG.dub_controllers import hj_contoller_attackers_dub, hj_contoller_defenders_dub_1vs1
-from MRAG.plots_dub import check_current_value_dub, plot_value_1vs1_dub
-from MRAG.plots import animation
+from MRAG.plots_dub import check_current_value_dub, plot_value_1vs1_dub, animation_dub
 
 #TODO: The 1vs1 value function is wrong, need to recompute it
 #### Game Settings ####
@@ -13,11 +12,12 @@ value1vs0_dub, grid1vs0_dub, value1vs1_dub, grid1vs1_dub = hj_preparations_dub()
 
 num_attackers = 1
 num_defenders = 1
-# initial_attacker = np.array([[-0.2, 0.2, 0.0]])
-# initial_defender = np.array([[0.2, 0.0, 0.0]])
-#TODO The value function is not correct: the defender crossed the obstacles
+# #TODO The value function is not correct: the defender crossed the obstacles
+# initial_attacker = np.array([[-0.4, -0.5, math.pi/2]])
+# initial_defender = np.array([[0.2, 0.0, math.pi]])  
+# Random test
 initial_attacker = np.array([[-0.4, -0.5, math.pi/2]])
-initial_defender = np.array([[0.2, 0.0, math.pi]])  # 
+initial_defender = np.array([[0.2, 0.0, -math.pi]])  
 
 initial_attacker, initial_defender = dubin_inital_check(initial_attacker, initial_defender)
 print(f"The initial attacker states are {initial_attacker}, and the initial defender states are {initial_defender}.")
@@ -65,7 +65,7 @@ for step in range(total_steps):
     
     obs, reward, terminated, truncated, info = game.step(np.vstack((control_attackers, control_defenders)))
 
-    print(f"Step {step}: the current value function is {check_current_value_dub(game.attackers.state, game.defenders.state, value1vs1_dub, grid1vs1_dub)}. ")
+    # print(f"Step {step}: the current value function is {check_current_value_dub(game.attackers.state, game.defenders.state, value1vs1_dub, grid1vs1_dub)}. ")
     
     if terminated or truncated:
         break
@@ -74,7 +74,7 @@ print(f"================ The game is over at the {step} step ({step / ctrl_freq}
 current_status_check(game.attackers_status[-1], step)
 
 #### Animation ####
-animation(game.attackers_traj, game.defenders_traj, game.attackers_status)
+animation_dub(game.attackers_traj, game.defenders_traj, game.attackers_status)
 # print(f"The number of value1vs0_counter is {value1vs0_counter}, and the number of value1vs1_counter is {value1vs1_counter}. \n")
 # print(f"The controller usage is {controller_usage}.")
 
