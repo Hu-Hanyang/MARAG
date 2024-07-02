@@ -85,7 +85,7 @@ class DubinCarGameEnv(BaseRLGameEnv):
 
     
     def _getAttackersStatus(self):
-        """Returns the current status of all attackers.
+        """Returns the current status of all attackers: 0 for free, 1 for arrived, -1 for captured, -2 for stuck in obs.
 
         Returns
             ndarray, shape (num_attackers,)
@@ -107,9 +107,9 @@ class DubinCarGameEnv(BaseRLGameEnv):
                     if self._check_area(current_attacker_state[num], self.des):
                         new_status[num] = 1
                     # # check if the attacker gets stuck in the obstacles this time (it won't usually)
-                    # elif self._check_area(current_attacker_state[num], self.obstacles):
-                    #     new_status[num] = -1
-                    #     break
+                    elif self._check_area(current_attacker_state[num], self.obstacles):
+                        new_status[num] = -2
+                        continue
                     else:
                         # check if the attacker is captured
                         for j in range(self.NUM_DEFENDERS):
@@ -173,9 +173,14 @@ class DubinCarGameEnv(BaseRLGameEnv):
             Whether the current episode is done.
 
         """
-        
+        # check the status of the attackers
         current_attacker_status = self.attackers_status[-1]
-        done = np.all((current_attacker_status == 1) | (current_attacker_status == -1))
+        attacker_done = np.all((current_attacker_status == 1) | (current_attacker_status == -1)) | (current_attacker_status == -2)
+        # check the status of the defenders
+        current_defender_state = self.defenders._get_state().copy()
+        defender_done = self._check_area(current_defender_state[0], self.obstacles)
+        # summary
+        done = attacker_done or defender_done
         
         return done
         
@@ -340,7 +345,7 @@ class DubinCar1vs0(DubinCarGameEnv):
         d2 = hcl.scalar(0, "d2")
         d3 = hcl.scalar(0, "d3")
 
-        return (opt_d, d2[0], d3[0])
+        return (opt_d[0], d2[0], d3[0])
     
 
     def optCtrl_1vs0(self, spat_deriv):

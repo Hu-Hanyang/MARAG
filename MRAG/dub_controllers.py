@@ -3,7 +3,7 @@
 '''
 import numpy as np
 
-from MRAG.plots_dub import po2slice1vs0_dub
+from MRAG.plots_dub import po2slice1vs0_dub, plot_value_1vs0_dub
 
 
 def spa_deriv(slice_index, value_function, grid, periodic_dims=[]):

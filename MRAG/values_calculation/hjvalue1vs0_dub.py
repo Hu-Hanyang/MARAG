@@ -27,8 +27,8 @@ from MRAG.plots_dub import plot_value_1vs0_dub_debug
 start_time = time.time()
 
 # 1. Initialize the grids
-grid_size = 50
-grid_size_theta = 100
+grid_size = 200
+grid_size_theta = 200
 grids = Grid(np.array([-1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi]), 3, np.array([grid_size, grid_size, grid_size_theta]), [2])
 
 # 2. Initialize the dynamics
@@ -70,7 +70,8 @@ solve_start_time = time.time()
 # # Before computation test
 # initial_attacker = np.array([[0.0, 0.0, math.pi/2]])
 # target = np.maximum(reach_set, -avoid_set)
-# plot_value_1vs0_dub_debug(initial_attacker, avoid_set, grids)
+# plot_value_1vs0_dub_debug(initial_attacker, target, grids)
+
 accuracy = "medium"
 result = HJSolver(agents_1vs0, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=True, accuracy=accuracy)
 process = psutil.Process(os.getpid())

@@ -202,8 +202,7 @@ def plot_value_1vs1_dub(attackers, defenders, plot_attacker, plot_defender, fix_
     print("Please check the plot on your browser.")
 
 
-
-def plot_value_1vs0_dub(attackers, value1vs0_dub, grid1vs0_dub):
+def plot_value_1vs0_dub(attackers, value1vs0_dub, grid1vs0_dub, slice=0):
     """Plot the value function of the game.
 
     Args:
@@ -219,7 +218,7 @@ def plot_value_1vs0_dub(attackers, value1vs0_dub, grid1vs0_dub):
     """
     a1x_slice, a1y_slice, a1o_slice = grid1vs0_dub.get_index(attackers[0])
 
-    value_function1vs1 = value1vs0_dub[:, :, a1o_slice, 0]
+    value_function1vs1 = value1vs0_dub[:, :, a1o_slice, slice]
     dims_plot = [0, 1]
     dim1, dim2 = dims_plot[0], dims_plot[1]
     
@@ -348,6 +347,130 @@ def plot_value_1vs0_dub_debug(attackers, value1vs0_dub, grid1vs0_dub):
     print("Please check the plot on your browser.")
 
 
+def animation_dub_original(attackers_traj, defenders_traj, attackers_status):
+    """Animate the game.
+
+    Args:
+        attackers_traj (list): List of attackers' trajectories.
+        defenders_traj (list): List of defenders' trajectories.
+        attackers_status (list): List of attackers' status.
+
+    Returns:
+        None
+    """
+    # Determine the number of steps
+    num_steps = len(attackers_traj)
+    num_attackers = attackers_traj[0].shape[0]
+    if defenders_traj is not None:
+        num_defenders = defenders_traj[0].shape[0]
+
+    # Create frames for animation
+    frames = []
+    arrow_length = 0.1  # Length of the arrow indicating direction
+
+    def calculate_arrow_end(x, y, heading):
+        end_x = x + arrow_length * np.cos(heading)
+        end_y = y + arrow_length * np.sin(heading)
+        return end_x, end_y
+    
+    
+    # Static object - obstacles, goal region, grid
+    fig = go.Figure(data=go.Scatter(x=[0.6, 0.8], y=[0.1, 0.1], mode='lines', name='Target', line=dict(color='purple')),
+        layout=Layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            updatemenus=[dict(type="buttons",
+                              buttons=[dict(label="Play", method="animate",
+                                            args=[None, {"frame": {"duration": 30, "redraw": True},
+                                                         "fromcurrent": True, "transition": {"duration": 0}}])])]))
+
+    for step in range(num_steps):
+        attackers = attackers_traj[step]
+        if defenders_traj is not None:
+            defenders = defenders_traj[step]
+        status = attackers_status[step]
+
+        x_list = []
+        y_list = []
+        symbol_list = []
+        color_list = []
+        lines = []
+        test_lines_x = []
+        test_lines_y = []
+
+        # Go through list of defenders
+        if defenders_traj is not None:
+            for j in range(num_defenders):
+                x_list.append(defenders[j][0])
+                y_list.append(defenders[j][1])
+                symbol_list += ["square"]
+                color_list += ["blue"]
+
+                # Calculate defender arrow end point
+                defender_end_x, defender_end_y = calculate_arrow_end(defenders[j][0], defenders[j][1], defenders[j][2])
+                lines.append(go.Scatter(x=[defenders[j][0], defender_end_x], y=[defenders[j][1], defender_end_y], mode='lines', line=dict(color='blue'), showlegend=False))
+                # test_lines_x.append([defenders[j][0], end_x])
+                # test_lines_y.append([defenders[j][1], end_y])
+
+        # Go through list of attackers
+        for i in range(num_attackers):
+            x_list.append(attackers[i][0])
+            y_list.append(attackers[i][1])
+            if status[i] == -1:  # attacker is captured
+                symbol_list += ["cross-open"]
+            elif status[i] == 1:  # attacker has arrived
+                symbol_list += ["circle"]
+            else:  # attacker is free
+                symbol_list += ["triangle-up"]
+            color_list += ["red"]
+
+            # Calculate attacker arrow end point
+            attacker_end_x, attacker_end_y = calculate_arrow_end(attackers[i][0], attackers[i][1], attackers[i][2])
+            lines.append(go.Scatter(x=[attackers[i][0], attacker_end_x], y=[attackers[i][1], attacker_end_y], mode='lines', line=dict(color='red'), showlegend=False))
+            # test_lines_x.append([attackers[i][0], attacker_end_x])
+            # test_lines_y.append([attackers[i][1], attacker_end_y])
+            
+        # # Generate a frame based on the characteristic of each agent
+        # frames.append(go.Frame(data=[go.Scatter(x=x_list, y=y_list, mode="markers", name="Agents trajectory",
+        #                marker=dict(symbol=symbol_list, size=10, color=color_list), showlegend=False)] + lines, traces=[0, 1]))
+        
+        # frames.append([go.Frame(data=[go.Scatter(x=[attackers[i][0], attacker_end_x], y=[attackers[i][1], attacker_end_y], mode='lines', line=dict(color='red'), showlegend=False),
+        #                        go.Scatter(x=[defenders[j][0], defender_end_x], y=[defenders[j][1], defender_end_y], mode='lines', line=dict(color='blue'), showlegend=False)],traces=[0, 1, 2]),
+        #                go.Scatter(x=x_list, y=y_list, mode="markers", name="Agents trajectory",marker=dict(symbol=symbol_list, size=10, color=color_list), showlegend=False)])
+        #                     #    go.Scatter(x=[defender_end_x], y=[defender_end_y], mode='markers', line=dict(color='green'), showlegend=False)],
+                               
+        # frames.append([go.Frame(data=[go.Scatter(x=[attackers[i][0], attacker_end_x], y=[attackers[i][1], attacker_end_y], mode='lines', line=dict(color='red'), showlegend=False),
+        #                        go.Scatter(x=[defenders[j][0], defender_end_x], y=[defenders[j][1], defender_end_y], mode='lines', line=dict(color='blue'), showlegend=False)],traces=[0, 1, 2]),
+        #                go.Scatter(x=x_list, y=y_list, mode="markers", name="Agents trajectory",marker=dict(symbol=symbol_list, size=10, color=color_list), showlegend=False)])
+        #                     #    go.Scatter(x=[defender_end_x], y=[defender_end_y], mode='markers', line=dict(color='green'), showlegend=False)],
+                            
+        # frames.append(go.Frame(data=[go.Scatter(x=x_list, y=y_list, mode="markers", name="Agents trajectory",
+        #                marker=dict(symbol=symbol_list, size=10, color=color_list), showlegend=False)] + lines, traces=[0, 1]))
+        
+        
+        
+        frames.append(go.Frame(data=[go.Scatter(x=x_list, y=y_list, mode="markers", name="Agents trajectory",marker=dict(symbol=symbol_list, size=10, color=color_list), showlegend=False), 
+                                     go.Scatter(x=[attackers[i][0], attacker_end_x], y=[attackers[i][1], attacker_end_y], mode='lines', line=dict(color='red'), showlegend=False), 
+                                     go.Scatter(x=[defenders[j][0], defender_end_x], y=[defenders[j][1], defender_end_y], mode='lines+markers', line=dict(color='blue'), showlegend=False)], 
+                               traces=[0, 1, 2]))
+
+
+    fig.update(frames=frames)
+    # plot target
+    fig.add_shape(type='rect', x0=0.6, y0=0.1, x1=0.8, y1=0.3, line=dict(color='purple', width=3.0), name="Target")
+    # plot obstacles
+    fig.add_shape(type='rect', x0=-0.1, y0=0.3, x1=0.1, y1=0.6, line=dict(color='black', width=3.0), name="Obstacle")
+    fig.add_shape(type='rect', x0=-0.1, y0=-1.0, x1=0.1, y1=-0.3, line=dict(color='black', width=3.0))
+    fig.add_trace(go.Scatter(x=[-0.1, 0.1], y=[0.3, 0.3], mode='lines', name='Obstacle', line=dict(color='black')))
+
+    # figure settings
+    fig.update_layout(autosize=False, width=560, height=500, margin=dict(l=50, r=150, b=100, t=100, pad=0),
+                      title={'text': "<b>Game recording, t={}s<b>".format(num_steps / 200), 'y': 0.85, 'x': 0.4, 'xanchor': 'center', 'yanchor': 'top', 'font_size': 20}, paper_bgcolor="White", xaxis_range=[-1.0, 1.0], yaxis_range=[-1.0, 1.0], font=dict(size=20))
+    fig.update_xaxes(showline=True, linecolor='black', linewidth=2.0, griddash='dot', zeroline=False, gridcolor='Lightgrey', mirror=True, ticks='outside')  # showgrid=False
+    fig.update_yaxes(showline=True, linecolor='black', linewidth=2.0, griddash='dot', zeroline=False, gridcolor='Lightgrey', mirror=True, ticks='outside')  # showgrid=False,
+    fig.show()
+
+
+
 def animation_dub(attackers_traj, defenders_traj, attackers_status):
     """Animate the game.
 
@@ -380,56 +503,58 @@ def animation_dub(attackers_traj, defenders_traj, attackers_status):
             defenders = defenders_traj[step]
         status = attackers_status[step]
 
-        x_list = []
-        y_list = []
-        symbol_list = []
-        color_list = []
-        lines = []
+        attacker_x_list = []
+        attcker_y_list = []
+        attacker_symbol_list = []
+        attacker_color_list = []
+        defender_x_list = []
+        defender_y_list = []
+        defender_symbol_list = []
+        defender_color_list = []
 
         # Go through list of defenders
         if defenders_traj is not None:
             for j in range(num_defenders):
-                x_list.append(defenders[j][0])
-                y_list.append(defenders[j][1])
-                symbol_list += ["square"]
-                color_list += ["blue"]
+                defender_x_list.append(defenders[j][0])
+                defender_y_list.append(defenders[j][1])
+                defender_symbol_list += ["square"]
+                defender_color_list += ["blue"]
 
                 # Calculate defender arrow end point
-                end_x, end_y = calculate_arrow_end(defenders[j][0], defenders[j][1], defenders[j][2])
-                lines.append(go.Scatter(x=[defenders[j][0], end_x], y=[defenders[j][1], end_y], mode='lines', line=dict(color='blue'), showlegend=False))
+                defender_end_x, defender_end_y = calculate_arrow_end(defenders[j][0], defenders[j][1], defenders[j][2])
+                defender_x_list.append(defender_end_x)
+                defender_y_list.append(defender_end_y)
+                defender_symbol_list += ["line-ns"]
 
         # Go through list of attackers
         for i in range(num_attackers):
-            x_list.append(attackers[i][0])
-            y_list.append(attackers[i][1])
+            attacker_x_list.append(attackers[i][0])
+            attcker_y_list.append(attackers[i][1])
             if status[i] == -1:  # attacker is captured
-                symbol_list += ["cross-open"]
+                attacker_symbol_list += ["cross-open"]
             elif status[i] == 1:  # attacker has arrived
-                symbol_list += ["circle"]
+                attacker_symbol_list += ["circle"]
             else:  # attacker is free
-                symbol_list += ["triangle-up"]
-            color_list += ["red"]
+                attacker_symbol_list += ["triangle-up"]
+            attacker_color_list += ["red"]
 
             # Calculate attacker arrow end point
             attacker_end_x, attacker_end_y = calculate_arrow_end(attackers[i][0], attackers[i][1], attackers[i][2])
-            lines.append(go.Scatter(x=[attackers[i][0], attacker_end_x], y=[attackers[i][1], attacker_end_y], mode='lines', line=dict(color='red'), showlegend=False))
-            
-        # Generate a frame based on the characteristic of each agent
-        frames.append(go.Frame(data=[go.Scatter(x=x_list, y=y_list, mode="markers", name="Agents trajectory",
-                       marker=dict(symbol=symbol_list, size=10, color=color_list), showlegend=False)] + lines))
+            attacker_x_list.append(attacker_end_x)
+            attcker_y_list.append(attacker_end_y)
+            attacker_symbol_list += ["line-ns"]
+        
+        frames.append(go.Frame(data=[go.Scatter(x=attacker_x_list, y=attcker_y_list, mode="markers+lines", line=dict(color="red"), name="Attacker trajectory", marker=dict(symbol=attacker_symbol_list, size=10, color=attacker_color_list), showlegend=False), 
+                                     go.Scatter(x=defender_x_list, y=defender_y_list, mode="markers+lines", line=dict(color="blue"), name="Defender trajectory", marker=dict(symbol=defender_symbol_list, size=10, color=defender_color_list), showlegend=False)], 
+                               traces=[0, 1]))
 
     # Static object - obstacles, goal region, grid
-    fig = go.Figure(
-        data=go.Scatter(x=[0.6, 0.8], y=[0.1, 0.1], mode='lines', name='Target', line=dict(color='purple')),
-        layout=Layout(
-            plot_bgcolor='rgba(0,0,0,0)',
-            updatemenus=[dict(type="buttons",
-                              buttons=[dict(label="Play", method="animate",
-                                            args=[None, {"frame": {"duration": 30, "redraw": True},
-                                                         "fromcurrent": True, "transition": {"duration": 0}}])])]),
-        frames=frames
-    )
-
+    fig = go.Figure(data=go.Scatter(x=[0.6, 0.8], y=[0.1, 0.1], 
+                                    mode='lines', name='Target', 
+                                    line=dict(color='purple')), 
+                    layout=Layout(plot_bgcolor='rgba(0,0,0,0)', 
+                                  updatemenus=[dict(type="buttons", buttons=[dict(label="Play", method="animate", args=[None, {"frame": {"duration": 30, "redraw": True}, "fromcurrent": True, "transition": {"duration": 0}}])])]))
+    fig.update(frames=frames)
     # plot target
     fig.add_shape(type='rect', x0=0.6, y0=0.1, x1=0.8, y1=0.3, line=dict(color='purple', width=3.0), name="Target")
     # plot obstacles
@@ -443,4 +568,3 @@ def animation_dub(attackers_traj, defenders_traj, attackers_status):
     fig.update_xaxes(showline=True, linecolor='black', linewidth=2.0, griddash='dot', zeroline=False, gridcolor='Lightgrey', mirror=True, ticks='outside')  # showgrid=False
     fig.update_yaxes(showline=True, linecolor='black', linewidth=2.0, griddash='dot', zeroline=False, gridcolor='Lightgrey', mirror=True, ticks='outside')  # showgrid=False,
     fig.show()
-

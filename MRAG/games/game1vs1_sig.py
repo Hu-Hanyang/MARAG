@@ -11,8 +11,10 @@ from MRAG.plots import animation, plot_value_1vs1_sig
 value1vs0, value1vs1, value2vs1, value1vs2, grid1vs0, grid1vs1, grid2vs1, grid1vs2  = hj_preparations_sig()
 num_attackers = 1
 num_defenders = 1
-initial_attacker = np.array([[-0.4, -0.8]])
-initial_defender = np.array([[0.3, -0.8]])
+# initial_attacker = np.array([[-0.4, -0.8]])
+# initial_defender = np.array([[0.3, -0.8]])
+initial_attacker = np.array([[-0.5, 0.8]])
+initial_defender = np.array([[0.3, -0.3]])
 # initial_attacker = np.array([[0.4, 0.0]])
 # initial_defender = np.array([[0.3, -0.8]]) 
 assert num_attackers == initial_attacker.shape[0], "The number of attackers should be equal to the number of initial attacker states."

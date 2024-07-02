@@ -38,7 +38,6 @@ class DubinsCar(BaseDynamics):
 
 
     def forward(self, state, action):
-        #TODO: Hanyang: check the correctness of the Runge Kutta method
         """Update and return the next state of one agent with the action based on the Runge Kutta method.
                 
         Args:
@@ -62,9 +61,9 @@ class DubinsCar(BaseDynamics):
         k3_x, k3_y, k3_theta = k3
         k4 = self._dynamics((x+dt*k3_x, y+dt*k3_y, theta+dt*k3_theta), action)
 
-        next_state = (x + dt/6*(k1_x + 2*k2_x + 2*k3_x + k4[0]),
-                               y + dt/6*(k1_y + 2*k2_y + 2*k3_y + k4[1]),
-                               theta + dt/6*(k1_theta + 2*k2_theta + 2*k3_theta + k4[2]))
+        next_state = (x + dt/6*(k1_x + 2*k2_x + 2*k3_x + k4[0]), 
+                      y + dt/6*(k1_y + 2*k2_y + 2*k3_y + k4[1]),
+                      theta + dt/6*(k1_theta + 2*k2_theta + 2*k3_theta + k4[2]))
         
 
         # # Forward-Euler method
