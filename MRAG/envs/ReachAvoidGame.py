@@ -72,7 +72,8 @@ class ReachAvoidGameEnv(BaseRLGameEnv):
         assert map is not None, "Map must be provided in the game."
         assert des is not None, "Destination must be provided in the game."
         assert initial_attacker is not None, "Initial attacker must be provided in the game."
-        assert initial_defender is not None, "Initial defender must be provided in the game."
+        if num_defenders > 0:
+            assert initial_defender is not None, "Initial defender must be provided in the game."
         
         self.map = map
         self.des = des

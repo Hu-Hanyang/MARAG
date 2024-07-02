@@ -27,7 +27,7 @@ class AttackerDefender1vs0(ReachAvoidGameEnv):
         
         if initial_attacker is None:
             initial_attacker = np.zeros((num_attackers, 2))
-        if initial_defender is None:
+        if initial_defender is None and num_defenders > 0:
             initial_defender = np.zeros((num_defenders, 2))
 
         super().__init__(num_attackers=num_attackers,
@@ -39,7 +39,10 @@ class AttackerDefender1vs0(ReachAvoidGameEnv):
                          uMode=uMode, dMode=dMode,
                          ctrl_freq=ctrl_freq)
         
-        self.x = np.vstack((initial_attacker, initial_defender))
+        if num_defenders == 0:
+            self.x = initial_attacker
+        else:
+            self.x = np.vstack((initial_attacker, initial_defender))
 
         self.uMax = uMax
         self.dMax = dMax

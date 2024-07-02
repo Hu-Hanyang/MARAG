@@ -13,7 +13,7 @@ num_attackers = 1
 num_defenders = 0
 # TODO np.array([[0.5, 0.0, -math.pi]]), np.array([[0.6, 0.0, math.pi]]) the attacker crosses the obstacles
 # initial_attacker = np.array([[0.5, 0.0, -math.pi]]) 
-initial_attacker = np.array([[-0.5, -0.5, math.pi/2]])
+initial_attacker = np.array([[0.6, 0.0, math.pi]])  #  np.array([[-0.5, -0.5, math.pi/2]])
 initial_defender = None #  np.array([[-0.8, 0.8, 0.0]])
 
 initial_attacker, initial_defender = dubin_inital_check(initial_attacker, initial_defender)
@@ -54,7 +54,7 @@ for step in range(total_steps):
     # current_value = value1vs1[current_state_slice]
     
     current_value = check_current_value_dub(game.attackers.state, game.defenders.state, value1vs0_dub[..., 0], grid1vs0_dub)
-    # print(f"Step {step}: the current 1vs0 value function is {current_value}. ")
+    print(f"Step {step}: the current 1vs0 value function is {current_value}. ")
     
     # if value_functions_logs[-1] != current_value:
     #     value_functions_logs.append(current_value)
@@ -66,7 +66,6 @@ for step in range(total_steps):
     
     control_attackers = hj_contoller_attackers_dub(game, value1vs0_dub, grid1vs0_dub)
     
-    last_control = control_attackers
     # print(f"The shape of control_attackers is {control_attackers.shape}.")
     # #     value1vs0_counter += 1
     # #     controller_usage.append(0)
@@ -81,6 +80,7 @@ for step in range(total_steps):
     
     obs, reward, terminated, truncated, info = game.step(control_attackers)
     # print(f"The current value of the current state is {check_current_value_dub(game.attackers.state, game.defenders.state, value1vs0_dub[..., 0], grid1vs0_dub)}")
+    last_control = control_attackers
     
     if terminated or truncated:
         break

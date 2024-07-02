@@ -251,13 +251,15 @@ def animation(attackers_traj, defenders_traj, attackers_status):
     # Determine the number of steps
     num_steps = len(attackers_traj)
     num_attackers = attackers_traj[0].shape[0]
-    num_defenders = defenders_traj[0].shape[0]
+    if defenders_traj is not None:
+        num_defenders = defenders_traj[0].shape[0]
 
     # Create frames for animation
     frames = []
     for step in range(num_steps):
         attackers = attackers_traj[step]
-        defenders = defenders_traj[step]
+        if defenders_traj is not None:
+            defenders = defenders_traj[step]
         status = attackers_status[step]
 
         x_list = []
@@ -266,11 +268,12 @@ def animation(attackers_traj, defenders_traj, attackers_status):
         color_list = []
 
         # Go through list defenders
-        for j in range(num_defenders):
-            x_list.append(defenders[j][0])
-            y_list.append(defenders[j][1])
-            symbol_list += ["square"]
-            color_list += ["blue"]
+        if defenders_traj is not None:
+            for j in range(num_defenders):
+                x_list.append(defenders[j][0])
+                y_list.append(defenders[j][1])
+                symbol_list += ["square"]
+                color_list += ["blue"]
         
         # Go through list of attackers
         for i in range(num_attackers):

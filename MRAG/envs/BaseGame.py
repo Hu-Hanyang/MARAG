@@ -89,7 +89,10 @@ class BaseGameEnv(gym.Env):
             self.defenders_traj = []
             self.defenders_actions = []
         else:
-            self.defenders = make_agents(self.DEFENDER_PHYSICS, 1, np.zeros((1, 3)), self.CTRL_FREQ)
+            if self.DEFENDER_PHYSICS['id'] == 'fsig':
+                self.defenders = make_agents(self.DEFENDER_PHYSICS, 1, np.zeros((1, 2)), self.CTRL_FREQ)
+            else:
+                self.defenders = make_agents(self.DEFENDER_PHYSICS, 1, np.zeros((1, 3)), self.CTRL_FREQ)
             self.defenders_traj = None
         #### Initialize/reset counters, players' trajectories and attackers status ###
         self.step_counter = 0
