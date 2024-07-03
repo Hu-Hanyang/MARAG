@@ -78,16 +78,16 @@ process = psutil.Process(os.getpid())
 print(f"The CPU memory used during the calculation of the value function is {process.memory_info().rss/1e9: .2f} GB.")  # in bytes
 
 solve_end_time = time.time()
-# print(f'The shape of the value function is {result.shape} \n')
-# print(f"The size of the value function is {result.nbytes / 1e9: .2f} GB or {result.nbytes/(1e6)} MB.")
-# print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
-# print(f'The shape of the value function is {result.shape} \n')
+print(f'The shape of the value function is {result.shape} \n')
+print(f"The size of the value function is {result.nbytes / 1e9: .2f} GB or {result.nbytes/(1e6)} MB.")
+print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
+print(f'The shape of the value function is {result.shape} \n')
 
-# # 6. Save the value function
-# np.save(f'MRAG/values/DubinCar1vs0_grid{grid_size}_{accuracy}_{angularv}angularv.npy', result)
+# 6. Save the value function
+np.save(f'MRAG/values/DubinCar1vs0_grid{grid_size}_{accuracy}_{angularv}angularv.npy', result)
 
-# print(f"The value function has been saved successfully.")
+print(f"The value function has been saved successfully.")
 
-# # Record the time of whole process
-# end_time = time.time()
-# print(f"The time of whole process is {end_time - start_time} seconds.")
+# Record the time of whole process
+end_time = time.time()
+print(f"The time of whole process is {end_time - start_time} seconds.")

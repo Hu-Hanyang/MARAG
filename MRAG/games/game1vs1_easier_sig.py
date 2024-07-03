@@ -9,9 +9,9 @@ from MRAG.plots import animation, plot_value_1vs1_sig, record_video
 #### Game Settings ####
 value1vs0, value1vs1, value2vs1, value1vs2, grid1vs0, grid1vs1, grid2vs1, grid1vs2  = hj_preparations_sig()
 
-value1vs1_easier = np.load('MRAG/values/1vs1Defender_easier.npy')
-value1vs1_attacker = np.load('MRAG/values/1vs1Attacker_easier.npy')
-value1vs0_easier = np.load('MRAG/values/1vs0Attacker_easier.npy')
+value1vs1_easier = np.load('/localhome/hha160/projects/safe-control-gym/safe_control_gym/envs/gym_game/values/1vs1Defender_easier.npy')
+value1vs1_attacker = np.load('/localhome/hha160/projects/safe-control-gym/safe_control_gym/envs/gym_game/values/1vs1Attacker_easier.npy')
+value1vs0_easier = np.load('/localhome/hha160/projects/safe-control-gym/safe_control_gym/envs/gym_game/values/1vs0Attacker_easier.npy')
 
 # print(f"================ The shape of the value1vs1_attacker is {value1vs1_easier.shape}. ================")
 num_attackers = 1
