@@ -458,7 +458,7 @@ def optCtrl_1vs0(spat_deriv, uMax, uMode, speed):
     return (opt_a1, opt_a2)
 
 
-def hj_controller_1vs0(uMode, dMode, uMax, speed, value1vs0, grid1vs0, current_states, current_status):
+def hj_controller_1vs0(uMode, dMode, uMax, dMax, a_speed, d_speed, value1vs0, grid1vs0, current_states, current_status):
     """This function computes the control for the attackers based on the control_attackers. 
        Assume dynamics are single integrator.   
 
@@ -482,10 +482,81 @@ def hj_controller_1vs0(uMode, dMode, uMax, speed, value1vs0, grid1vs0, current_s
                     value1vs0 = value1vs0 - current_value
                 v = value1vs0[..., neg2pos] 
                 spat_deriv_vector = spa_deriv(grid1vs0.get_index(attackers[i]), v, grid1vs0)
-                control_attackers[i] = optCtrl_1vs0(spat_deriv_vector, uMax, uMode, speed)
+                control_attackers[i] = optCtrl_1vs0(spat_deriv_vector, uMax, uMode, a_speed)
             else:
                 control_attackers[i] = (0.0, 0.0)
         else:  # the attacker is captured or arrived
             control_attackers[i] = (0.0, 0.0)
             
     return control_attackers
+
+
+def optDistb_1vs1(spat_deriv, uMax, uMode, speed):
+    """Computes the optimal control (disturbance) for the defender in a 1 vs. 1 game.
+    
+    Parameters:
+        spat_deriv (tuple): spatial derivative in all dimensions
+        uMax (float): the maximum control value
+        uMode (str): the control mode
+        speed (float): the speed of the defender
+    
+    Returns:
+        tuple: a tuple of optimal control of the defender (disturbances)
+    """
+    opt_d1 = uMax
+    opt_d2 = uMax
+    deriv3 = spat_deriv[2]
+    deriv4 = spat_deriv[3]
+    distb_len = np.sqrt(deriv3*deriv3 + deriv4*deriv4)
+    if uMode == "max":
+        if distb_len == 0:
+            opt_d1 = 0.0
+            opt_d2 = 0.0
+        else:
+            opt_d1 = speed * deriv3 / distb_len
+            opt_d2 = speed * deriv4 / distb_len
+    else:
+        if distb_len == 0:
+            opt_d1 = 0.0
+            opt_d2 = 0.0
+        else:
+            opt_d1 = -speed * deriv3 / distb_len
+            opt_d2 = -speed * deriv4 / distb_len
+            
+    return (opt_d1, opt_d2)
+
+
+def hj_controller_1vs1_defender(uMode, dMode, uMax, dMax, a_speed, d_speed, value1vs1, grid1vs1, current_states, current_status):
+    """This function computes the control for the defender based on 1 vs. 1 value function. 
+       Assume dynamics are single integrator.   
+
+    Args:
+        game (class): the corresponding ReachAvoidGameEnv instance
+        value1vs0 (np.ndarray): the value function for 1 vs 0 game with all time slices
+        grid1vs0 (Grid): the grid for 1 vs 0 game
+        current_states (a1x, a1y, d1x, d1y): the current joint state of one attacker and one defender
+        current_status (np.ndarray): the current status of attackers
+    """
+    value1vs1s = value1vs1[..., np.newaxis] 
+    spat_deriv_vector = spa_deriv(grid1vs1.get_index(current_states), value1vs1s, grid1vs1)
+    opt_d1, opt_d2 = optDistb_1vs1(spat_deriv_vector, dMax, dMode, d_speed)
+
+    return (opt_d1, opt_d2)
+
+
+def hj_controller_2vs1_defender(uMode, dMode, uMax, dMax, a_speed, d_speed, value2vs1, grid2vs1, current_states, current_status):
+    """This function computes the control for the defender based on 2 vs. 1 value function. 
+       Assume dynamics are single integrator.   
+
+    Args:
+        game (class): the corresponding ReachAvoidGameEnv instance
+        value1vs0 (np.ndarray): the value function for 1 vs 0 game with all time slices
+        grid1vs0 (Grid): the grid for 1 vs 0 game
+        current_states (a1x, a1y, a2x, a2y, d1x, d1y): the current joint state of two attackers and one defender
+        current_status (np.ndarray): the current status of attackers
+    """
+    value1vs1s = value2vs1[..., np.newaxis] 
+    spat_deriv_vector = spa_deriv(grid2vs1.get_index(current_states), value1vs1s, grid2vs1)
+    opt_d1, opt_d2 = optDistb_1vs1(spat_deriv_vector, dMax, dMode, d_speed)
+
+    return (opt_d1, opt_d2)

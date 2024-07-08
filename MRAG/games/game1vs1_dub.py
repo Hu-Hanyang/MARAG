@@ -16,8 +16,8 @@ num_defenders = 1
 # initial_attacker = np.array([[-0.4, -0.5, math.pi/2]])
 # initial_defender = np.array([[0.2, 0.0, math.pi]])  
 # Random test
-initial_attacker = np.array([[-0.5, -0.5, math.pi/2]])
-initial_defender = np.array([[0.2, 0.0, -math.pi]])  
+initial_attacker = np.array([[-0.5, -0.2, -math.pi/2]])
+initial_defender = np.array([[-0.5, -0.5, -math.pi/2]])  
 
 initial_attacker, initial_defender = dubin_inital_check(initial_attacker, initial_defender)
 print(f"The initial attacker states are {initial_attacker}, and the initial defender states are {initial_defender}.")
@@ -47,21 +47,27 @@ for step in range(total_steps):
 
     current_1vs1_value = check_current_value_dub(game.attackers.state, game.defenders.state, value1vs1_dub, grid1vs1_dub)
     print(f"Step {step}: the current 1vs1 value function is {current_1vs1_value}. ")
-    current_1vs0_value = check_current_value_dub(game.attackers.state, game.defenders.state, value1vs0_dub[..., 0], grid1vs0_dub)
-    print(f"Step {step}: the current 1vs0 value function is {current_1vs0_value}. ")
+    # current_1vs0_value = check_current_value_dub(game.attackers.state, game.defenders.state, value1vs0_dub[..., 0], grid1vs0_dub)
+    # print(f"Step {step}: the current 1vs0 value function is {current_1vs0_value}. ")
     
-    # Compute the control for the attacker
-    if current_1vs0_value < threshold_1vs0:
-        control_attackers = hj_contoller_attackers_dub(game, value1vs0_dub, grid1vs0_dub)
-    else:
-        control_attackers = last_attacker_control
+    # # Compute the control for the attacker
+    # if current_1vs0_value < threshold_1vs0:
+    #     control_attackers = hj_contoller_attackers_dub(game, value1vs0_dub, grid1vs0_dub)
+    # else:
+    #     control_attackers = last_attacker_control
     
-    # Compute the control for the defender
-    if current_1vs1_value >= threshold_1vs1:
-        control_defenders = hj_contoller_defenders_dub_1vs1(game, value1vs1_dub, grid1vs1_dub)
-    else:
-        assert last_defender_control is not None, "In such initial joint state, the defender won't win."
-        control_defenders = last_defender_control
+    control_attackers = hj_contoller_attackers_dub(game, value1vs0_dub, grid1vs0_dub)
+    
+    
+    # # Compute the control for the defender
+    # if current_1vs1_value >= threshold_1vs1:
+    #     control_defenders = hj_contoller_defenders_dub_1vs1(game, value1vs1_dub, grid1vs1_dub)
+    # else:
+    #     assert last_defender_control is not None, "In such initial joint state, the defender won't win."
+    #     control_defenders = last_defender_control
+        
+    control_defenders = hj_contoller_defenders_dub_1vs1(game, value1vs1_dub, grid1vs1_dub)
+    
     
     # #     value1vs0_counter += 1
     # #     controller_usage.append(0)

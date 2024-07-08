@@ -13,7 +13,7 @@ print(f"================ The shape of the value1vs1_attacker is {value1vs1_attac
 num_attackers = 1
 num_defenders = 1
 initial_attacker = np.array([[-0.5, -0.5]])
-initial_defender = np.array([[-0.5, 0.5]]) 
+initial_defender = np.array([[0.5, 0.5]]) 
 assert num_attackers == initial_attacker.shape[0], "The number of attackers should be equal to the number of initial attacker states."
 assert num_defenders == initial_defender.shape[0], "The number of defenders should be equal to the number of initial defender states."
 T = 20.0  # time for the game
@@ -44,17 +44,19 @@ for step in range(total_steps):
     
     
     # if current_value >= 0.0:
-    control_attackers = hj_controller_attackers_1vs0(game, value1vs0, grid1vs0)
+    #     control_attackers = hj_controller_attackers_1vs0(game, value1vs0, grid1vs0)
     #     value1vs0_counter += 1
     #     controller_usage.append(0)
     # else:
-        # control_attackers = hj_contoller_attackers_1vs1(game, value1vs1_attacker, grid1vs1)
+    #     control_attackers = hj_contoller_attackers_1vs1(game, value1vs1_attacker, grid1vs1)
     #     value1vs1_counter += 1
     #     controller_usage.append(1)
     # control_attackers = np.array([[0.0, 0.0]])
-    # 
+    control_attackers = hj_contoller_attackers_1vs1(game, value1vs1_attacker, grid1vs1)
+        
+# 
     control_defenders = single_1vs1_controller_defender(game, value1vs1, grid1vs1)
-    control_defenders = np.array([[0.0, 0.0]])
+    # control_defenders = np.array([[0.0, 0.0]])
     
     obs, reward, terminated, truncated, info = game.step(np.vstack((control_attackers, control_defenders)))
     

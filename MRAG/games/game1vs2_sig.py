@@ -12,14 +12,14 @@ value1vs0, value1vs1, value2vs1, value1vs2, grid1vs0, grid1vs1, grid2vs1, grid1v
 num_attackers = 1
 num_defenders = 2
 # # This example, captured, everything seems correct
-initial_attacker = np.array([[-0.3, 0.0]])
-initial_defender = np.array([[-0.7, 0.5], [-0.7, -0.5]])
-#TODO This example, captured, but one defender moves to a wierd position
+# initial_attacker = np.array([[-0.3, 0.0]])
+# initial_defender = np.array([[-0.7, 0.5], [-0.7, -0.5]])
+# This example, captured, but one defender moves to a wierd position
 # initial_attacker = np.array([[0.0, 0.0]])
 # initial_defender = np.array([[0.5, 0.3], [0.5, -0.3]])
-#TODO This example, captured, but one defender moves out of the map
-# initial_attacker = np.array([[-0.3, 0.0]])
-# initial_defender = np.array([[0.5, 0.3], [0.5, -0.3]])
+# This example, captured, but one defender moves out of the map
+initial_attacker = np.array([[-0.3, 0.0]])
+initial_defender = np.array([[0.5, 0.3], [0.5, -0.3]])
 # # This example, captured, everything seems correct
 # initial_attacker = np.array([[-0.5, 0.0]])
 # initial_defender = np.array([[0.4, 0.3], [0.4, -0.3]])
@@ -54,7 +54,7 @@ for step in range(total_steps):
     # control_defenders = hj_controller_defenders(game, assignments, value1vs1, value2vs1, grid1vs1, grid2vs1)
 
     # control_attackers = np.array([0.0, 0.0])
-    control_attackers = hj_controller_1vs0(uMode="min", dMode="max", uMax=1.0, speed=1.0, 
+    control_attackers = hj_controller_1vs0(uMode="min", dMode="max", uMax=1.0, a_speed=1.0, 
                                            value1vs0=value1vs0, grid1vs0=grid1vs0, 
                                            current_states=game.attackers.state, 
                                            current_status=game.attackers_status[-1])

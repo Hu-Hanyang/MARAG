@@ -72,11 +72,21 @@ class DubinsCar(BaseDynamics):
         # next_theta = theta + u * dt
         # next_state = (next_x, next_y, next_theta)
 
+        def check_theta(angle):
+            # Make sure the angle is in the range of [-pi, pi)
+            while angle >=np.pi:
+                angle -= 2 * np.pi
+            while angle < -np.pi:
+                angle += 2 * np.pi
+
+            return angle
+
         # Check the boundary
         x_min, x_max, y_min, y_max = -1.0, 1.0, -1.0, 1.0
         x_new = max(min(next_state[0], x_max), x_min)
         y_new = max(min(next_state[1], y_max), y_min)
-        theta_new = next_state[2]
+        theta_new = check_theta(next_state[2])
+        # print(f"theta_new is {theta_new}. \n")
         next_state = (x_new, y_new, theta_new)
         
         return next_state

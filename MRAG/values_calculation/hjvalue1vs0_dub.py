@@ -27,7 +27,7 @@ from MRAG.plots_dub import plot_value_1vs0_dub_debug
 start_time = time.time()
 
 # 1. Initialize the grids
-grid_size = 150
+grid_size = 100
 grid_size_theta = 200
 grids = Grid(np.array([-1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi]), 3, np.array([grid_size, grid_size, grid_size_theta]), [2])
 
@@ -52,7 +52,7 @@ del obs2_a
 reach_set = ShapeRectangle(grids, [0.6, 0.1, -1000], [0.8, 0.3, 1000]) 
 
 # 4. Set the look-back length and time step
-lookback_length = 12.0 
+lookback_length = 15.0 
 t_step = 0.025
 
 # Actual calculation process, needs to add new plot function to draw a 2D figure

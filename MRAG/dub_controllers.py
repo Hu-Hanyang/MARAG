@@ -4,6 +4,7 @@
 import numpy as np
 
 from MRAG.plots_dub import po2slice1vs0_dub, plot_value_1vs0_dub
+from odp.solver import HJSolver, computeSpatDerivArray
 
 
 def spa_deriv(slice_index, value_function, grid, periodic_dims=[]):
@@ -99,9 +100,14 @@ def attacker_control_1vs0_dub(game, grid1vs0, value1vs0, attacker, neg2pos):
     if current_value > 0:
         value1vs0 = value1vs0 - current_value
     v = value1vs0[..., neg2pos] # Minh: v = value1v0[..., neg2pos[0]]
+    print(neg2pos)
     # current_slices = po2slice1vs0_dub(attacker, value1vs0.shape[0])
-    spat_deriv_vector = spa_deriv(grid1vs0.get_index(attacker), v, grid1vs0)
-    # spat_deriv_vector = spa_deriv(current_slices, v, grid1vs0)
+    # computeSpatDerivArray(grid1vs0, value1vs0[..., 0], deriv_dim=0, accuracy="low")
+    # computeSpatDerivArray(grid1vs0, value1vs0[..., 0], deriv_dim=1, accuracy="low")
+    
+    spat_deriv_vector = spa_deriv(grid1vs0.get_index(attacker), v, grid1vs0, [2])
+    # spat_deriv_vector[2] = computeSpatDerivArray(grid1vs0, value1vs0[..., neg2pos[0]], deriv_dim=3, accuracy="medium")[grid1vs0.get_index(attacker)]
+    # print(f"The spatial derivative vector is {spat_deriv_vector}. \n")
     opt_u = game.optCtrl_1vs0(spat_deriv_vector)
 
     return (opt_u)
@@ -178,7 +184,7 @@ def defender_control_1vs1_dub(game, grid1vs1_dub, value1vs1_dub, jointstate_1vs1
         opt_d (tuple): the optimal control of the defender
     """
     value1vs1s = value1vs1_dub[..., np.newaxis] 
-    spat_deriv_vector = spa_deriv(grid1vs1_dub.get_index(jointstate_1vs1), value1vs1s, grid1vs1_dub)
+    spat_deriv_vector = spa_deriv(grid1vs1_dub.get_index(jointstate_1vs1), value1vs1s, grid1vs1_dub, [2,5])
     opt_d = game.optDistb_1vs1(spat_deriv_vector) 
 
     return (opt_d)
@@ -213,7 +219,7 @@ def hj_controller_dub_1vs1(uMode, dMode, uMax, dMax, speed, attacker_state, defe
     d1x, d1y, d1o = defender_state[0]
     jointstate_1vs1 = (a1x, a1y, a1o, d1x, d1y, d1o)
     value1vs1s = value1vs1_dub[..., np.newaxis] 
-    spat_deriv_vector = spa_deriv(grid1vs1_dub.get_index(jointstate_1vs1), value1vs1s, grid1vs1_dub)
+    spat_deriv_vector = spa_deriv(grid1vs1_dub.get_index(jointstate_1vs1), value1vs1s, grid1vs1_dub, [2,5])
     opt_d = dMax
     if spat_deriv_vector[5] > 0:
         if dMode == "min":

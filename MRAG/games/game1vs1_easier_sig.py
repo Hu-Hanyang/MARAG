@@ -4,7 +4,7 @@ from MRAG.envs.AttackerDefender import AttackerDefender1vs1
 from MRAG.solvers import mip_solver, extend_mip_solver
 from MRAG.utilities import *
 from MRAG.sig_controllers import hj_controller_attackers_1vs0, hj_contoller_attackers_1vs1, single_1vs1_controller_defender, single_1vs1_controller_defender_noise
-from MRAG.plots import animation, plot_value_1vs1_sig, record_video
+from MRAG.plots import animation, plot_value_1vs1_easier_sig, record_video
 
 #### Game Settings ####
 value1vs0, value1vs1, value2vs1, value1vs2, grid1vs0, grid1vs1, grid2vs1, grid1vs2  = hj_preparations_sig()
@@ -16,11 +16,11 @@ value1vs0_easier = np.load('/localhome/hha160/projects/safe-control-gym/safe_con
 # print(f"================ The shape of the value1vs1_attacker is {value1vs1_easier.shape}. ================")
 num_attackers = 1
 num_defenders = 1
-initial_attacker = np.array([[0.2, 0.0]])
-initial_defender = np.array([[-0.8, 0.0]]) 
+initial_attacker = np.array([[-0.15, 0.0]])
+initial_defender = np.array([[0.0, 0.0]]) 
 assert num_attackers == initial_attacker.shape[0], "The number of attackers should be equal to the number of initial attacker states."
 assert num_defenders == initial_defender.shape[0], "The number of defenders should be equal to the number of initial defender states."
-T = 20.0  # time for the game
+T = 10.0  # time for the game
 ctrl_freq = 200  # control frequency
 total_steps = int(T * ctrl_freq)
 
@@ -32,7 +32,7 @@ game = AttackerDefender1vs1(num_attackers=num_attackers, num_defenders=num_defen
 print(f"The initial value of the initial states is {check_current_value(game.attackers.state, game.defenders.state, value1vs1_easier, grid1vs1)}")
 
 
-plot_value_1vs1_sig(game.attackers.state, game.defenders.state, 
+plot_value_1vs1_easier_sig(game.attackers.state, game.defenders.state, 
                 plot_attacker=0, plot_defender=0, 
                 fix_agent=1, value1vs1=value1vs1_easier, grid1vs1=grid1vs1)
 
@@ -50,15 +50,17 @@ for step in range(total_steps):
     current_value = value1vs1_easier[current_state_slice]
     
     
-    if current_value >= 0.0: # the attacker will fail in theory, then use the 1vs0 policy
-        control_attackers = hj_controller_attackers_1vs0(game, value1vs0_easier, grid1vs0)
-        value1vs0_counter += 1
-        controller_usage.append(0)
-    else:
-        control_attackers = hj_contoller_attackers_1vs1(game, value1vs1_attacker, grid1vs1)
-        value1vs1_counter += 1
-        controller_usage.append(1)
+    # if current_value >= 0.0: # the attacker will fail in theory, then use the 1vs0 policy
+    #     control_attackers = hj_controller_attackers_1vs0(game, value1vs0_easier, grid1vs0)
+    #     value1vs0_counter += 1
+    #     controller_usage.append(0)
+    # else:
+    #     control_attackers = hj_contoller_attackers_1vs1(game, value1vs1_attacker, grid1vs1)
+    #     value1vs1_counter += 1
+    #     controller_usage.append(1)
     # control_attackers = np.array([[0.0, 0.0]])
+    control_attackers = hj_controller_attackers_1vs0(game, value1vs0_easier, grid1vs0)
+    
     # 
     control_defenders = single_1vs1_controller_defender(game, value1vs1_easier, grid1vs1)
     # control_defenders = np.array([[0.0, 0.0]])

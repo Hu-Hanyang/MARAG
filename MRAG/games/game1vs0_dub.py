@@ -11,9 +11,9 @@ value1vs0_dub, grid1vs0_dub, value1vs1_dub, grid1vs1_dub = hj_preparations_dub()
 print(f"The shape of value1vs0_dub is {value1vs0_dub.shape}.")
 num_attackers = 1
 num_defenders = 0
-# TODO np.array([[0.5, 0.0, -math.pi]]), np.array([[0.6, 0.0, math.pi]]) the attacker crosses the obstacles
+# TODO np.array([[-0.5, -0.4, -math.pi/2]]) the attacker hits the obstalce; np.array([[-0.5, -0.5, -math.pi/2]]) the attacker hits the boundary
 # initial_attacker = np.array([[0.5, 0.0, -math.pi]]) 
-initial_attacker = np.array([[0.6, 0.0, math.pi]])  #  np.array([[-0.5, -0.5, math.pi/2]])
+initial_attacker = np.array([[-0.5, -0.5, -math.pi/4]])  #  np.array([[-0.5, -0.4, -math.pi/2]])  # np.array([[-0.5, -0.5, -math.pi/2]])
 initial_defender = None #  np.array([[-0.8, 0.8, 0.0]])
 
 initial_attacker, initial_defender = dubin_inital_check(initial_attacker, initial_defender)
@@ -21,15 +21,15 @@ print(f"The initial attacker states are {initial_attacker}, and the initial defe
 
 assert num_attackers == initial_attacker.shape[0], "The number of attackers should be equal to the number of initial attacker states."
 # assert num_defenders == initial_defender.shape[0], "The number of defenders should be equal to the number of initial defender states."
-T = 15.0  # time for the game
+T = 12  # time for the game
 ctrl_freq = 200  # control frequency
 total_steps = int(T * ctrl_freq)
-value_threshold = -0.15
+value_threshold = -0.0
 
 #### Game Initialization ####
 game = DubinCar1vs0(num_attackers=num_attackers, num_defenders=num_defenders, 
                          initial_attacker=initial_attacker, initial_defender=initial_defender, 
-                         ctrl_freq=ctrl_freq, uMode="min", dMode="max", uMax=1.0,dMax=1.0,)
+                         ctrl_freq=ctrl_freq, uMode="min", dMode="max", uMax=1.0, dMax=1.0,)
 
 plot_value_1vs0_dub(game.attackers.state, value1vs0_dub, grid1vs0_dub)
 
@@ -63,8 +63,9 @@ for step in range(total_steps):
     #     control_attackers = hj_contoller_attackers_dub(game, value1vs0_dub, grid1vs0_dub)
     # else:
     #     control_attackers = last_control
-    
+    # print(f"=========== Step {step}: the attacker state is {game.attackers.state}. ===========")
     control_attackers = hj_contoller_attackers_dub(game, value1vs0_dub, grid1vs0_dub)
+    # print(f"Step {step}: the control of the attacker is {control_attackers}.")
     
     # print(f"The shape of control_attackers is {control_attackers.shape}.")
     # #     value1vs0_counter += 1
