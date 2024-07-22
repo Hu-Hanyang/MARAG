@@ -3,7 +3,7 @@ import numpy as np
 from MRAG.envs.ReachAvoidGame import ReachAvoidGameEnv
 from MRAG.solvers import mip_solver, extend_mip_solver
 from MRAG.utilities import *
-from MRAG.sig_controllers import hj_controller_attackers_1vs0, hj_controller_defenders, extend_hj_controller_defenders
+from MRAG.sig_controllers import hj_controller_attackers_1vs0, hj_controller_defenders, extend_hj_controller_defenders, hj_controller_defenders_independent, hj_controller_1vs0
 from MRAG.plots import animation
 
 
@@ -33,14 +33,20 @@ for step in range(total_steps):
     assignments, weights, attacker_views = extend_mip_solver(num_defenders, game.attackers_status[-1],  
                                                               EscapedAttacker1vs1, EscapedPairs2vs1,
                                                               EscapedAttackers1vs2, EscapedTri1vs2)
-    control_defenders, flag_1vs2 = extend_hj_controller_defenders(game, 
-                                                       assignments, weights, attacker_views, 
-                                                       value1vs1, value2vs1, value1vs2, 
-                                                       grid1vs1, grid2vs1, grid1vs2)
+    # control_defenders, flag_1vs2 = extend_hj_controller_defenders(game, 
+    #                                                    assignments, weights, attacker_views, 
+    #                                                    value1vs1, value2vs1, value1vs2, 
+    #                                                    grid1vs1, grid2vs1, grid1vs2)
+    
+    control_defenders, flag_1vs2 = hj_controller_defenders_independent(game.attackers.state, game.defenders.state, 
+                                                                       assignments, weights, attacker_views, 
+                                                                       value1vs1, value2vs1, value1vs2, 
+                                                                       grid1vs1, grid2vs1, grid1vs2)
     if flag_1vs2:
         counters_1vs2 += 1
-    # control_defenders = hj_controller_defenders(game, assignments, value1vs1, value2vs1, grid1vs1, grid2vs1)
-    control_attackers = hj_controller_attackers_1vs0(game, value1vs0, grid1vs0)
+
+    # control_attackers = hj_controller_attackers_1vs0(game, value1vs0, grid1vs0)
+    control_attackers = hj_controller_1vs0('min', 1.0, 1.0, value1vs0, grid1vs0, game.attackers.state, game.attackers_status[-1])
     obs, reward, terminated, truncated, info = game.step(np.vstack((control_attackers, control_defenders)))
     
     if terminated or truncated:

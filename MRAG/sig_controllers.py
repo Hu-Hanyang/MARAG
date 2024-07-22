@@ -427,11 +427,15 @@ def single_1vs1_controller_defender_noise(game, value1vs1, grid1vs1, epsilon=0.3
     return control_defenders
 
 
-def optCtrl_1vs0(spat_deriv, uMax, uMode, speed):
+########################################## game-independent controls ##########################################
+def optCtrl_1vs0(spat_deriv, uMax, uMode, a_speed):
     """Computes the optimal control (disturbance) for the attacker in a 1 vs. 0 game.
 
     Parameters:
         spat_deriv (tuple): spatial derivative in all dimensions
+        uMax (float): the maximum control value of the attacker
+        uMode (str): the control mode of the attacker
+        a_speed (float): the speed of the attacker
     
     Returns:
         tuple: a tuple of optimal control of the defender (disturbances)
@@ -446,31 +450,33 @@ def optCtrl_1vs0(spat_deriv, uMax, uMode, speed):
             opt_a1 = 0.0
             opt_a2 = 0.0
         else:
-            opt_a1 = - speed * deriv1 / ctrl_len
-            opt_a2 = - speed * deriv2 / ctrl_len
+            opt_a1 = - a_speed * deriv1 / ctrl_len
+            opt_a2 = - a_speed * deriv2 / ctrl_len
     else:
         if ctrl_len == 0:
             opt_a1 = 0.0
             opt_a2 = 0.0
         else:
-            opt_a1 = speed * deriv1 / ctrl_len
-            opt_a2 = speed * deriv2 / ctrl_len
+            opt_a1 = a_speed * deriv1 / ctrl_len
+            opt_a2 = a_speed * deriv2 / ctrl_len
     return (opt_a1, opt_a2)
 
 
-def hj_controller_1vs0(uMode, dMode, uMax, dMax, a_speed, d_speed, value1vs0, grid1vs0, current_states, current_status):
+def hj_controller_1vs0(uMode, uMax, a_speed, value1vs0, grid1vs0, attackers, current_status):
     """This function computes the control for the attackers based on the control_attackers. 
        Assume dynamics are single integrator.   
 
     Args:
-        game (class): the corresponding ReachAvoidGameEnv instance
+        uMode (str): the control mode of the attacker
+        uMax (float): the maximum control value of the attacker
+        a_speed (float): the speed of the attacker
         value1vs0 (np.ndarray): the value function for 1 vs 0 game with all time slices
         grid1vs0 (Grid): the grid for 1 vs 0 game
-        current_states (np.ndarray, (num_players, 2)): the current states of attackers
+        attackers (np.ndarray, (num_players, 2)): the current states of attackers
         current_status (np.ndarray): the current status of attackers
     """
-    attackers = current_states
-    num_attackers = current_states.shape[0]
+    attackers = attackers.copy()    
+    num_attackers = attackers.shape[0]
     current_attackers_status = current_status
     control_attackers = np.zeros((num_attackers, 2))
     for i in range(num_attackers):
@@ -491,72 +497,245 @@ def hj_controller_1vs0(uMode, dMode, uMax, dMax, a_speed, d_speed, value1vs0, gr
     return control_attackers
 
 
-def optDistb_1vs1(spat_deriv, uMax, uMode, speed):
+def optDistb_1vs1(spat_deriv, dMax, dMode, d_speed):
     """Computes the optimal control (disturbance) for the defender in a 1 vs. 1 game.
     
     Parameters:
         spat_deriv (tuple): spatial derivative in all dimensions
-        uMax (float): the maximum control value
-        uMode (str): the control mode
-        speed (float): the speed of the defender
+        dMax (float): the maximum control value of the defender
+        dMode (str): the control mode of the defender
+        d_speed (float): the speed of the defender
     
     Returns:
         tuple: a tuple of optimal control of the defender (disturbances)
     """
-    opt_d1 = uMax
-    opt_d2 = uMax
+    opt_d1 = dMax
+    opt_d2 = dMax
     deriv3 = spat_deriv[2]
     deriv4 = spat_deriv[3]
     distb_len = np.sqrt(deriv3*deriv3 + deriv4*deriv4)
-    if uMode == "max":
+    if dMode == "max":
         if distb_len == 0:
             opt_d1 = 0.0
             opt_d2 = 0.0
         else:
-            opt_d1 = speed * deriv3 / distb_len
-            opt_d2 = speed * deriv4 / distb_len
+            opt_d1 = d_speed * deriv3 / distb_len
+            opt_d2 = d_speed * deriv4 / distb_len
     else:
         if distb_len == 0:
             opt_d1 = 0.0
             opt_d2 = 0.0
         else:
-            opt_d1 = -speed * deriv3 / distb_len
-            opt_d2 = -speed * deriv4 / distb_len
+            opt_d1 = -d_speed * deriv3 / distb_len
+            opt_d2 = -d_speed * deriv4 / distb_len
             
     return (opt_d1, opt_d2)
 
 
-def hj_controller_1vs1_defender(uMode, dMode, uMax, dMax, a_speed, d_speed, value1vs1, grid1vs1, current_states, current_status):
+def optDistb_2vs1(spat_deriv, dMax, dMode, d_speed):
+    """Computes the optimal control (disturbance) for the defender in a 2 vs. 1 game.
+    
+    Parameters:
+        spat_deriv (tuple): spatial derivative in all dimensions
+        dMax (float): the maximum control value of the defender
+        dMode (str): the control mode of the defender
+        d_speed (float): the speed of the defender
+    
+    Returns:
+        tuple: a tuple of optimal control of the defender (disturbances)
+    """
+    opt_d1 = dMax
+    opt_d2 = dMax
+    deriv5 = spat_deriv[4]
+    deriv6 = spat_deriv[5]
+    distb_len = np.sqrt(deriv5*deriv5 + deriv6*deriv6)
+    if dMode == "max":
+        if distb_len == 0:
+            opt_d1 = 0.0
+            opt_d2 = 0.0
+        else:
+            opt_d1 = d_speed * deriv5 / distb_len
+            opt_d2 = d_speed * deriv6 / distb_len
+    else:
+        if distb_len == 0:
+            opt_d1 = 0.0
+            opt_d2 = 0.0
+        else:
+            opt_d1 = -d_speed * deriv5 / distb_len
+            opt_d2 = -d_speed * deriv6 / distb_len
+
+    return (opt_d1, opt_d2)
+
+
+def optDistb_1vs2(spat_deriv, dMax, dMode, d_speed):
+    """Computes the optimal control (disturbance) for the attacker in a 1 vs. 2 game.
+    
+    Parameters:
+        spat_deriv (tuple): spatial derivative in all dimensions
+        dMax (float): the maximum control value of the defender
+        dMode (str): the control mode of the defender
+        d_speed (float): the speed of the defender
+    
+    Returns:
+        tuple: a tuple of optimal control of the defender (disturbances)
+    """
+    opt_d1 = dMax
+    opt_d2 = dMax
+    opt_d3 = dMax
+    opt_d4 = dMax
+    deriv3 = spat_deriv[2]
+    deriv4 = spat_deriv[3]
+    deriv5 = spat_deriv[4]
+    deriv6 = spat_deriv[5]
+    distb_len1 = np.sqrt(deriv3*deriv3 + deriv4*deriv4)
+    distb_len2 = np.sqrt(deriv5*deriv5 + deriv6*deriv6)
+    if dMode == "max":
+        if distb_len1 == 0:
+            opt_d1 = 0.0
+            opt_d2 = 0.0
+        else:
+            opt_d1 = deriv3 / distb_len1
+            opt_d2 = deriv4 / distb_len1
+        if distb_len2 == 0:
+            opt_d3 = 0.0
+            opt_d4 = 0.0
+        else:
+            opt_d3 = d_speed*deriv5 / distb_len2
+            opt_d4 = d_speed*deriv6 / distb_len2
+    else:  # dMode == "min"
+        if distb_len1 == 0:
+            opt_d1 = 0.0
+            opt_d2 = 0.0
+        else:
+            opt_d1 = -d_speed*deriv3 / distb_len1
+            opt_d2 = -d_speed*deriv4 / distb_len1
+        if distb_len2 == 0:
+            opt_d3 = 0.0
+            opt_d4 = 0.0
+        else:
+            opt_d3 = -d_speed*deriv5 / distb_len2
+            opt_d4 = -d_speed*deriv6 / distb_len2
+
+    return (opt_d1, opt_d2, opt_d3, opt_d4)
+
+
+def hj_controller_1vs1_defender(dMode, dMax, d_speed, value1vs1, grid1vs1, jointstate_1vs1):
     """This function computes the control for the defender based on 1 vs. 1 value function. 
        Assume dynamics are single integrator.   
 
     Args:
-        game (class): the corresponding ReachAvoidGameEnv instance
-        value1vs0 (np.ndarray): the value function for 1 vs 0 game with all time slices
-        grid1vs0 (Grid): the grid for 1 vs 0 game
-        current_states (a1x, a1y, d1x, d1y): the current joint state of one attacker and one defender
-        current_status (np.ndarray): the current status of attackers
+        dMode (str): the control mode of the defender, either "max" or "min"
+        dMax (float): the maximum control value of the defender
+        d_speed (float): the speed of the defender
+        value1vs1 (np.ndarray): the value function for 1 vs 1 game with the final time slices
+        grid1vs1 (Grid): the grid for 1 vs 1 game
+        jointstate_1vs1 (a1x, a1y, d1x, d1y): the current joint state of one attacker and one defender
     """
     value1vs1s = value1vs1[..., np.newaxis] 
-    spat_deriv_vector = spa_deriv(grid1vs1.get_index(current_states), value1vs1s, grid1vs1)
+    spat_deriv_vector = spa_deriv(grid1vs1.get_index(jointstate_1vs1), value1vs1s, grid1vs1)
     opt_d1, opt_d2 = optDistb_1vs1(spat_deriv_vector, dMax, dMode, d_speed)
 
     return (opt_d1, opt_d2)
 
 
-def hj_controller_2vs1_defender(uMode, dMode, uMax, dMax, a_speed, d_speed, value2vs1, grid2vs1, current_states, current_status):
+def hj_controller_2vs1_defender(dMode, dMax, d_speed, value2vs1, grid2vs1, jointstate_2vs1):
     """This function computes the control for the defender based on 2 vs. 1 value function. 
        Assume dynamics are single integrator.   
 
     Args:
-        game (class): the corresponding ReachAvoidGameEnv instance
-        value1vs0 (np.ndarray): the value function for 1 vs 0 game with all time slices
-        grid1vs0 (Grid): the grid for 1 vs 0 game
-        current_states (a1x, a1y, a2x, a2y, d1x, d1y): the current joint state of two attackers and one defender
-        current_status (np.ndarray): the current status of attackers
+        dMode (str): the control mode of the defender, either "max" or "min"
+        dMax (float): the maximum control value of the defender
+        d_speed (float): the speed of the defender
+        value1vs1 (np.ndarray): the value function for 2 vs 1 game with the final time slices
+        grid1vs1 (Grid): the grid for 2 vs 1 game
+        jointstate_2vs1 (a1x, a1y, a2x, a2y, d1x, d1y): the current joint state of two attackers and one defender
     """
     value1vs1s = value2vs1[..., np.newaxis] 
-    spat_deriv_vector = spa_deriv(grid2vs1.get_index(current_states), value1vs1s, grid2vs1)
-    opt_d1, opt_d2 = optDistb_1vs1(spat_deriv_vector, dMax, dMode, d_speed)
+    spat_deriv_vector = spa_deriv(grid2vs1.get_index(jointstate_2vs1), value1vs1s, grid2vs1)
+    opt_d1, opt_d2 = optDistb_2vs1(spat_deriv_vector, dMax, dMode, d_speed)
 
     return (opt_d1, opt_d2)
+
+
+def hj_controller_1vs2_defender(dMode, dMax, d_speed, value1vs2, grid1vs2, jointstate_1vs2):
+    """This function computes the control for the defender based on 1 vs. 2 value function. 
+       Assume dynamics are single integrator.   
+
+    Args:
+        dMode (str): the control mode of the defender, either "max" or "min"
+        dMax (float): the maximum control value of the defender
+        d_speed (float): the speed of the defender
+        value1vs2 (np.ndarray): the value function for 1 vs 2 game with the final time slices
+        grid1vs2 (Grid): the grid for 1 vs 2 game
+        jointstate_1vs2 (a1x, a1y, d1x, d1y, d2x, d2y): the current joint state of one attacker and two defenders
+    """
+    value1vs2s = value1vs2[..., np.newaxis] 
+    spat_deriv_vector = spa_deriv(grid1vs2.get_index(jointstate_1vs2), value1vs2s, grid1vs2)
+    opt_d1, opt_d2, opt_d3, opt_d4 = optDistb_1vs2(spat_deriv_vector, dMax, dMode, d_speed)
+
+    return (opt_d1, opt_d2, opt_d3, opt_d4)
+
+
+def hj_controller_defenders_independent(attackers, defenders,
+                                        assignments, weights, attacker_views,
+                                        value1vs1, value2vs1, value1vs2, 
+                                        grid1vs1, grid2vs1, grid1vs2):
+    """This fuction computes the control for the defenders based on the assignments.
+       Assume dynamics are single integrator.
+
+    Args:
+        attackers (np.ndarray, (num_attackers, 2)): the current states of attackers
+        defenders (np.ndarray, (num_defenders, 2)): the current states of defenders
+        assignments (a list of lists): the list of attackers that the defender assigned to capture
+        weights (np.ndarray, (num_free_attackers, num_defenders)): the weights for each assignment
+        attacker_views (a list of lists): the list of defenders that could capture the attacker
+        value1vs1 (np.ndarray): the value function for 1 vs 1 game
+        value2vs1 (np.ndarray): the value function for 2 vs 1 game
+        value1vs2 (np.ndarray): the value function for 1 vs 2 game
+        grid1vs1 (Grid): the grid for 1 vs 1 game
+        grid2vs1 (Grid): the grid for 2 vs 1 game
+        grid1vs2 (Grid): the grid for 1 vs 2 game
+
+    Returns:
+        control_defenders ((ndarray): the control of defenders
+    """
+    attackers = attackers.copy()
+    defenders = defenders.copy()
+    num_defenders = defenders.shape[0] 
+    control_defenders = np.zeros((num_defenders, 2))
+    calculated_defenders = []  # store the calculated defenders which should not calculate the control again
+    flag_1vs2 = False
+
+    for j in range(num_defenders):
+
+        if j in calculated_defenders:
+            continue
+        d1x, d1y = defenders[j]
+
+        if len(assignments[j]) == 2: # defender j capture the attacker selected[j][0] and selected[j][1]
+            a1x, a1y = attackers[assignments[j][0]]
+            a2x, a2y = attackers[assignments[j][1]]
+            jointstate_2vs1 = (a1x, a1y, a2x, a2y, d1x, d1y)
+            control_defenders[j] = hj_controller_2vs1_defender('max', 1.0, 1.5, value2vs1, grid2vs1, jointstate_2vs1)
+        elif len(assignments[j]) == 1:
+            a1x, a1y = attackers[assignments[j][0]]
+
+            if weights[assignments[j][0], j] == 0.5:  # use 1 vs. 2 game based control
+                collaborate_defender = attacker_views[assignments[j][0]][-1]
+                d2x, d2y = defenders[collaborate_defender]
+                jointstate_1vs2 = (a1x, a1y, d1x, d1y, d2x, d2y)
+                opt_d1, opt_d2, opt_d3, opt_d4 = hj_controller_1vs2_defender('min', 1.0, 1.5, value1vs2, grid1vs2, jointstate_1vs2)
+                control_defenders[j] = (opt_d1, opt_d2)
+                control_defenders[collaborate_defender] = (opt_d3, opt_d4)
+                calculated_defenders.append(collaborate_defender)
+                flag_1vs2 = True
+            else:  # use 1 vs. 1 game based control
+                jointstate_1vs1 = (a1x, a1y, d1x, d1y)
+                control_defenders[j] = hj_controller_1vs1_defender('max', 1.0, 1.5, value1vs1, grid1vs1, jointstate_1vs1)
+
+        elif len(assignments[j]) == 0: # defender j could not capture any of attackers
+            control_defenders[j] = (0.0, 0.0)
+        else:
+            raise ValueError("The number of attackers assigned to one defender should be less than 3.")
+
+    return control_defenders, flag_1vs2

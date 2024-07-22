@@ -56,7 +56,7 @@ for step in range(total_steps):
     # control_attackers = np.array([0.0, 0.0])
     control_attackers = hj_controller_1vs0(uMode="min", dMode="max", uMax=1.0, a_speed=1.0, 
                                            value1vs0=value1vs0, grid1vs0=grid1vs0, 
-                                           current_states=game.attackers.state, 
+                                           attackers=game.attackers.state, 
                                            current_status=game.attackers_status[-1])
     attackers_controls.append(control_attackers.copy())
     obs, reward, terminated, truncated, info = game.step(np.vstack((control_attackers, control_defenders)))

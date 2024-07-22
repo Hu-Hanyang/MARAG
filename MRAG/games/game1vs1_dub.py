@@ -16,8 +16,8 @@ num_defenders = 1
 # initial_attacker = np.array([[-0.4, -0.5, math.pi/2]])
 # initial_defender = np.array([[0.2, 0.0, math.pi]])  
 # Random test
-initial_attacker = np.array([[-0.5, -0.2, -math.pi/2]])
-initial_defender = np.array([[-0.5, -0.5, -math.pi/2]])  
+initial_attacker = np.array([[-0.5, 0.5, -math.pi/2]])
+initial_defender = np.array([[0.5, 0.5, -math.pi/2]])  
 
 initial_attacker, initial_defender = dubin_inital_check(initial_attacker, initial_defender)
 print(f"The initial attacker states are {initial_attacker}, and the initial defender states are {initial_defender}.")
@@ -57,6 +57,7 @@ for step in range(total_steps):
     #     control_attackers = last_attacker_control
     
     control_attackers = hj_contoller_attackers_dub(game, value1vs0_dub, grid1vs0_dub)
+    # control_attackers = np.array([[0.0]])
     
     
     # # Compute the control for the defender
@@ -75,7 +76,6 @@ for step in range(total_steps):
     # #     control_attackers = hj_contoller_attackers_test(game, value1vs1_attacker, grid1vs1)
     # #     value1vs1_counter += 1
     # #     controller_usage.append(1)
-    # # control_attackers = np.array([[0.0, 0.0]])
     
     # # control_defenders = single_1vs1_controller_defender(game, value1vs1, grid1vs1)
     # control_defenders = hj_contoller_defenders_dub_1vs1(game, value1vs1_dub, grid1vs1_dub)

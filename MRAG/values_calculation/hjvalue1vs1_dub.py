@@ -28,7 +28,7 @@ from odp.solver import HJSolver
 start_time = time.time()
 
 # 1. Initialize the grids
-grid_size = 18
+grid_size = 28
 grids = Grid(np.array([-1.0, -1.0, -math.pi, -1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi, 1.0, 1.0, math.pi]),
              6, np.array([grid_size, grid_size, grid_size, grid_size, grid_size, grid_size]), [2, 5])
 process = psutil.Process(os.getpid())
@@ -108,18 +108,19 @@ target = np.maximum(reach_set, -avoid_set)
 plot_value_1vs1_dub(initial_attacker, initial_defender, 0, 0, 1, target, grids)
 
 # accuracy = "medium"
-# result = HJSolver(agents_1vs1, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=None, accuracy=accuracy) # original one
-# process = psutil.Process(os.getpid())
-# print(f"The CPU memory used during the calculation of the value function is {process.memory_info().rss/1e9: .2f} GB.")  # in bytes
+accuracy = "low"
+result = HJSolver(agents_1vs1, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=None, accuracy=accuracy) # original one
+process = psutil.Process(os.getpid())
+print(f"The CPU memory used during the calculation of the value function is {process.memory_info().rss/1e9: .2f} GB.")  # in bytes
 
-# solve_end_time = time.time()
-# print(f'The shape of the value function is {result.shape} \n')
-# print(f"The size of the value function is {result.nbytes / 1e9: .2f} GB or {result.nbytes/(1e6)} MB.")
-# print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
-# print(f'The shape of the value function is {result.shape} \n')
+solve_end_time = time.time()
+print(f'The shape of the value function is {result.shape} \n')
+print(f"The size of the value function is {result.nbytes / 1e9: .2f} GB or {result.nbytes/(1e6)} MB.")
+print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
+print(f'The shape of the value function is {result.shape} \n')
 
-# # 6. Save the value function
-# np.save(f'MRAG/values/DubinCar1vs1_grid{grid_size}_{accuracy}_{angularv}angularv.npy', result)
+# 6. Save the value function
+np.save(f'MRAG/values/DubinCar1vs1_grid{grid_size}_{accuracy}_{angularv}angularv.npy', result)
 
 
 # print(f"The value function has been saved successfully.")
