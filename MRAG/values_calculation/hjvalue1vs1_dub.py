@@ -85,7 +85,7 @@ process = psutil.Process(os.getpid())
 print("3. Gigabytes consumed of the reach_set {}".format(process.memory_info().rss/1e9))  # in bytes
 
 # 4. Set the look-back length and time step
-lookback_length = 10.0  
+lookback_length = 12.0  
 t_step = 0.025
 
 # Actual calculation process, needs to add new plot function to draw a 2D figure
