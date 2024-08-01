@@ -108,8 +108,8 @@ initial_defender = np.array([[-0.4, 0.4, 0.0]])
 target = np.maximum(reach_set, -avoid_set)
 plot_value_1vs1_dub(initial_attacker, initial_defender, 0, 0, 1, target, grids)
 
-# accuracy = "medium"
-accuracy = "low"
+accuracy = "medium"
+# accuracy = "low"
 result = HJSolver(agents_1vs1, grids, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=None, accuracy=accuracy) # original one
 process = psutil.Process(os.getpid())
 print(f"The CPU memory used during the calculation of the value function is {process.memory_info().rss/1e9: .2f} GB.")  # in bytes
