@@ -36,7 +36,8 @@ print("1. Gigabytes consumed of the grids initialization {}".format(process.memo
 
 # 2. Initialize the dynamics
 angularv = 1.0
-agents_1vs1 = DubinCar1vs1(uMode="min", dMode="max", uMax=angularv, dMax=angularv)  # 1v1 (6 dims dynamics)
+ctrl_freq = 20
+agents_1vs1 = DubinCar1vs1(uMode="min", dMode="max", uMax=angularv, dMax=angularv, ctrl_freq=ctrl_freq)  # 1v1 (6 dims dynamics)
 
 # 3. Instruct the avoid set and reach set
 ## 3.1 Avoid set, no constraint means inf
@@ -85,7 +86,7 @@ process = psutil.Process(os.getpid())
 print("3. Gigabytes consumed of the reach_set {}".format(process.memory_info().rss/1e9))  # in bytes
 
 # 4. Set the look-back length and time step
-lookback_length = 12.0  
+lookback_length = 16.0  
 t_step = 0.025
 
 # Actual calculation process, needs to add new plot function to draw a 2D figure
@@ -120,11 +121,11 @@ print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
 print(f'The shape of the value function is {result.shape} \n')
 
 # 6. Save the value function
-np.save(f'MRAG/values/DubinCar1vs1_grid{grid_size}_{accuracy}_{angularv}angularv.npy', result)
+np.save(f'MRAG/values/DubinCar1vs1_grid{grid_size}_{accuracy}_{angularv}angularv_ctrl{ctrl_freq}hz.npy', result)
 
 
-# print(f"The value function has been saved successfully.")
+print(f"The value function has been saved successfully.")
 
-# # Record the time of whole process
-# end_time = time.time()
-# print(f"The time of whole process is {end_time - start_time} seconds.")
+# Record the time of whole process
+end_time = time.time()
+print(f"The time of whole process is {end_time - start_time} seconds.")

@@ -100,7 +100,7 @@ def attacker_control_1vs0_dub(game, grid1vs0, value1vs0, attacker, neg2pos):
     if current_value > 0:
         value1vs0 = value1vs0 - current_value
     v = value1vs0[..., neg2pos] # Minh: v = value1v0[..., neg2pos[0]]
-    print(neg2pos)
+    # print(neg2pos)
     # current_slices = po2slice1vs0_dub(attacker, value1vs0.shape[0])
     # computeSpatDerivArray(grid1vs0, value1vs0[..., 0], deriv_dim=0, accuracy="low")
     # computeSpatDerivArray(grid1vs0, value1vs0[..., 0], deriv_dim=1, accuracy="low")
