@@ -10,7 +10,7 @@ class DubinsCar(BaseDynamics):
     y_dot = v * sin(theta)
     theta_dot = u
     '''
-    def __init__(self, number, initials, frequency, uMin=-1.0, uMax=1.0, speed=0.22):  # Hanyang: for real world experiments, change uMax from 2.84 to 1.0
+    def __init__(self, number, initials, frequency, uMin=-0.4, uMax=0.4, speed=0.22):  # Hanyang: for real world experiments, change uMax from 2.84 to 1.0
         ''' Initialize the dynamics of the agents.
         
         Args:

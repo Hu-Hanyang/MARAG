@@ -8,7 +8,7 @@ from MRAG.plots_dub import check_current_value_dub, plot_value_1vs1_dub, animati
 
 #### Game Settings ####
 value1vs0_dub, grid1vs0_dub, value1vs1_dub, grid1vs1_dub = hj_preparations_dub()
-
+value1vs1_dub_20hz = np.load("MRAG/values/DubinCar1vs1_grid28_medium_1.0angularv_ctrl20hz.npy")
 num_attackers = 1
 num_defenders = 1
 
@@ -25,7 +25,7 @@ print(f"The initial attacker states are {initial_attacker}, and the initial defe
 assert num_attackers == initial_attacker.shape[0], "The number of attackers should be equal to the number of initial attacker states."
 assert num_defenders == initial_defender.shape[0], "The number of defenders should be equal to the number of initial defender states."
 T = 10.0  # time for the game
-ctrl_freq = 200 # control frequency
+ctrl_freq = 20 # control frequency
 total_steps = int(T * ctrl_freq)
 threshold_1vs0 = -0.15
 threshold_1vs1 = 0.0
@@ -67,7 +67,9 @@ for step in range(total_steps):
     #     assert last_defender_control is not None, "In such initial joint state, the defender won't win."
     #     control_defenders = last_defender_control
         
-    control_defenders = hj_contoller_defenders_dub_1vs1(game, value1vs1_dub, grid1vs1_dub)
+    # control_defenders = hj_contoller_defenders_dub_1vs1(game, value1vs1_dub, grid1vs1_dub)
+    control_defenders = hj_contoller_defenders_dub_1vs1(game, value1vs1_dub_20hz, grid1vs1_dub)
+
     # print(f"The control for the defender is {control_defenders}. \n")
     
     

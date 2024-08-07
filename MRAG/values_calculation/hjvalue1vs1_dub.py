@@ -28,14 +28,14 @@ from odp.solver import HJSolver
 start_time = time.time()
 
 # 1. Initialize the grids
-grid_size = 28
+grid_size = 3
 grids = Grid(np.array([-1.0, -1.0, -math.pi, -1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi, 1.0, 1.0, math.pi]),
              6, np.array([grid_size, grid_size, grid_size, grid_size, grid_size, grid_size]), [2, 5])
 process = psutil.Process(os.getpid())
 print("1. Gigabytes consumed of the grids initialization {}".format(process.memory_info().rss/1e9))  # in bytes
 
 # 2. Initialize the dynamics
-angularv = 1.0
+angularv = 0.4
 ctrl_freq = 20
 agents_1vs1 = DubinCar1vs1(uMode="min", dMode="max", uMax=angularv, dMax=angularv, ctrl_freq=ctrl_freq)  # 1v1 (6 dims dynamics)
 
