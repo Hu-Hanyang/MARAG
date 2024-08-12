@@ -17,7 +17,7 @@ num_defenders = 1
 # initial_defender = np.array([[0.2, 0.0, math.pi]])  
 # Random test
 initial_attacker = np.array([[-0.7, 0.5, -1.0]])
-initial_defender = np.array([[0.7, -0.5, 1.58]])  
+initial_defender = np.array([[0.7, -0.5, 1.00]])  
 
 initial_attacker, initial_defender = dubin_inital_check(initial_attacker, initial_defender)
 print(f"The initial attacker states are {initial_attacker}, and the initial defender states are {initial_defender}.")
@@ -25,10 +25,10 @@ print(f"The initial attacker states are {initial_attacker}, and the initial defe
 assert num_attackers == initial_attacker.shape[0], "The number of attackers should be equal to the number of initial attacker states."
 assert num_defenders == initial_defender.shape[0], "The number of defenders should be equal to the number of initial defender states."
 T = 10.0  # time for the game
-ctrl_freq = 20 # control frequency
+ctrl_freq = 200 # control frequency
 total_steps = int(T * ctrl_freq)
-threshold_1vs0 = -0.15
-threshold_1vs1 = 0.0
+# threshold_1vs0 = -0.15
+# threshold_1vs1 = 0.0
 #### Game Initialization ####
 game = DubinCar1vs1(num_attackers=num_attackers, num_defenders=num_defenders, 
                          initial_attacker=initial_attacker, initial_defender=initial_defender, 

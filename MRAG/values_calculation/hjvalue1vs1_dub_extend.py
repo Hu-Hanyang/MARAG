@@ -29,7 +29,8 @@ start_time = time.time()
 
 # 1. Initialize the grids
 grid_size = 28
-grids = Grid(np.array([-1.0, -1.0, -math.pi, -1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi, 1.0, 1.0, math.pi]),
+boundary = 2.0
+grids = Grid(np.array([-boundary, -boundary, -math.pi, -boundary, -boundary, -math.pi]), np.array([boundary, boundary, math.pi, boundary, boundary, math.pi]),
              6, np.array([grid_size, grid_size, grid_size, grid_size, grid_size, grid_size]), [2, 5])
 process = psutil.Process(os.getpid())
 print("1. Gigabytes consumed of the grids initialization {}".format(process.memory_info().rss/1e9))  # in bytes
@@ -86,7 +87,7 @@ process = psutil.Process(os.getpid())
 print("3. Gigabytes consumed of the reach_set {}".format(process.memory_info().rss/1e9))  # in bytes
 
 # 4. Set the look-back length and time step
-lookback_length = 16.0  
+lookback_length = 20.0  
 t_step = 0.025 
 
 # Actual calculation process, needs to add new plot function to draw a 2D figure
@@ -94,19 +95,18 @@ small_number = 1e-5
 tau = np.arange(start=0, stop=lookback_length + small_number, step=t_step)
 
 # while plotting make sure the len(slicesCut) + len(plotDims) = grid.dims
-po = PlotOptions(do_plot=False, plot_type="set", plotDims=[0, 1], slicesCut=[2, 2, 2, 2])
+po = PlotOptions(do_plot=True, plot_type="set", plotDims=[0, 1], slicesCut=[2, 2, 2, 2])
 
 # 5. Call HJSolver function
 compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithObstacle"} # original one
 # compMethods = {"TargetSetMode": "minVWithVTarget"}
 solve_start_time = time.time()
 
-
-# Before computation test
-initial_attacker = np.array([[0.0, 0.0, math.pi/2]])
-initial_defender = np.array([[-0.4, 0.4, 0.0]])
-target = np.maximum(reach_set, -avoid_set)
-plot_value_1vs1_dub(initial_attacker, initial_defender, 0, 0, 1, target, grids)
+# # Before computation test
+# initial_attacker = np.array([[0.0, 0.0, math.pi/2]])
+# initial_defender = np.array([[-0.4, 0.4, 0.0]])
+# target = np.maximum(reach_set, -avoid_set)
+# plot_value_1vs1_dub(initial_attacker, initial_defender, 0, 0, 1, target, grids)
 
 accuracy = "medium"
 # accuracy = "low"
