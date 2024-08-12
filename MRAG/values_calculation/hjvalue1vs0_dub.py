@@ -32,8 +32,9 @@ grid_size_theta = 200
 grids = Grid(np.array([-1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi]), 3, np.array([grid_size, grid_size, grid_size_theta]), [2])
 
 # 2. Initialize the dynamics
-angularv = 1.0
-agents_1vs0 = DubinCar1vs0(uMode="min", dMode="max", uMax=angularv, dMax=angularv)  
+angularv = 0.4
+ctrl_freq = 20
+agents_1vs0 = DubinCar1vs0(uMode="min", dMode="max", uMax=angularv, dMax=angularv, ctrl_freq=ctrl_freq)   
 
 # 3. Instruct the avoid set and reach set
 ## 3.1 Avoid set, no constraint means inf
@@ -60,7 +61,7 @@ small_number = 1e-5
 tau = np.arange(start=0, stop=lookback_length + small_number, step=t_step)
 
 # while plotting make sure the len(slicesCut) + len(plotDims) = grid.dims
-po = PlotOptions(do_plot=True, plot_type="set", plotDims=[0, 1], slicesCut=[50])
+po = PlotOptions(do_plot=True, plot_type="set", plotDims=[0, 1], slicesCut=[10])
 
 # 5. Call HJSolver function
 compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithObstacle"}
@@ -84,7 +85,7 @@ print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
 print(f'The shape of the value function is {result.shape} \n')
 
 # 6. Save the value function
-np.save(f'MRAG/values/DubinCar1vs0_grid{grid_size}_{accuracy}_{angularv}angularv.npy', result)
+np.save(f'MRAG/values/DubinCar1vs0_grid{grid_size}_{accuracy}_{angularv}angularv_{ctrl_freq}hz.npy', result)
 
 print(f"The value function has been saved successfully.")
 

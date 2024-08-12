@@ -26,13 +26,8 @@ print(f"========== The shape of value1vs0_dub is {value1vs0_dub_extend.shape}. =
 # value1vs0_dub, grid1vs0_dub, value1vs1_dub, grid1vs1_dub = hj_preparations_dub()
 num_attackers = 1
 num_defenders = 1
-
-# #TODO The value function is not correct: the defender crossed the obstacles
-# initial_attacker = np.array([[-0.4, -0.5, math.pi/2]])
-# initial_defender = np.array([[0.2, 0.0, math.pi]])  
-# Random test
-initial_attacker = np.array([[-0.5, -0.5, 0.7]])
-initial_defender = np.array([[0.7, -0.5, math.pi/2]])  
+initial_attacker = np.array([[-0.5, -0.5, 1.57]])
+initial_defender = np.array([[0.5, 0.5, -1.57]])  
 
 initial_attacker, initial_defender = dubin_inital_check(initial_attacker, initial_defender)
 print(f"The initial attacker states are {initial_attacker}, and the initial defender states are {initial_defender}.")
