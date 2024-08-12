@@ -29,7 +29,7 @@ start_time = time.time()
 
 # 1. Initialize the grids
 grid_size = 28
-boundary = 2.0
+boundary = 1.5
 grids = Grid(np.array([-boundary, -boundary, -math.pi, -boundary, -boundary, -math.pi]), np.array([boundary, boundary, math.pi, boundary, boundary, math.pi]),
              6, np.array([grid_size, grid_size, grid_size, grid_size, grid_size, grid_size]), [2, 5])
 process = psutil.Process(os.getpid())
@@ -121,7 +121,7 @@ print(f"The time of solving HJ is {solve_end_time - solve_start_time} seconds.")
 print(f'The shape of the value function is {result.shape} \n')
 
 # 6. Save the value function
-np.save(f'MRAG/values/DubinCar1vs1_grid{grid_size}_{accuracy}_{angularv}angularv_ctrl{ctrl_freq}hz.npy', result)
+np.save(f'MRAG/values/DubinCar1vs1_grid{grid_size}_{accuracy}_{angularv}angularv_ctrl{ctrl_freq}hz_{boundary}map.npy', result)
 
 
 print(f"The value function has been saved successfully.")

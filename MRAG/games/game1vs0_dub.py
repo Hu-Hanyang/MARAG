@@ -31,6 +31,8 @@ game = DubinCar1vs0(num_attackers=num_attackers, num_defenders=num_defenders,
                          initial_attacker=initial_attacker, initial_defender=initial_defender, 
                          ctrl_freq=ctrl_freq, uMode="min", dMode="max", uMax=1.0, dMax=1.0,)
 
+# DubinCar1vs0(uMode="min", dMode="max", uMax=angularv, dMax=angularv, ctrl_freq=ctrl_freq) 
+
 plot_value_1vs0_dub(game.attackers.state, value1vs0_dub, grid1vs0_dub)
 
 # TODO debugging

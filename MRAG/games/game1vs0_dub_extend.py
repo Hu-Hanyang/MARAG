@@ -7,14 +7,24 @@ from MRAG.dub_controllers import hj_contoller_attackers_dub
 from MRAG.plots_dub import check_current_value_dub, plot_value_1vs0_dub, animation_dub
 
 #### Game Settings ####
-#TODO: Not finished yet
-value1vs0_dub, grid1vs0_dub, value1vs1_dub, grid1vs1_dub = hj_preparations_dub()
-print(f"The shape of value1vs0_dub is {value1vs0_dub.shape}.")
+grid_size = 100
+grid_size_theta = 200
+boundary = 2.0
+angularv = 0.4
+ctrl_freq = 20
+
+start = time.time()
+value1vs0_dub_extend = np.load('MRAG/values/DubinCar1vs0_grid100_medium_0.4angularv_20hz.npy')
+grid1vs0_dub_extend = Grid(np.array([-boundary, -boundary, -math.pi]), np.array([boundary, boundary, math.pi]), 3, np.array([grid_size, grid_size, grid_size_theta]), [2])
+end = time.time()
+print(f"============= HJ value functions loaded Successfully! (Time: {end-start :.4f} seconds) =============")
+# value1vs0_dub, grid1vs0_dub, value1vs1_dub, grid1vs1_dub = hj_preparations_dub()
+print(f"========== The shape of value1vs0_dub is {value1vs0_dub_extend.shape}. ========== \n")
 num_attackers = 1
 num_defenders = 0
 # TODO np.array([[-0.5, -0.4, -math.pi/2]]) the attacker hits the obstalce; np.array([[-0.5, -0.5, -math.pi/2]]) the attacker hits the boundary
 # initial_attacker = np.array([[0.5, 0.0, -math.pi]]) 
-initial_attacker = np.array([[-0.5, -0.5, -math.pi/4]])  #  np.array([[-0.5, -0.4, -math.pi/2]])  # np.array([[-0.5, -0.5, -math.pi/2]])
+initial_attacker = np.array([[-0.5, 0.5, -1.57]])  #  np.array([[-0.5, -0.4, -math.pi/2]])  # np.array([[-0.5, -0.5, -math.pi/2]])
 initial_defender = None #  np.array([[-0.8, 0.8, 0.0]])
 
 initial_attacker, initial_defender = dubin_inital_check(initial_attacker, initial_defender)
@@ -22,21 +32,18 @@ print(f"The initial attacker states are {initial_attacker}, and the initial defe
 
 assert num_attackers == initial_attacker.shape[0], "The number of attackers should be equal to the number of initial attacker states."
 # assert num_defenders == initial_defender.shape[0], "The number of defenders should be equal to the number of initial defender states."
-T = 12  # time for the game
-ctrl_freq = 200  # control frequency
+T = 15  # time for the game
+ctrl_freq = 20  # control frequency
 total_steps = int(T * ctrl_freq)
-value_threshold = -0.0
+# value_threshold = -0.0
 
 #### Game Initialization ####
 game = DubinCar1vs0(num_attackers=num_attackers, num_defenders=num_defenders, 
                          initial_attacker=initial_attacker, initial_defender=initial_defender, 
-                         ctrl_freq=ctrl_freq, uMode="min", dMode="max", uMax=1.0, dMax=1.0,)
+                         ctrl_freq=ctrl_freq, uMode="min", dMode="max", uMax=angularv, dMax=angularv)
 
-# DubinCar1vs0(uMode="min", dMode="max", uMax=angularv, dMax=angularv, ctrl_freq=ctrl_freq) 
+plot_value_1vs0_dub(game.attackers.state, value1vs0_dub_extend, grid1vs0_dub_extend)
 
-plot_value_1vs0_dub(game.attackers.state, value1vs0_dub, grid1vs0_dub)
-
-# TODO debugging
 # print(f"The speed of the DubinCar is {game.attackers.speed}.")
 # print(f"The maximum control of the DubinCar is {game.attackers.uMax}.")
 # print(f"The obs are {game.obstacles}.")
@@ -45,10 +52,10 @@ plot_value_1vs0_dub(game.attackers.state, value1vs0_dub, grid1vs0_dub)
 # print(f"The test_pos is in the obs:{game._check_area(test_pos, game.obstacles)}")
 
 #### Game Loop ####
-value1vs0_counter, value1vs1_counter = 0, 0
-controller_usage = []
-value_functions_logs = []
-value_functions_logs.append(check_current_value_dub(game.attackers.state, game.defenders.state, value1vs0_dub[..., 0], grid1vs0_dub))
+# value1vs0_counter, value1vs1_counter = 0, 0
+# controller_usage = []
+# value_functions_logs = []
+# value_functions_logs.append(check_current_value_dub(game.attackers.state, game.defenders.state, value1vs0_dub[..., 0], grid1vs0_dub))
 
 print(f"================ The game starts now. ================")
 for step in range(total_steps):
@@ -56,8 +63,8 @@ for step in range(total_steps):
     # current_state_slice = po2slice1vs1(game.attackers.state[0], game.defenders.state[0], value1vs1.shape[0])
     # current_value = value1vs1[current_state_slice]
     
-    current_value = check_current_value_dub(game.attackers.state, game.defenders.state, value1vs0_dub[..., 0], grid1vs0_dub)
-    print(f"Step {step}: the current 1vs0 value function is {current_value}. ")
+    current_value = check_current_value_dub(game.attackers.state, game.defenders.state, value1vs0_dub_extend[..., 0], grid1vs0_dub_extend)
+    # print(f"Step {step}: the current 1vs0 value function is {current_value}. ")
     
     # if value_functions_logs[-1] != current_value:
     #     value_functions_logs.append(current_value)
@@ -67,7 +74,7 @@ for step in range(total_steps):
     # else:
     #     control_attackers = last_control
     # print(f"=========== Step {step}: the attacker state is {game.attackers.state}. ===========")
-    control_attackers = hj_contoller_attackers_dub(game, value1vs0_dub, grid1vs0_dub)
+    control_attackers = hj_contoller_attackers_dub(game, value1vs0_dub_extend, grid1vs0_dub_extend)
     # print(f"Step {step}: the control of the attacker is {control_attackers}.")
     
     # print(f"The shape of control_attackers is {control_attackers.shape}.")
