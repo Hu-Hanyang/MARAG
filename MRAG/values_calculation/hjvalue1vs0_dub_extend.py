@@ -29,11 +29,11 @@ start_time = time.time()
 # 1. Initialize the grids
 grid_size = 100
 grid_size_theta = 200
-boundary = 1.5
+boundary = 1.0
 grids = Grid(np.array([-boundary, -boundary, -math.pi]), np.array([boundary, boundary, math.pi]), 3, np.array([grid_size, grid_size, grid_size_theta]), [2])
 
 # 2. Initialize the dynamics
-angularv = 0.4
+angularv = 1.0
 ctrl_freq = 20
 agents_1vs0 = DubinCar1vs0(uMode="min", dMode="max", uMax=angularv, dMax=angularv, ctrl_freq=ctrl_freq)  
 

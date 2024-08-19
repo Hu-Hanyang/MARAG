@@ -14,10 +14,14 @@ angularv = 0.4
 ctrl_freq = 20
 
 start = time.time()
-value1vs0_dub_extend = np.load('MRAG/values/DubinCar1vs0_grid100_medium_0.4angularv_20hz.npy')
-value1vs1_dub_extend = np.load('MRAG/values/DubinCar1vs1_grid28_medium_0.4angularv_ctrl20hz.npy')
-grid1vs0_dub_extend = Grid(np.array([-boundary, -boundary, -math.pi]), np.array([boundary, boundary, math.pi]), 3, np.array([grid_size, grid_size, grid_size_theta]), [2])
-grid1vs1_dub_extend = Grid(np.array([-boundary, -boundary, -math.pi, -boundary, -boundary, -math.pi]), np.array([boundary, boundary, math.pi, boundary, boundary, math.pi]),
+value1vs0_dub_extend = np.load('MRAG/values/DubinCar1vs0_grid100_medium_0.4angularv_20hz_1.0map.npy')
+# value1vs1_dub_extend = np.load('MRAG/values/DubinCar1vs1_grid28_medium_0.4angularv_ctrl20hz_1.0map.npy')
+value1vs1_dub_extend = np.load('MRAG/values/DubinCar1vs1_grid28_medium_1.0angularv_ctrl20hz_1.0map.npy')
+# grid1vs0_dub_extend = Grid(np.array([-boundary, -boundary, -math.pi]), np.array([boundary, boundary, math.pi]), 3, np.array([grid_size, grid_size, grid_size_theta]), [2])
+grid1vs0_dub_extend = Grid(np.array([-1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi]), 3, np.array([grid_size, grid_size, grid_size_theta]), [2])
+# grid1vs1_dub_extend = Grid(np.array([-boundary, -boundary, -math.pi, -boundary, -boundary, -math.pi]), np.array([boundary, boundary, math.pi, boundary, boundary, math.pi]),
+#              6, np.array([28, 28, 28, 28, 28, 28]), [2, 5])
+grid1vs1_dub_extend = Grid(np.array([-1.0, -1.0, -math.pi, -1.0, -1.0, -math.pi]), np.array([1.0, 1.0, math.pi, 1.0, 1.0, math.pi]),
              6, np.array([28, 28, 28, 28, 28, 28]), [2, 5])
 end = time.time()
 print(f"============= HJ value functions loaded Successfully! (Time: {end-start :.4f} seconds) =============")
@@ -28,6 +32,8 @@ num_attackers = 1
 num_defenders = 1
 initial_attacker = np.array([[-0.5, -0.5, 1.57]])
 initial_defender = np.array([[0.5, 0.5, -1.57]])  
+# initial_attacker = np.array([[-0.5000639954463644, -0.5000304876598463, 0.7071731094834994]])
+# initial_defender = np.array([[0.5000640550373561, 0.500030621390162, -0.7064660827550182]])  
 
 initial_attacker, initial_defender = dubin_inital_check(initial_attacker, initial_defender)
 print(f"The initial attacker states are {initial_attacker}, and the initial defender states are {initial_defender}.")

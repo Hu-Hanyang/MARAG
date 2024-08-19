@@ -29,14 +29,9 @@ print(f"================ The game starts now. ================")
 counters_1vs2 = 0
 for step in range(total_steps):
     EscapedAttacker1vs1, EscapedPairs2vs1, EscapedAttackers1vs2, EscapedTri1vs2 = judges(game.attackers.state, game.defenders.state, game.attackers_status[-1], value1vs1, value2vs1, value1vs2)
-    # assignments = mip_solver(num_defenders, game.attackers_status[-1],  EscapedAttacker1vs1, EscapedPairs2vs1)
     assignments, weights, attacker_views = extend_mip_solver(num_defenders, game.attackers_status[-1],  
                                                               EscapedAttacker1vs1, EscapedPairs2vs1,
                                                               EscapedAttackers1vs2, EscapedTri1vs2)
-    # control_defenders, flag_1vs2 = extend_hj_controller_defenders(game, 
-    #                                                    assignments, weights, attacker_views, 
-    #                                                    value1vs1, value2vs1, value1vs2, 
-    #                                                    grid1vs1, grid2vs1, grid1vs2)
     
     control_defenders, flag_1vs2 = hj_controller_defenders_independent(game.attackers.state, game.defenders.state, 
                                                                        assignments, weights, attacker_views, 

@@ -29,14 +29,14 @@ start_time = time.time()
 
 # 1. Initialize the grids
 grid_size = 28
-boundary = 1.5
+boundary = 1.0
 grids = Grid(np.array([-boundary, -boundary, -math.pi, -boundary, -boundary, -math.pi]), np.array([boundary, boundary, math.pi, boundary, boundary, math.pi]),
              6, np.array([grid_size, grid_size, grid_size, grid_size, grid_size, grid_size]), [2, 5])
 process = psutil.Process(os.getpid())
 print("1. Gigabytes consumed of the grids initialization {}".format(process.memory_info().rss/1e9))  # in bytes
 
 # 2. Initialize the dynamics
-angularv = 0.4
+angularv = 1.0
 ctrl_freq = 20  # Minh recommends minimum 10HZ, try 22HZ
 agents_1vs1 = DubinCar1vs1(uMode="min", dMode="max", uMax=angularv, dMax=angularv, ctrl_freq=ctrl_freq)  # 1v1 (6 dims dynamics)
 

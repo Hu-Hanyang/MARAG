@@ -104,6 +104,7 @@ def check_current_value_dub(attackers, defenders, value_function, grids):
         # joint_slice = po2slice1vs0_dub(attackers[0], value_function.shape[0])
     elif len(value_function.shape) == 6:  # 1vs1 game
         joint_slice = grids.get_index(np.concatenate((attackers[0], defenders[0])))
+        print(f"The joint slice is {joint_slice}.")
         # joint_slice = po2slice1vs1_dub(attackers[0], defenders[0], value_function.shape[0])
         
     value = value_function[joint_slice]
