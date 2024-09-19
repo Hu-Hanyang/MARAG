@@ -1,8 +1,13 @@
 import heterocl as hcl
 import numpy as np
 from odp.computeGraphs.CustomGraphFunctions import *
+<<<<<<< HEAD
 from odp.spatialDerivatives.first_orderENO2D import *
 from odp.spatialDerivatives.second_orderENO3D import *
+=======
+from odp.spatialDerivatives.firstOrderENO.first_orderENO2D import *
+from odp.spatialDerivatives.secondOrderENO.second_orderENO2D import *
+>>>>>>> dev_hhy
 
 #from user_definer import *
 #def graph_2D(dynamics_obj, grid):
@@ -66,6 +71,7 @@ def graph_2D(my_object, g, compMethod, accuracy, generate_SpatDeriv=False, deriv
             with hcl.for_(0, V_init.shape[0], name="i") as i:  # Plus 1 as for loop count stops at V_init.shape[0]
                 with hcl.for_(0, V_init.shape[1], name="j") as j:
                     # Variables to calculate dV_dx
+<<<<<<< HEAD
                     dV_dx1_L = hcl.scalar(0, "dV_dx1_L")
                     dV_dx1_R = hcl.scalar(0, "dV_dx1_R")
                     dV_dx1 = hcl.scalar(0, "dV_dx1")
@@ -125,11 +131,76 @@ def graph_2D(my_object, g, compMethod, accuracy, generate_SpatDeriv=False, deriv
                         max_deriv2[0] = dV_dx2_R[0]
 
         # Calculate the dissipation amount
+=======
+                    dV_dx_L = hcl.scalar(0, "dV_dx_L")
+                    dV_dx_R = hcl.scalar(0, "dV_dx_R")
+                    dV_dx = hcl.scalar(0, "dV_dx")
+                    # Variables to calculate dV_dy
+                    dV_dy_L = hcl.scalar(0, "dV_dy_L")
+                    dV_dy_R = hcl.scalar(0, "dV_dy_R")
+                    dV_dy = hcl.scalar(0, "dV_dy")
+
+                    # No tensor slice operation
+                    if accuracy == "low":
+                        dV_dx_L[0], dV_dx_R[0] = spa_derivX(i, j, V_init, g)
+                        dV_dy_L[0], dV_dy_R[0] = spa_derivY(i, j, V_init, g)
+                    if accuracy == "medium":
+                        dV_dx_L[0], dV_dx_R[0] = secondOrder_ENO2D_X0(i, j, V_init, g)
+                        dV_dy_L[0], dV_dy_R[0] = secondOrder_ENO2D_X1(i, j, V_init, g)
+
+                    # Saves spatial derivative diff into tables
+                    deriv_diff1[i, j] = dV_dx_R[0] - dV_dx_L[0]
+                    deriv_diff2[i, j] = dV_dy_R[0] - dV_dy_L[0]
+
+                    # Calculate average gradient
+                    dV_dx[0] = (dV_dx_L + dV_dx_R) / 2
+                    dV_dy[0] = (dV_dy_L + dV_dy_R) / 2
+
+                    # Use method of DubinsCar to solve optimal control instead
+                    uOpt = my_object.opt_ctrl(t, (x1[i], x2[j]),
+                                                    (dV_dx[0], dV_dy[0]))
+                    dOpt = my_object.opt_dstb(t, (x1[i], x2[j]),
+                                                (dV_dx[0], dV_dy[0]))
+
+                    # Calculate dynamical rates of changes
+                    dx_dt, dy_dt = my_object.dynamics(t, (x1[i], x2[j]), uOpt, dOpt)
+
+                    # Calculate Hamiltonian terms:
+                    V_new[i, j] = -(dx_dt * dV_dx[0] + dy_dt * dV_dy[0])
+
+                    # Get derivMin
+                    with hcl.if_(dV_dx_L[0] < min_deriv1[0]):
+                        min_deriv1[0] = dV_dx_L[0]
+                    with hcl.if_(dV_dx_R[0] < min_deriv1[0]):
+                        min_deriv1[0] = dV_dx_R[0]
+
+                    with hcl.if_(dV_dy_L[0] < min_deriv2[0]):
+                        min_deriv2[0] = dV_dy_L[0]
+                    with hcl.if_(dV_dy_R[0] < min_deriv2[0]):
+                        min_deriv2[0] = dV_dy_R[0]
+
+                    # Get derivMax
+                    with hcl.if_(dV_dx_L[0] > max_deriv1[0]):
+                        max_deriv1[0] = dV_dx_L[0]
+                    with hcl.if_(dV_dx_R[0] > max_deriv1[0]):
+                        max_deriv1[0] = dV_dx_R[0]
+
+                    with hcl.if_(dV_dy_L[0] > max_deriv2[0]):
+                        max_deriv2[0] = dV_dy_L[0]
+                    with hcl.if_(dV_dy_R[0] > max_deriv2[0]):
+                        max_deriv2[0] = dV_dy_R[0]
+
+
+        # Calculate the dissipation
+>>>>>>> dev_hhy
         with hcl.Stage("Dissipation"):
             # Storing alphas
             dOptL1 = hcl.scalar(0, "dOptL1")
             dOptL2 = hcl.scalar(0, "dOptL2")
+<<<<<<< HEAD
 
+=======
+>>>>>>> dev_hhy
             # Find UPPER BOUND optimal disturbance
             dOptU1 = hcl.scalar(0, "dOptU1")
             dOptU2 = hcl.scalar(0, "dOptU2")
@@ -170,6 +241,7 @@ def graph_2D(my_object, g, compMethod, accuracy, generate_SpatDeriv=False, deriv
                     uOptL1[0], uOptL2[0] = my_object.opt_ctrl(t, (x1[i], x2[j]), \
                                                                                     (min_deriv1[0], min_deriv2[0]))
 
+<<<<<<< HEAD
                     # Find UPPER BOUND optimal control
                     uOptU1[0], uOptU2[0] = my_object.opt_ctrl(t, (x1[i], x2[j]),
                                                                                     (max_deriv1[0], max_deriv2[0]))
@@ -177,6 +249,15 @@ def graph_2D(my_object, g, compMethod, accuracy, generate_SpatDeriv=False, deriv
                     dx_LL1[0], dx_LL2[0] = my_object.dynamics(t, (x1[i], x2[j]),
                                                                                     (uOptL1[0], uOptL2[0]), \
                                                                                     (dOptL1[0], dOptL2[0]))
+=======
+                        # Find UPPER BOUND optimal control
+                    uOptU1[0], uOptU2[0] = my_object.opt_ctrl(t, (x1[i], x2[j]),
+                                                                                        (max_deriv1[0], max_deriv2[0]))
+                        # Find magnitude of rates of changes
+                    dx_LL1[0], dx_LL2[0] = my_object.dynamics(t, (x1[i], x2[j]),
+                                                                                        (uOptL1[0], uOptL2[0]), \
+                                                                                        (dOptL1[0], dOptL2[0]))
+>>>>>>> dev_hhy
                     dx_LL1[0] = my_abs(dx_LL1[0])
                     dx_LL2[0] = my_abs(dx_LL2[0])
 
@@ -190,7 +271,11 @@ def graph_2D(my_object, g, compMethod, accuracy, generate_SpatDeriv=False, deriv
                     alpha1[0] = my_max(dx_LL1[0], dx_LU1[0])
                     alpha2[0] = my_max(dx_LL2[0], dx_LU2[0])
 
+<<<<<<< HEAD
                     dx_UL1[0], dx_UL2[0]= my_object.dynamics(t, (x1[i], x2[j]),\
+=======
+                    dx_UL1[0], dx_UL2[0] = my_object.dynamics(t, (x1[i], x2[j]),\
+>>>>>>> dev_hhy
                                                                                         (uOptU1[0], uOptU2[0]), \
                                                                                         (dOptL1[0], dOptL2[0]))
                     dx_UL1[0] = my_abs(dx_UL1[0])
@@ -205,7 +290,10 @@ def graph_2D(my_object, g, compMethod, accuracy, generate_SpatDeriv=False, deriv
                                                                                         (dOptU1[0], dOptU2[0]))
                     dx_UU1[0] = my_abs(dx_UU1[0])
                     dx_UU2[0] = my_abs(dx_UU2[0])
+<<<<<<< HEAD
 
+=======
+>>>>>>> dev_hhy
                     # Calculate alpha
                     alpha1[0] = my_max(alpha1[0], dx_UU1[0])
                     alpha2[0] = my_max(alpha2[0], dx_UU2[0])
@@ -224,6 +312,10 @@ def graph_2D(my_object, g, compMethod, accuracy, generate_SpatDeriv=False, deriv
                         max_alpha2[0] = alpha2[0]
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> dev_hhy
         # Determine time step
         delta_t = hcl.compute((1,), lambda x: step_bound(), name="delta_t")
         # Integrate
@@ -247,6 +339,7 @@ def graph_2D(my_object, g, compMethod, accuracy, generate_SpatDeriv=False, deriv
         with hcl.Stage("ComputeDeriv"):
             with hcl.for_(0, V_array.shape[0], name="i") as i:
                 with hcl.for_(0, V_array.shape[1], name="j") as j:
+<<<<<<< HEAD
                     dV_dx1_L = hcl.scalar(0, "dV_dx1_L")
                     dV_dx1_R = hcl.scalar(0, "dV_dx1_R")
                     if accuracy == "low":
@@ -261,6 +354,22 @@ def graph_2D(my_object, g, compMethod, accuracy, generate_SpatDeriv=False, deriv
                             dV_dx1_L[0], dV_dx1_R[0] = secondOrderY(i, j, V_array, g)
 
                     Deriv_array[i, j] = (dV_dx1_L[0] + dV_dx1_R[0]) / 2
+=======
+                    dV_dx_L = hcl.scalar(0, "dV_dx_L")
+                    dV_dx_R = hcl.scalar(0, "dV_dx_R")
+                    if accuracy == "low":
+                        if deriv_dim == 1:
+                            dV_dx_L[0], dV_dx_R[0] = spa_derivX(i, j, V_array, g)
+                        if deriv_dim == 2:
+                            dV_dx_L[0], dV_dx_R[0] = spa_derivY(i, j, V_array, g)
+                    if accuracy == "medium":
+                        if deriv_dim == 1:
+                            dV_dx_L[0], dV_dx_R[0] = secondOrder_ENO2D_X0(i, j, V_array, g)
+                        if deriv_dim == 2:
+                            dV_dx_L[0], dV_dx_R[0] = secondOrder_ENO2D_X1(i, j, V_array, g)
+
+                    Deriv_array[i, j] = (dV_dx_L[0] + dV_dx_R[0]) / 2
+>>>>>>> dev_hhy
 
     if generate_SpatDeriv == False:
         s = hcl.create_schedule([V_f, V_init, x1, x2, t, l0], graph_create)

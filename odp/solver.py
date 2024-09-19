@@ -2,11 +2,16 @@ import heterocl as hcl
 import numpy as np
 import time
 
-from odp.Plots import plot_isosurface
+from odp.Plots import plot_isosurface, plot_valuefunction
 
 # Backward reachable set computation library
+<<<<<<< HEAD
 from odp.computeGraphs import graph_2D, graph_3D, graph_4D, graph_5D, graph_6D, graph_7D, graph_8D
 from odp.TimeToReach import TTR_3D, TTR_4D, TTR_5D 
+=======
+from odp.computeGraphs import graph_1D, graph_2D, graph_3D, graph_4D, graph_5D, graph_6D
+from odp.TimeToReach import TTR_2D, TTR_3D, TTR_4D, TTR_5D 
+>>>>>>> dev_hhy
 
 # Value Iteration library
 from odp.valueIteration import value_iteration_3D, value_iteration_4D, value_iteration_5D, value_iteration_6D
@@ -53,8 +58,15 @@ def solveValueIteration(MDP_obj):
     # Now use the executable
     t_s = time.time()
     if MDP_obj._bounds.shape[0] == 3:
-        f(V_opt, actions, intermeds, trans, interpV, gamma, epsilon, iVals, sVals, bounds, goal, ptsEachDim, count,
-            maxIters, useNN, fillVal)
+        iter = 0
+        resweep = 1
+        while iter < MDP_obj._maxIters and resweep == 1:
+            reSweep = hcl.asarray(np.zeros([1]))
+            print("Currently at iteration {}".format(iter))
+            f(V_opt, actions, intermeds, trans, interpV, gamma, epsilon, reSweep, iVals, sVals, bounds, goal, ptsEachDim, count,
+                maxIters, useNN, fillVal)
+            iter += 1
+            resweep = reSweep.asnumpy()[0]
     else:
         f(V_opt, actions, intermeds, trans, interpV, gamma, epsilon, iVals, sVals, bounds, goal, ptsEachDim, count,
           maxIters, useNN)
@@ -142,7 +154,12 @@ def HJSolver(dynamics_obj, grid, multiple_value, tau, compMethod,
 
     # Array for each state values
     list_x1 = np.reshape(grid.vs[0], grid.pts_each_dim[0])
+<<<<<<< HEAD
     list_x2 = np.reshape(grid.vs[1], grid.pts_each_dim[1])
+=======
+    if grid.dims >= 2:
+        list_x2 = np.reshape(grid.vs[1], grid.pts_each_dim[1])
+>>>>>>> dev_hhy
     if grid.dims >= 3:
         list_x3 = np.reshape(grid.vs[2], grid.pts_each_dim[2])
     if grid.dims >= 4:
@@ -158,7 +175,12 @@ def HJSolver(dynamics_obj, grid, multiple_value, tau, compMethod,
 
     # Convert state arrays to hcl array type
     list_x1 = hcl.asarray(list_x1)
+<<<<<<< HEAD
     list_x2 = hcl.asarray(list_x2)
+=======
+    if grid.dims >= 2:
+        list_x2 = hcl.asarray(list_x2)
+>>>>>>> dev_hhy
     if grid.dims >= 3:
         list_x3 = hcl.asarray(list_x3)
     if grid.dims >= 4:
@@ -173,6 +195,12 @@ def HJSolver(dynamics_obj, grid, multiple_value, tau, compMethod,
         list_x8 = hcl.asarray(list_x8)
 
     # Get executable, obstacle check intial value function
+<<<<<<< HEAD
+=======
+    if grid.dims == 1:
+        solve_pde = graph_1D(dynamics_obj, grid, compMethod["TargetSetMode"], accuracy)
+
+>>>>>>> dev_hhy
     if grid.dims == 2:
         solve_pde = graph_2D(dynamics_obj, grid, compMethod["TargetSetMode"], accuracy)
 
@@ -229,6 +257,11 @@ def HJSolver(dynamics_obj, grid, multiple_value, tau, compMethod,
             start = time.time()
 
             # Run the execution and pass input into graph
+<<<<<<< HEAD
+=======
+            if grid.dims == 1:
+                solve_pde(V_1, V_0, list_x1, t_minh, l0)
+>>>>>>> dev_hhy
             if grid.dims == 2:
                 solve_pde(V_1, V_0, list_x1, list_x2, t_minh, l0)
             if grid.dims == 3:
@@ -290,7 +323,16 @@ def HJSolver(dynamics_obj, grid, multiple_value, tau, compMethod,
     ##################### PLOTTING #####################
     if plot_option.do_plot :
         # Only plots last value array for now
-        plot_isosurface(grid, V_1.asnumpy(), plot_option)
+        if plot_option.plot_type == "set":
+            if saveAllTimeSteps is True:
+                plot_isosurface(grid, valfuncs, plot_option)
+            else:
+                plot_isosurface(grid, V_1.asnumpy(), plot_option)
+        elif plot_option.plot_type == "value":
+            if saveAllTimeSteps is True:
+                plot_valuefunction(grid, valfuncs, plot_option)
+            else:
+                plot_valuefunction(grid, V_1.asnumpy(), plot_option)
 
     if saveAllTimeSteps is True:
         valfuncs[..., 0] = V_1.asnumpy()
@@ -314,8 +356,10 @@ def TTRSolver(dynamics_obj, grid, init_value, epsilon, plot_option):
 
     # Re-shape states vector
     list_x1 = np.reshape(grid.vs[0], grid.pts_each_dim[0])
-    list_x2 = np.reshape(grid.vs[1], grid.pts_each_dim[1])
-    list_x3 = np.reshape(grid.vs[2], grid.pts_each_dim[2])
+    if grid.dims >= 2:
+        list_x2 = np.reshape(grid.vs[1], grid.pts_each_dim[1])
+    if grid.dims >= 3:
+        list_x3 = np.reshape(grid.vs[2], grid.pts_each_dim[2])
     if grid.dims >= 4:
         list_x4 = np.reshape(grid.vs[3], grid.pts_each_dim[3])
     if grid.dims >= 5:
@@ -325,8 +369,10 @@ def TTRSolver(dynamics_obj, grid, init_value, epsilon, plot_option):
 
     # Convert states vector to hcl array type
     list_x1 = hcl.asarray(list_x1)
-    list_x2 = hcl.asarray(list_x2)
-    list_x3 = hcl.asarray(list_x3)
+    if grid.dims >= 2:
+        list_x2 = hcl.asarray(list_x2)
+    if grid.dims >= 3:
+        list_x3 = hcl.asarray(list_x3)
     if grid.dims >= 4:
         list_x4 = hcl.asarray(list_x4)
     if grid.dims >= 5:
@@ -335,7 +381,10 @@ def TTRSolver(dynamics_obj, grid, init_value, epsilon, plot_option):
         list_x6 = hcl.asarray(list_x6)
 
     # Get executable
-
+    # if grid.dims == 1:
+    #     solve_TTR = TTR_1D(dynamics_obj, grid)
+    if grid.dims == 2:
+        solve_TTR = TTR_2D(dynamics_obj, grid)
     if grid.dims == 3:
         solve_TTR = TTR_3D(dynamics_obj, grid)
     if grid.dims == 4:
@@ -356,6 +405,10 @@ def TTRSolver(dynamics_obj, grid, init_value, epsilon, plot_option):
     while error > epsilon:
         print("Iteration: {} Error: {}".format(count, error))
         count += 1
+        if grid.dims == 1:
+            solve_TTR(V_0, list_x1)
+        if grid.dims == 2:
+            solve_TTR(V_0, list_x1, list_x2)
         if grid.dims == 3:
             solve_TTR(V_0, list_x1, list_x2, list_x3)
         if grid.dims == 4:
@@ -371,7 +424,13 @@ def TTRSolver(dynamics_obj, grid, init_value, epsilon, plot_option):
     print("Finished solving\n")
 
     ##################### PLOTTING #####################
-    plot_isosurface(grid, V_0.asnumpy(), plot_option)
+    if plot_option.do_plot :
+        # Only plots last value array for now
+        if plot_option.plot_type == "set":
+            plot_isosurface(grid, V_0.asnumpy(), plot_option)
+        elif plot_option.plot_type == "value":
+            plot_valuefunction(grid, V_0.asnumpy(), plot_option)
+
     return V_0.asnumpy()
 
 def computeSpatDerivArray(grid, V, deriv_dim, accuracy="low"):
@@ -386,6 +445,12 @@ def computeSpatDerivArray(grid, V, deriv_dim, accuracy="low"):
     spatial_deriv = hcl.asarray(np.zeros(tuple(grid.pts_each_dim)))
 
     # Get executable, obstacle check intial value function
+<<<<<<< HEAD
+=======
+    if grid.dims == 1:
+        compute_SpatDeriv = graph_1D(None, grid, "None", accuracy,
+                                     generate_SpatDeriv=True, deriv_dim=deriv_dim)
+>>>>>>> dev_hhy
     if grid.dims == 2:
         compute_SpatDeriv = graph_2D(None, grid, "None", accuracy,
                                      generate_SpatDeriv=True, deriv_dim=deriv_dim)

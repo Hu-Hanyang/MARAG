@@ -1,7 +1,12 @@
 import heterocl as hcl
 from odp.computeGraphs.CustomGraphFunctions import *
+<<<<<<< HEAD
 from odp.spatialDerivatives.first_orderENO6D import *
 from odp.spatialDerivatives.second_orderENO6D import *
+=======
+from odp.spatialDerivatives.firstOrderENO.first_orderENO6D import *
+from odp.spatialDerivatives.secondOrderENO.second_orderENO6D import *
+>>>>>>> dev_hhy
 
 ########################## 6D graph definition ########################
 
@@ -30,6 +35,7 @@ def graph_6D(my_object, g, compMethod, accuracy, generate_SpatDeriv=False, deriv
         # deriv_diff6 = hcl.compute(V_init.shape, lambda *x: 0, "deriv_diff6")
 
         # These variables are used to dissipation calculation
+<<<<<<< HEAD
         max_alpha1 = hcl.scalar(my_object.speed_a, "max_alpha1")
         max_alpha2 = hcl.scalar(my_object.speed_a, "max_alpha2")
         max_alpha3 = hcl.scalar(my_object.speed_d, "max_alpha3")  #Hanyang: modify this to be consistent with dynamics 
@@ -38,6 +44,16 @@ def graph_6D(my_object, g, compMethod, accuracy, generate_SpatDeriv=False, deriv
         # max_alpha4 = hcl.scalar(my_object.speed_a, "max_alpha4")
         max_alpha5 = hcl.scalar(my_object.speed_d, "max_alpha5")
         max_alpha6 = hcl.scalar(my_object.speed_d, "max_alpha6")
+=======
+        max_alpha1 = hcl.scalar(my_object.attackers.speed, "max_alpha1")
+        max_alpha2 = hcl.scalar(my_object.attackers.speed, "max_alpha2")
+        max_alpha3 = hcl.scalar(my_object.defenders.speed, "max_alpha3")  #Hanyang: modify this to be consistent with dynamics 
+        max_alpha4 = hcl.scalar(my_object.defenders.speed, "max_alpha4")
+        # max_alpha3 = hcl.scalar(my_object.attackers.speed, "max_alpha3")  
+        # max_alpha4 = hcl.scalar(my_object.attackers.speed, "max_alpha4")
+        max_alpha5 = hcl.scalar(my_object.defenders.speed, "max_alpha5")
+        max_alpha6 = hcl.scalar(my_object.defenders.speed, "max_alpha6")
+>>>>>>> dev_hhy
 
         def step_bound():  # Function to calculate time step
             stepBoundInv = hcl.scalar(0, "stepBoundInv")
@@ -118,6 +134,7 @@ def graph_6D(my_object, g, compMethod, accuracy, generate_SpatDeriv=False, deriv
                                         dV_dx4_L[0], dV_dx4_R[0] = spa_derivX4_6d(i, j, k, l, m, n, V_init, g)
                                         dV_dx5_L[0], dV_dx5_R[0] = spa_derivX5_6d(i, j, k, l, m, n, V_init, g)
                                         dV_dx6_L[0], dV_dx6_R[0] = spa_derivX6_6d(i, j, k, l, m, n, V_init, g)
+<<<<<<< HEAD
                                     if accuracy == "high":
                                         dV_dx1_L[0], dV_dx1_R[0] = secondOrderX1_6d(i, j, k, l, m, n, V_init, g)
                                         dV_dx2_L[0], dV_dx2_R[0] = secondOrderX2_6d(i, j, k, l, m, n, V_init, g)
@@ -125,6 +142,16 @@ def graph_6D(my_object, g, compMethod, accuracy, generate_SpatDeriv=False, deriv
                                         dV_dx4_L[0], dV_dx4_R[0] = secondOrderX4_6d(i, j, k, l, m, n, V_init, g)
                                         dV_dx5_L[0], dV_dx5_R[0] = secondOrderX5_6d(i, j, k, l, m, n, V_init, g)
                                         dV_dx6_L[0], dV_dx6_R[0] = secondOrderX6_6d(i, j, k, l, m, n, V_init, g)
+=======
+                                    if accuracy == "medium":
+                                        dV_dx1_L[0], dV_dx1_R[0] = secondOrder_ENO6D_X0(i, j, k, l, m, n, V_init, g)
+                                        dV_dx2_L[0], dV_dx2_R[0] = secondOrder_ENO6D_X1(i, j, k, l, m, n, V_init, g)
+                                        dV_dx3_L[0], dV_dx3_R[0] = secondOrder_ENO6D_X2(i, j, k, l, m, n, V_init, g)
+                                        dV_dx4_L[0], dV_dx4_R[0] = secondOrder_ENO6D_X3(i, j, k, l, m, n, V_init, g)
+                                        dV_dx5_L[0], dV_dx5_R[0] = secondOrder_ENO6D_X4(i, j, k, l, m, n, V_init, g)
+                                        dV_dx6_L[0], dV_dx6_R[0] = secondOrder_ENO6D_X5(i, j, k, l, m, n, V_init, g)
+
+>>>>>>> dev_hhy
 
                                     # Saves spatial derivative diff into tables
                                     deriv_diff1[0] = dV_dx1_R[0] - dV_dx1_L[0]
@@ -159,6 +186,7 @@ def graph_6D(my_object, g, compMethod, accuracy, generate_SpatDeriv=False, deriv
                                                 dV_dx4[0] + dx5_dt * dV_dx5[0] + dx6_dt * dV_dx6[0])
 
                                     # Directly add the dissipation here
+<<<<<<< HEAD
                                     alpha1 = hcl.scalar(my_object.speed_a, "alpha1")
                                     alpha2 = hcl.scalar(my_object.speed_a, "alpha2")  
                                     alpha3 = hcl.scalar(my_object.speed_d, "alpha3")  # Hanyang: modify this to be consistent with dynamics
@@ -167,6 +195,16 @@ def graph_6D(my_object, g, compMethod, accuracy, generate_SpatDeriv=False, deriv
                                     # alpha4 = hcl.scalar(my_object.speed_a, "alpha4")
                                     alpha5 = hcl.scalar(my_object.speed_d, "alpha5")
                                     alpha6 = hcl.scalar(my_object.speed_d, "alpha6")
+=======
+                                    alpha1 = hcl.scalar(my_object.attackers.speed, "alpha1")
+                                    alpha2 = hcl.scalar(my_object.attackers.speed, "alpha2")  
+                                    alpha3 = hcl.scalar(my_object.defenders.speed, "alpha3")  # Hanyang: modify this to be consistent with dynamics
+                                    alpha4 = hcl.scalar(my_object.defenders.speed, "alpha4")
+                                    # alpha3 = hcl.scalar(my_object.attackers.speed, "alpha3")
+                                    # alpha4 = hcl.scalar(my_object.attackers.speed, "alpha4")
+                                    alpha5 = hcl.scalar(my_object.defenders.speed, "alpha5")
+                                    alpha6 = hcl.scalar(my_object.defenders.speed, "alpha6")
+>>>>>>> dev_hhy
 
                                     diss = hcl.scalar(0, "diss")
                                     diss[0] = 0.5 * (deriv_diff1[0] * alpha1[0] + deriv_diff2[0] * alpha2[0] \
@@ -403,6 +441,7 @@ def graph_6D(my_object, g, compMethod, accuracy, generate_SpatDeriv=False, deriv
                                             dV_dx_L[0], dV_dx_R[0] = spa_derivX6_6d(i, j, k, l, m, n, V_init, g)
                                     if accuracy == "medium":
                                         if deriv_dim == 1:
+<<<<<<< HEAD
                                             dV_dx_L[0], dV_dx_R[0] = secondOrderX1_6d(i, j, k, l, m, n, V_init, g)
                                         if deriv_dim == 2:
                                             dV_dx_L[0], dV_dx_R[0] = secondOrderX2_6d(i, j, k, l, m, n, V_init, g)
@@ -414,6 +453,19 @@ def graph_6D(my_object, g, compMethod, accuracy, generate_SpatDeriv=False, deriv
                                             dV_dx_L[0], dV_dx_R[0] = secondOrderX5_6d(i, j, k, l, m, n, V_init, g)
                                         if deriv_dim == 6:
                                             dV_dx_L[0], dV_dx_R[0] = secondOrderX6_6d(i, j, k, l, m, n, V_init, g)
+=======
+                                            dV_dx_L[0], dV_dx_R[0] = secondOrder_ENO6D_X0(i, j, k, l, m, n, V_init, g)
+                                        if deriv_dim == 2:
+                                            dV_dx_L[0], dV_dx_R[0] = secondOrder_ENO6D_X1(i, j, k, l, m, n, V_init, g)
+                                        if deriv_dim == 3:
+                                            dV_dx_L[0], dV_dx_R[0] = secondOrder_ENO6D_X2(i, j, k, l, m, n, V_init, g)
+                                        if deriv_dim == 4:
+                                            dV_dx_L[0], dV_dx_R[0] = secondOrder_ENO6D_X3(i, j, k, l, m, n, V_init, g)
+                                        if deriv_dim == 5:
+                                            dV_dx_L[0], dV_dx_R[0] = secondOrder_ENO6D_X4(i, j, k, l, m, n, V_init, g)
+                                        if deriv_dim == 6:
+                                            dV_dx_L[0], dV_dx_R[0] = secondOrder_ENO6D_X5(i, j, k, l, m, n, V_init, g)
+>>>>>>> dev_hhy
 
                                     Deriv_array[i, j, k, l, m, n] = (dV_dx_L[0] + dV_dx_R[0]) / 2
 
