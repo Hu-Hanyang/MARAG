@@ -43,10 +43,10 @@ print(f"The dynamics is done.")
 # 2. Initialize the grid
 min_bounds = np.array([-6.5, 4.0, -0.1, 0.0]) 
 max_bounds = np.array([5.0, 15.0, 0.8, 2*np.pi]) 
-num_x = 10  # 231
-num_y = 10  # 220
-num_speed = 10  # 50
-num_theta = 10  # 50
+num_x = 231
+num_y = 220
+num_speed = 50
+num_theta = 50
 pts_each_dim = np.array([num_x, num_y, num_speed, num_theta]) 
 grid = Grid(min_bounds, max_bounds, 4, pts_each_dim, [3])
 
