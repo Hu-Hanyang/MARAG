@@ -1,4 +1,5 @@
-# %%
+import pdb
+pdb.set_trace()
 import os
 import gc
 import time
@@ -92,7 +93,7 @@ ttr_info = {"dyn.z_dim": 4,
             "recover_ttr_from_brt": False,}
 
 ttr_info_hash = get_hash(ttr_info)
-costmapinfo = [561.0, 231.0, 0.05, -6.5, -13.0]
+costmapinfo = [220.0, 231.0, 0.05, -6.5, -13.0]
 np.savez(
     f"ttr_{ttr_info_hash}",
     ttr_values=ttr_values,
