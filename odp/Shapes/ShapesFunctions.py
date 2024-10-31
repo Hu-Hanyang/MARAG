@@ -65,9 +65,10 @@ def Lower_Half_Space(grid, dim, value):
                     of size grid.pts_each_dim
     """
     data = np.zeros(grid.pts_each_dim)
-    for i in range(grid.dims):
-        if i == dim:
-            data += grid.vs[i] - value
+    data += grid.vs[dim] - value
+    # for i in range(grid.dims):
+    #     if i == dim:
+    #         data += grid.vs[i] - value
     return data
 
 
@@ -84,9 +85,10 @@ def Upper_Half_Space(grid, dim, value):
                     of size grid.pts_each_dim
     """
     data = np.zeros(grid.pts_each_dim)
-    for i in range(grid.dims):
-        if i == dim:
-            data += -grid.vs[i] + value
+    # for i in range(grid.dims):
+    #     if i == dim:
+    data += -grid.vs[dim] + value
+            
     return data
 
 def Union(shape1, shape2):
