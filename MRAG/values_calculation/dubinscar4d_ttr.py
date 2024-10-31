@@ -43,11 +43,11 @@ def compute_4d_ttr(ttr_whole_map=False):
     if ttr_whole_map: 
         # in theory the speed ranges from [-0.1, 0.8], we extend this range to make sure the extremes are covered
         min_bounds = np.array([-6.5, -13.0, -0.3, 0.0])  
-        costmapinfo = [561.0, 231.0, 0.05, -6.5, 4.0]
+        costmapinfo = [561.0, 231.0, 0.05, -6.5, -13.0]
         num_y = 561
     else:
         min_bounds = np.array([-6.5, 4.0, -0.3, 0.0])
-        costmapinfo = [220.0, 231.0, 0.05, -6.5, -13.0]  
+        costmapinfo = [220.0, 231.0, 0.05, -6.5, 4.0]  
         num_y = 220 
         
     max_bounds = np.array([5.0, 15.0, 1.0, 2*np.pi]) 
@@ -68,7 +68,8 @@ def compute_4d_ttr(ttr_whole_map=False):
     speed_obs1 = ShapeRectangle(grid, 
                                 [min_bounds.copy()[0], min_bounds.copy()[1], -0.3, min_bounds.copy()[3]],
                                 [max_bounds.copy()[0], max_bounds.copy()[1], -0.15, max_bounds.copy()[3]])
-    speed_obs2 = ShapeRectangle(grid, [min_bounds.copy()[0], min_bounds.copy()[1], 0.85, min_bounds.copy()[3]],
+    speed_obs2 = ShapeRectangle(grid,
+                                [min_bounds.copy()[0], min_bounds.copy()[1], 0.85, min_bounds.copy()[3]],
                                 [max_bounds.copy()[0], max_bounds.copy()[1], 1.0, max_bounds.copy()[3]])  
     speed_obs = np.minimum(speed_obs1, speed_obs2)
     del speed_obs1
@@ -79,7 +80,15 @@ def compute_4d_ttr(ttr_whole_map=False):
     TTR_values = []
     start_time = time.time()
     for goal in goals:
-        goal_region = CylinderShape(grid, [2,3], goal, 0.5)
+        xy_goal = CylinderShape(grid, [2,3], goal, 0.5)
+        speed_lower = Lower_Half_Space(grid, 2, 0.4)
+        speed_upper = Upper_Half_Space(grid, 2, 0.0)
+        speed_goal = Intersection(speed_lower, speed_upper)
+        goal_region = Intersection(xy_goal, speed_goal)
+        del xy_goal
+        del speed_lower
+        del speed_upper
+        del speed_goal
         ttr_value = TTRSolver(dyn,
                             grid,
                             [goal_region, speed_obs],
